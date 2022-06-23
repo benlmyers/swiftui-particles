@@ -6,13 +6,13 @@
 
 ```swift
 var body: some View {
-  Emitter(from: .center, to: .trailing) {
-    Confetti(.rainbow)
+  Emitter(from: .center, to: .trailing) { // Emit particles from the center of the view to the right side of the view
+    Confetti(.rainbow) // Emit rainbow confetti
   }
-  .emitVelocity(x: 100.0, y: -100.0)
-  .emitForever(intensity: 20)
-  .particleLifetime(0.75)
-  .emitSpread(0.4)
+  .emitVelocity(x: 100.0, y: -100.0) // Emit up and to the right initially
+  .emitForever(intensity: 20) // Emit 20 particles forever
+  .particleLifetime(0.75) // Each particle will have an animate 0.75s
+  .emitSpread(0.4) // The particles will spread out as they are emitted
 }
 ```
 
