@@ -42,5 +42,7 @@ struct ParticleView<P>: View where P: Particle {
     }
     .onAppear { animate = true }
     .animation(.linear(duration: duration).delay(0.01).forever(forever, autoreverses: false).delay(delay), value: animate)
+    .opacity(animate ? 1.0 : 0.0)
+    .animation(.linear.delay(delay), value: animate)
   }
 }

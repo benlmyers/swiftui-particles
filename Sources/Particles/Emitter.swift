@@ -16,6 +16,7 @@ public struct Emitter<P>: View where P: Particle {
   let end: UnitPoint
   var velocity: CGVector = .init(dx: 0.0, dy: 0.0)
   var duration: TimeInterval = 1.0
+  var delay: TimeInterval = 0.0
   var volume: Int = 10
   var spread: Double = 0.1
   var interval: TimeInterval = 0.1
@@ -42,7 +43,7 @@ public struct Emitter<P>: View where P: Particle {
                        end: modifiedEnd,
                        duration: duration,
                        forever: forever,
-                       delay: interval * Double(i))
+                       delay: interval * Double(i) + delay)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
       }
@@ -61,8 +62,8 @@ public struct Emitter<P>: View where P: Particle {
   public init(from start: UnitPoint = .center,
               to end: UnitPoint = .topTrailing,
               isEmitting: Binding<Bool> = .constant(true),
-              particle: @escaping () -> P)
-  {
+              particle: @escaping () -> P
+  ) {
     self.start = start
     self.end = end
     self.particle = particle()
@@ -129,6 +130,17 @@ public extension Emitter {
   func emitSpread(_ value: Double) -> Emitter {
     var copy = self
     copy.spread = value
+    return copy
+  }
+  
+  /**
+   Delays the emitter's animation.
+   
+   - parameter value: The delay to apply.
+   */
+  func emitDelay(_ value: TimeInterval) -> Emitter {
+    var copy = self
+    copy.delay = value
     return copy
   }
   
