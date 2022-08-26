@@ -47,6 +47,9 @@ public struct Emitter<P>: View where P: Particle {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
       }
+      .padding(100.0)
+      .drawingGroup()
+      .padding(-100.0)
     }
   }
   
