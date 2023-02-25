@@ -34,7 +34,6 @@ public struct Emoji: Particle {
     Group {
       Text(emoji)
       .frame(width: size, height: size)
-      .rotationEffect(animate.wrappedValue ? .zero : .tau)
       .animation(.linear(duration: .random(in: 2.0 ... 8.0)).forever(forever, autoreverses: false).delay(delay), value: animate.wrappedValue)
       .animation(.linear(duration: .random(in: 1.0 ... 4.0)).forever(forever, autoreverses: false).delay(delay), value: animate.wrappedValue)
     }
