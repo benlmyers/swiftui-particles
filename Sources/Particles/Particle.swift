@@ -14,8 +14,6 @@ public protocol Particle {
   
   // MARK: - Properties
 
-  /// The color of the particle.
-  var colors: [Color]? { get set }
   /// The size of the particle.
   var size: ParticleSize { get set }
   
