@@ -8,7 +8,18 @@
 import SwiftUI
 import Foundation
 
-struct ParticleSystem: View {
+struct SampleView: View {
+  
+  // MARK: - Views
+  
+  var body: some View {
+    VStack {
+      Text("test")
+    }
+  }
+}
+
+struct ParticleSystem<Content>: View where Content: View {
   
   // MARK: - Parameters
   
@@ -18,31 +29,42 @@ struct ParticleSystem: View {
   var colorMode: ColorRenderingMode = .nonLinear
   /// Whether to render the particles asynchronously.
   var async: Bool = true
+  /// The (tagged) views the system will render.
+  var views: () -> Content
   
-  // MARK: - Properties
+  // MARK: - State
   
   /// The underlying physics for the particle system.
   @State var entities: [Entity] = []
-  /// The views the system shall render.
-  @State var views: [AnyView] = []
   
   // MARK: - Views
   
   var body: some View {
     TimelineView(.animation(paused: paused)) { t in
-      Canvas(opaque: true, colorMode: colorMode, rendersAsynchronously: async, renderer: renderer) {
-        Text("x").tag(0)
-      }
+      Canvas(opaque: true, colorMode: colorMode, rendersAsynchronously: async, renderer: renderer, symbols: views)
+        .onChange(of: t.date) { date in
+          update()
+        }
     }
-  }
-  
-  func renderer(context: inout GraphicsContext, size: CGSize) {
-    
   }
   
   // MARK: - Methods
   
-  func calculate() {
+  func renderer(context: inout GraphicsContext, size: CGSize) {
+    for entity in entities {
+      context.drawLayer { context in
+        if let resolved = context.resolveSymbol(id: entity.id) {
+          
+        }
+      }
+    }
+  }
+  
+  func register(entity: Entity) {
+    entities.append(entity)
+  }
+  
+  func update() {
     var toRemove: [Entity.ID] = []
     for entity in entities {
       entity.update()
@@ -54,26 +76,40 @@ struct ParticleSystem: View {
   }
 }
 
+struct AnyParticleSystem {
+  
+}
+
 class Entity: Identifiable {
   
   // MARK: - Properties
   
+  /// The entity's ID.
   var id: UUID
+  /// The entity's position.
   var pos: CGPoint
+  /// The entity's velocity.
   var vel: CGVector
+  /// The entity's acceleration.
   var acc: CGVector
+  /// The entity's size.
   var size: CGSize
+  /// When the entity is to be destroyed.
   var expiration: Date
+  
+  /// A method that registers the entity in a particle system.
+  var register: () -> Void
   
   // MARK: - Initalizers
   
-  init(p0: CGPoint, v0: CGVector = .zero, a: CGVector = .zero, size: CGSize = .init(width: 5.0, height: 5.0), expiration: Date) {
+  init(p0: CGPoint, v0: CGVector = .zero, a: CGVector = .zero, size: CGSize = .init(width: 5.0, height: 5.0), expiration: Date, register: @escaping () -> Void) {
     self.id = UUID()
     self.pos = p0
     self.vel = v0
     self.acc = a
     self.size = size
     self.expiration = expiration
+    self.register = register
   }
   
   // MARK: - Methods
@@ -111,11 +147,11 @@ class Emitter: Entity {
   
   // MARK: - Initalizers
   
-  init(p0: CGPoint, v0: CGVector = .zero, a: CGVector = .zero, size: CGSize = .zero, fire: Bool = true, rate: Double, lifetime: TimeInterval = 3.0) {
+  init(p0: CGPoint, v0: CGVector = .zero, a: CGVector = .zero, size: CGSize = .zero, fire: Bool = true, rate: Double, lifetime: TimeInterval = 3.0, register: @escaping () -> Void) {
     self.fire = fire
     self.rate = rate
     self.lifetime = lifetime
-    super.init(p0: p0, v0: v0, a: a, size: size, expiration: Date.distantFuture)
+    super.init(p0: p0, v0: v0, a: a, size: size, expiration: Date.distantFuture, register: register)
   }
   
   // MARK: - Methods
@@ -125,8 +161,10 @@ class Emitter: Entity {
       guard Date().timeIntervalSince(lastFire) < 1.0 / rate else { return }
     }
     let vel = fireVelocity(count, Date().timeIntervalSince(inception))
-    let particle = Particle(p0: self.pos, v0: ignoreInheritedVelocity ? vel : vel.add(self.vel), expiration: Date() + lifetime)
+    let particle = Particle(p0: self.pos, v0: ignoreInheritedVelocity ? vel : vel.add(self.vel), expiration: Date() + lifetime, register: register)
+    particles.append(particle)
     lastFire = Date()
+    count += 1
   }
 }
 
@@ -137,6 +175,6 @@ class Particle: Entity {
 
 struct ParticleSystem_Previews: PreviewProvider {
   static var previews: some View {
-    ParticleSystem()
+    SampleView()
   }
 }
