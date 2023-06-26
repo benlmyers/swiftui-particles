@@ -20,6 +20,7 @@ struct ContentView: View {
           Text("x")
           Text("o")
         }
+        .emitVelocity(.init(dx: 1.0, dy: 1.0))
         Emitter {
           Text("x")
           Text("o")

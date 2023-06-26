@@ -20,7 +20,9 @@ fileprivate struct SampleView: View {
           Text("x")
           Text("o")
         }
+        .emitVelocity(.init(dx: 1, dy: 0))
       }
+      .debug()
     }
   }
 }
@@ -35,11 +37,11 @@ public struct ParticleSystem<Content>: View where Content: View {
   var colorMode: ColorRenderingMode = .nonLinear
   /// Whether to render the particles asynchronously.
   var async: Bool = true
+  /// Whether to show elements of the system for debugging.
+  var _debug: Bool = false
   
   /// The system's distinct views to render.
   var views: Box<[Content]> = .init([])
-  /// A map of view indices to entity IDs.
-  var idMap: Box<[Entity<Content>.ID: Int]> = .init([:])
   
   // MARK: - State
   
@@ -55,6 +57,8 @@ public struct ParticleSystem<Content>: View where Content: View {
           views.item[i].tag(i)
         }
       }
+      .frame(width: 200.0, height: 200.0)
+      .border(Color.red.opacity(_debug ? 0.5 : 0.0))
       .opacity(t.date == Date() ? 1.0 : 1.0)
       .onChange(of: t.date) { date in
         update()
@@ -71,8 +75,16 @@ public struct ParticleSystem<Content>: View where Content: View {
     }
     for entity in self.entities {
       entity.views = self.views
-      entity.idMap = self.idMap
     }
+  }
+  
+  public init(copying system: ParticleSystem) {
+    self.async = system.async
+    self.colorMode = system.colorMode
+    self.entities = system.entities
+    self.paused = system.paused
+    self.views = system.views
+    self._debug = system._debug
   }
   
   // MARK: - Methods
@@ -94,6 +106,15 @@ public struct ParticleSystem<Content>: View where Content: View {
       entity.update()
     }
     //entities.removeAll(where: { toRemove.contains($0.id) })
+  }
+}
+
+public extension ParticleSystem {
+  
+  func debug() -> ParticleSystem {
+    var new = ParticleSystem(copying: self)
+    new._debug = true
+    return new
   }
 }
 
@@ -266,6 +287,22 @@ public class Emitter<Content>: Entity<Content> where Content: View {
     self.particles.append(particle)
     lastFire = Date()
     count += 1
+  }
+}
+
+public extension Emitter {
+  
+  func emitVelocity(_ velocity: CGVector) -> Emitter {
+    self.fireVelocity = { _, _ in return velocity }
+    return self
+  }
+  
+  func emitVelocity(_ velocityFromParticleCount: @escaping (Int) -> CGVector) {
+    self.fireVelocity = { i, _ in return velocityFromParticleCount(i) }
+  }
+  
+  func emitVelocity(_ velocityFromTimeAlive: @escaping (TimeInterval) -> CGVector) {
+    self.fireVelocity = { _, t in return velocityFromTimeAlive(t) }
   }
 }
 
