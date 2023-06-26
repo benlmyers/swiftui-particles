@@ -15,10 +15,10 @@ struct ContentView: View {
         .imageScale(.large)
         .foregroundColor(.accentColor)
       Text("Hello, world!")
-      ParticleSystem(d: true) {
+      ParticleSystem {
         Emitter {
-          Text("x")
-          Text("o")
+          Text("🚀")
+          Text("⭐️")
         }
         .particlesInheritVelocity(false)
         .initialVelocity(x: 0.0, y: 1.0)
@@ -27,6 +27,7 @@ struct ContentView: View {
           Text("x")
           Text("o")
         }
+        .initialVelocity(x: 2.0, y: 2.0)
       }
     }
     .padding()
