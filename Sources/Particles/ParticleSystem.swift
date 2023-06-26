@@ -38,7 +38,7 @@ public struct ParticleSystem<Content>: View where Content: View {
   
   /// The system's distinct views to render.
   var views: Box<[Content]> = .init([])
-  /// A map of entity IDs to view indices.
+  /// A map of view indices to entity IDs.
   var idMap: Box<[Entity<Content>.ID: Int]> = .init([:])
   
   // MARK: - State
@@ -51,10 +51,11 @@ public struct ParticleSystem<Content>: View where Content: View {
   public var body: some View {
     TimelineView(.animation(paused: paused)) { t in
       Canvas(opaque: true, colorMode: colorMode, rendersAsynchronously: async, renderer: renderer) {
-        ForEach(0 ..< views.item.count) { i in
+        ForEach(0 ..< views.item.count, id: \.self) { i in
           views.item[i].tag(i)
         }
       }
+      .opacity(t.date == Date() ? 1.0 : 1.0)
       .onChange(of: t.date) { date in
         update()
       }
@@ -185,8 +186,11 @@ public class Emitter<Content>: Entity<Content> where Content: View {
   /// The lifetime to give fired particles.
   var lifetime: TimeInterval = 5.0
   
-  /// The prototypical views that this emitter creates particles for.
+  /// The prototypical views that this emitter creates particles for, and their respective system view indices.
   var protos: [Content]
+  /// The base index registered in the particle system for prototypical views.
+  var baseIndex: Int?
+  
   /// The particles fired by the emitter.
   var particles: [Particle<Content>] = []
   /// The fire velocity. This may be determined by the amount of particles fired and the amount of time since the emitter was created.
@@ -209,9 +213,10 @@ public class Emitter<Content>: Entity<Content> where Content: View {
     self.chooser = { _, _ in return Int.random(in: 0 ..< views.count) }
     super.init()
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.00001) {
-      guard var _views = self.views, var _idMap = self.idMap else {
+      guard let _views = self.views, let _idMap = self.idMap else {
         fatalError("The particle system could not be accessed by the particle.")
       }
+      self.baseIndex = _views.item.count
       for view in views {
         _views.item.append(view)
         _idMap.item[self.id] = _views.item.count - 1
@@ -242,19 +247,22 @@ public class Emitter<Content>: Entity<Content> where Content: View {
     let interval: TimeInterval = Date().timeIntervalSince(inception)
     let vel: CGVector = fireVelocity(count, interval)
     let i: Int = chooser(count, interval)
-    guard var views = self.views else {
+    guard let views = self.views else {
       fatalError("The particle system could not be accessed by the particle.")
     }
     guard !views.item.isEmpty else {
-      fatalError("The particle system did not have any prototypical views.")
+      return
+      // fatalError("The particle system did not have any prototypical views.")
     }
     guard i < views.item.count else {
       fatalError("Out of bounds: Your chooser closure looked for content of index \(i), but this emitter only has content up to index \(views.item.count).")
     }
+    guard let baseIndex else {
+      fatalError("No base index was assigned.")
+    }
     let view: Content = views.item[i]
-    var particle: Particle = Particle(view, p0: pos, v0: useInheritedVelocity ? self.vel.add(vel) : vel, a: .zero)
+    let particle: Particle = Particle(view, index: baseIndex + i, p0: pos, v0: useInheritedVelocity ? self.vel.add(vel) : vel, a: .zero)
     particle.views = self.views
-    particle.idMap = self.idMap
     self.particles.append(particle)
     lastFire = Date()
     count += 1
@@ -285,12 +293,16 @@ class Particle<Content>: Entity<Content> where Content: View {
   
   // MARK: - Properties
   
+  /// The content this particle displays.
   var view: Content
+  /// The index of the graphical prototype relative to the `Emitter.proto` index.
+  var index: Int
   
   // MARK: - Initializers
   
-  init(_ view: Content, p0: CGPoint, v0: CGVector, a: CGVector) {
+  init(_ view: Content, index: Int, p0: CGPoint, v0: CGVector, a: CGVector) {
     self.view = view
+    self.index = index
     super.init(p0, v0, a)
   }
   
@@ -298,22 +310,9 @@ class Particle<Content>: Entity<Content> where Content: View {
   
   override func render(_ context: GraphicsContext) {
     context.drawLayer { context in
-      let index = resolveTagIndex(from: self.id)
       guard let resolved = context.resolveSymbol(id: index) else { return }
       context.draw(resolved, at: pos)
     }
-  }
-  
-  // MARK: - Methods
-  
-  func resolveTagIndex(from entityID: Entity.ID) -> Int {
-    guard var idMap = self.idMap else {
-      fatalError("The particle system could not be accessed by the particle.")
-    }
-    guard let i = idMap.item[entityID] else {
-      fatalError("A problem occured trying to resolve entity ID \(entityID) in the following map: \(idMap.item)")
-    }
-    return i
   }
 }
 
