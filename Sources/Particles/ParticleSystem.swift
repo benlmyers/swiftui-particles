@@ -8,25 +8,6 @@
 import SwiftUI
 import Foundation
 
-fileprivate struct SampleView: View {
-  
-  // MARK: - Views
-  
-  var body: some View {
-    VStack {
-      Text("test")
-      ParticleSystem {
-        Emitter {
-          Text("x")
-          Text("o")
-        }
-        .emitVelocity(.init(dx: 1, dy: 0))
-      }
-      .debug()
-    }
-  }
-}
-
 public struct ParticleSystem<Content>: View where Content: View {
   
   // MARK: - Properties
@@ -38,7 +19,7 @@ public struct ParticleSystem<Content>: View where Content: View {
   /// Whether to render the particles asynchronously.
   var async: Bool = true
   /// Whether to show elements of the system for debugging.
-  var _debug: Bool = false
+  var enableDebug: Bool = false
   
   /// The system's distinct views to render.
   var views: Box<[Content]> = .init([])
@@ -46,7 +27,7 @@ public struct ParticleSystem<Content>: View where Content: View {
   // MARK: - State
   
   /// The underlying physics for the particle system.
-  var entities: [Entity<Content>] = []
+  var entities: Box<[Entity<Content>]> = .init([])
   
   // MARK: - Views
   
@@ -58,7 +39,7 @@ public struct ParticleSystem<Content>: View where Content: View {
         }
       }
       .frame(width: 200.0, height: 200.0)
-      .border(Color.red.opacity(_debug ? 0.5 : 0.0))
+      .border(Color.red.opacity(enableDebug ? 1.0 : 0.1))
       .opacity(t.date == Date() ? 1.0 : 1.0)
       .onChange(of: t.date) { date in
         update()
@@ -68,36 +49,28 @@ public struct ParticleSystem<Content>: View where Content: View {
   
   // MARK: - Initalizers
   
-  public init(@ParticleSystemBuilder entities: @escaping () -> [Entity<Content>]) {
+  public init(d: Bool = false, @ParticleSystemBuilder entities: @escaping () -> [Entity<Content>]) {
     let entities = entities()
     for entity in entities {
-      self.entities.append(entity)
+      self.entities.item.append(entity)
     }
-    for entity in self.entities {
+    self.enableDebug = d
+    for entity in self.entities.item {
       entity.views = self.views
     }
-  }
-  
-  public init(copying system: ParticleSystem) {
-    self.async = system.async
-    self.colorMode = system.colorMode
-    self.entities = system.entities
-    self.paused = system.paused
-    self.views = system.views
-    self._debug = system._debug
   }
   
   // MARK: - Methods
   
   func renderer(context: inout GraphicsContext, size: CGSize) {
-    for entity in entities {
+    for entity in entities.item {
       entity.render(context)
     }
   }
   
   func update() {
     var toRemove: [Entity.ID] = []
-    for entity in entities {
+    for entity in entities.item {
       guard entity.expiration > Date() else {
         toRemove.append(entity.id)
         continue
@@ -106,15 +79,6 @@ public struct ParticleSystem<Content>: View where Content: View {
       entity.update()
     }
     //entities.removeAll(where: { toRemove.contains($0.id) })
-  }
-}
-
-public extension ParticleSystem {
-  
-  func debug() -> ParticleSystem {
-    var new = ParticleSystem(copying: self)
-    new._debug = true
-    return new
   }
 }
 
@@ -151,8 +115,6 @@ public class Entity<Content>: Identifiable, Renderable where Content: View {
   
   /// A reference to the entity's parent system of views.
   unowned var views: Box<[Content]>?
-  /// A reference to the entity's parent system's id mappings.
-  unowned var idMap: Box<[Entity<Content>.ID: Int]>?
   
   /// The entity's position.
   var pos: CGPoint = .zero
@@ -196,6 +158,19 @@ public class Entity<Content>: Identifiable, Renderable where Content: View {
   func update() {}
 }
 
+public extension Entity {
+  
+  func initialVelocity(x: CGFloat, y: CGFloat) -> Self {
+    self.vel = CGVector(dx: x, dy: y)
+    return self
+  }
+  
+  func setAcceleration(x: CGFloat, y: CGFloat) -> Self {
+    self.acc = CGVector(dx: x, dy: y)
+    return self
+  }
+}
+
 public class Emitter<Content>: Entity<Content> where Content: View {
   
   // MARK: - Properties
@@ -234,13 +209,12 @@ public class Emitter<Content>: Entity<Content> where Content: View {
     self.chooser = { _, _ in return Int.random(in: 0 ..< views.count) }
     super.init()
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.00001) {
-      guard let _views = self.views, let _idMap = self.idMap else {
+      guard let _views = self.views else {
         fatalError("The particle system could not be accessed by the particle.")
       }
       self.baseIndex = _views.item.count
       for view in views {
         _views.item.append(view)
-        _idMap.item[self.id] = _views.item.count - 1
       }
     }
   }
@@ -248,6 +222,10 @@ public class Emitter<Content>: Entity<Content> where Content: View {
   // MARK: - Override
   
   override func update() {
+    for particle in particles {
+      particle.updatePhysics()
+      particle.update()
+    }
     if let lastFire {
       guard Date().timeIntervalSince(lastFire) < 1.0 / rate else { return }
     }
@@ -292,18 +270,23 @@ public class Emitter<Content>: Entity<Content> where Content: View {
 
 public extension Emitter {
   
-  func emitVelocity(_ velocity: CGVector) -> Emitter {
-    self.fireVelocity = { _, _ in return velocity }
+  func particlesInheritVelocity(_ flag: Bool) -> Emitter {
+    self.useInheritedVelocity = flag
     return self
   }
   
-  func emitVelocity(_ velocityFromParticleCount: @escaping (Int) -> CGVector) {
-    self.fireVelocity = { i, _ in return velocityFromParticleCount(i) }
+  func emitVelocity(x: CGFloat, y: CGFloat) -> Emitter {
+    self.fireVelocity = { _, _ in return CGVector(dx: x, dy: y) }
+    return self
   }
   
-  func emitVelocity(_ velocityFromTimeAlive: @escaping (TimeInterval) -> CGVector) {
-    self.fireVelocity = { _, t in return velocityFromTimeAlive(t) }
-  }
+//  func emitVelocity(_ velocityFromParticleCount: @escaping (Int) -> CGVector) {
+//    self.fireVelocity = { i, _ in return velocityFromParticleCount(i) }
+//  }
+//
+//  func emitVelocity(_ velocityFromTimeAlive: @escaping (TimeInterval) -> CGVector) {
+//    self.fireVelocity = { _, t in return velocityFromTimeAlive(t) }
+//  }
 }
 
 @resultBuilder
@@ -350,11 +333,5 @@ class Particle<Content>: Entity<Content> where Content: View {
       guard let resolved = context.resolveSymbol(id: index) else { return }
       context.draw(resolved, at: pos)
     }
-  }
-}
-
-struct ParticleSystem_Previews: PreviewProvider {
-  static var previews: some View {
-    SampleView()
   }
 }
