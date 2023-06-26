@@ -15,6 +15,11 @@ struct SampleView: View {
   var body: some View {
     VStack {
       Text("test")
+      ParticleSystem(views: {
+        Text("A").tag("A")
+      }) {
+        
+      }
     }
   }
 }
@@ -24,11 +29,11 @@ struct ParticleSystem<Content>: View where Content: View {
   // MARK: - Parameters
   
   /// Whether the system's animation is paused.
-  var paused: Bool = false
+  var paused: Bool
   /// The color mode of the renderer.
-  var colorMode: ColorRenderingMode = .nonLinear
+  var colorMode: ColorRenderingMode
   /// Whether to render the particles asynchronously.
-  var async: Bool = true
+  var async: Bool
   /// The (tagged) views the system will render.
   var views: () -> Content
   
@@ -48,14 +53,29 @@ struct ParticleSystem<Content>: View where Content: View {
     }
   }
   
+  // MARK: - Initalizers
+  
+  init(
+    paused: Bool = false,
+    colorMode: ColorRenderingMode = .nonLinear,
+    async: Bool = true,
+    @ViewBuilder views: @escaping () -> Content,
+    @EntitiesBuilder entities: @escaping () -> [Entity]
+  ) {
+    self.paused = paused
+    self.colorMode = colorMode
+    self.async = async
+    self.views = views
+    self.entities = entities()
+  }
+  
   // MARK: - Methods
   
   func renderer(context: inout GraphicsContext, size: CGSize) {
     for entity in entities {
       context.drawLayer { context in
-        if let resolved = context.resolveSymbol(id: entity.id) {
-          
-        }
+        guard let resolved = context.resolveSymbol(id: entity.id) else { return }
+        context.draw(resolved, at: entity.pos)
       }
     }
   }
@@ -67,17 +87,35 @@ struct ParticleSystem<Content>: View where Content: View {
   func update() {
     var toRemove: [Entity.ID] = []
     for entity in entities {
-      entity.update()
-      if entity.expiration >= Date() {
+      guard entity.expiration > Date() else {
         toRemove.append(entity.id)
+        continue
       }
+      entity.updatePhysics()
+      entity.update()
     }
     entities.removeAll(where: { toRemove.contains($0.id) })
   }
 }
 
-struct AnyParticleSystem {
+@resultBuilder
+struct EntitiesBuilder {
   
+    static func buildBlock(_ parts: Entity...) -> [Entity] {
+        return parts
+    }
+
+//    static func buildEither(first component: String) -> String {
+//        return component
+//    }
+//
+//    static func buildEither(second component: String) -> String {
+//        return component
+//    }
+//
+//    static func buildArray(_ components: [String]) -> String {
+//        components.joined(separator: "\n")
+//    }
 }
 
 class Entity: Identifiable {
@@ -97,27 +135,25 @@ class Entity: Identifiable {
   /// When the entity is to be destroyed.
   var expiration: Date
   
-  /// A method that registers the entity in a particle system.
-  var register: () -> Void
-  
   // MARK: - Initalizers
   
-  init(p0: CGPoint, v0: CGVector = .zero, a: CGVector = .zero, size: CGSize = .init(width: 5.0, height: 5.0), expiration: Date, register: @escaping () -> Void) {
+  init(p0: CGPoint, v0: CGVector = .zero, a: CGVector = .zero, size: CGSize = .init(width: 5.0, height: 5.0), expiration: Date) {
     self.id = UUID()
     self.pos = p0
     self.vel = v0
     self.acc = a
     self.size = size
     self.expiration = expiration
-    self.register = register
   }
   
   // MARK: - Methods
   
-  func update() {
+  func updatePhysics() {
     pos = pos.apply(vel)
     vel = vel.add(acc)
   }
+  
+  func update() {}
 }
 
 class Emitter: Entity {
@@ -147,11 +183,24 @@ class Emitter: Entity {
   
   // MARK: - Initalizers
   
-  init(p0: CGPoint, v0: CGVector = .zero, a: CGVector = .zero, size: CGSize = .zero, fire: Bool = true, rate: Double, lifetime: TimeInterval = 3.0, register: @escaping () -> Void) {
+  init(
+    p0: CGPoint,
+    v0: CGVector = .zero,
+    a: CGVector = .zero,
+    size: CGSize = .zero,
+    fire: Bool = true,
+    rate: Double,
+    lifetime: TimeInterval = 3.0) {
     self.fire = fire
     self.rate = rate
     self.lifetime = lifetime
-    super.init(p0: p0, v0: v0, a: a, size: size, expiration: Date.distantFuture, register: register)
+    super.init(p0: p0, v0: v0, a: a, size: size, expiration: Date.distantFuture)
+  }
+  
+  // MARK: - Override
+  
+  override func update() {
+    emit()
   }
   
   // MARK: - Methods
@@ -161,7 +210,7 @@ class Emitter: Entity {
       guard Date().timeIntervalSince(lastFire) < 1.0 / rate else { return }
     }
     let vel = fireVelocity(count, Date().timeIntervalSince(inception))
-    let particle = Particle(p0: self.pos, v0: ignoreInheritedVelocity ? vel : vel.add(self.vel), expiration: Date() + lifetime, register: register)
+    let particle = Particle(p0: self.pos, v0: ignoreInheritedVelocity ? vel : vel.add(self.vel), expiration: Date() + lifetime)
     particles.append(particle)
     lastFire = Date()
     count += 1
@@ -169,8 +218,20 @@ class Emitter: Entity {
 }
 
 class Particle: Entity {
-  /// The particle's appearance.
-  var view: some View = Circle()
+  
+  // MARK: - Properties
+  
+  /// The particle's resolved Canvas image.
+  var image: GraphicsContext.ResolvedSymbol
+  
+  // MARK: - Initalizers
+  
+  init?(id: String, context: GraphicsContext) {
+    guard let image = context.resolveSymbol(id: id) else {
+      return nil
+    }
+    self.image = image
+  }
 }
 
 struct ParticleSystem_Previews: PreviewProvider {
