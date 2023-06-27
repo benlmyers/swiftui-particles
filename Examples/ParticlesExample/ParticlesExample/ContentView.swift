@@ -27,6 +27,7 @@ struct ContentView: View {
         //.initialVelocity(x: 1.0, y: 1.0)
         //.particlesInheritVelocity(false)
       }
+      .debug()
     }
     .padding()
   }

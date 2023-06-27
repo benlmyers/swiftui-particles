@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public class Entity: Identifiable, Renderable, Updatable, Copyable {
+public class Entity: Identifiable, Renderable, Updatable, Copyable, Debuggable {
   
   // MARK: - Properties
   
@@ -56,7 +56,20 @@ public class Entity: Identifiable, Renderable, Updatable, Copyable {
   }
   
   func render(_ context: GraphicsContext) {
-    // Do nothing
+    if data?.debug ?? false {
+      debug(context)
+    }
+  }
+  
+  func debug(_ context: GraphicsContext) {
+    context.stroke(
+      Path { build in
+        build.move(to: pos)
+        build.addLine(to: pos.apply(vel.scale(10.0)))
+      },
+      with: .color(.green),
+      lineWidth: 2.0
+    )
   }
   
   // MARK: - Methods

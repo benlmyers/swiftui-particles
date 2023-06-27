@@ -41,6 +41,7 @@ public class Particle: Entity {
   }
   
   override func render(_ context: GraphicsContext) {
+    super.render(context)
     context.drawLayer { context in
       context.translateBy(x: pos.x, y: pos.y)
       context.rotate(by: rot)

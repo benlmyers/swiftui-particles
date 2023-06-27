@@ -64,28 +64,29 @@ public struct ParticleSystem: View {
   
   // MARK: - Static Methods
   
-  static func destroyExpiredEntities(in collection: inout [Entity]) {
-    var toRemove: [Entity.ID] = []
-    for entity in collection {
-      guard entity.expiration > Date() else {
-        toRemove.append(entity.id)
-        continue
-      }
-      entity.update()
-    }
-    collection.removeAll(where: { toRemove.contains($0.id) })
+  static func destroyExpiredEntities(in collection: inout [Entity?]) {
+//    for i in 0 ..< collection.count {
+//      guard let entity = collection[i] else { continue }
+//      if Date() >= entity.expiration {
+//        collection[i] = nil
+//      }
+//    }
+//    collection.removeAll(where: { $0 == nil })
   }
   
   // MARK: - Methods
   
   func renderer(context: inout GraphicsContext, size: CGSize) {
     for entity in data.entities {
-      entity.render(context)
+      entity?.render(context)
     }
   }
   
   func update() {
     ParticleSystem.destroyExpiredEntities(in: &data.entities)
+    for entity in data.entities {
+      entity?.update()
+    }
   }
 }
 
@@ -98,7 +99,7 @@ extension ParticleSystem {
     /// The particle views that the particle system will render.
     var views: [AnyTaggedView] = []
     /// A (recursive) collection of each active entity in the particle system.
-    var entities: [Entity] = []
+    var entities: [Entity?] = []
     /// A collection of each field in the particle system.
     var fields: [Field] = []
     /// Whether to enable debug mode.
@@ -106,7 +107,13 @@ extension ParticleSystem {
   }
 }
 
-extension ParticleSystem {
+public extension ParticleSystem {
+  
+  func debug() -> ParticleSystem {
+    var new = self
+    new.data.debug = true
+    return new
+  }
   
   func paused(_ flag: Bool) -> ParticleSystem {
     var new = self

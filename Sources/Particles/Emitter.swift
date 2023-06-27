@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public class Emitter: Entity, Debuggable {
+public class Emitter: Entity {
   
   // MARK: - Properties
   
@@ -29,7 +29,7 @@ public class Emitter: Entity, Debuggable {
   var useInheritedVelocity: Bool = true
   
   /// The entities spawned by the emitter.
-  var spawned: [Entity] = []
+  var spawned: [Entity?] = []
   /// The last time the emitter fired a particle.
   var lastFire: Date?
   /// The amount of particles this emitter has spawned.
@@ -62,20 +62,22 @@ public class Emitter: Entity, Debuggable {
     super.init(copying: origin)
   }
   
-  func debug(_ context: GraphicsContext) {
+  // MARK: - Overrides
+  
+  override func debug(_ context: GraphicsContext) {
+    super.debug(context)
     context.stroke(
       Path(ellipseIn: CGRect(origin: .zero, size: CGSize(width: 5.0, height: 5.0))),
       with: .color(.yellow),
-      lineWidth: 4)
+      lineWidth: 4
+    )
   }
-  
-  // MARK: - Overrides
   
   override func update() {
     super.update()
     ParticleSystem.destroyExpiredEntities(in: &spawned)
     for entity in spawned {
-      entity.update()
+      entity?.update()
     }
     if let lastFire {
       guard Date().timeIntervalSince(lastFire) >= 1.0 / rate else { return }
@@ -84,8 +86,12 @@ public class Emitter: Entity, Debuggable {
   }
   
   override func render(_ context: GraphicsContext) {
+    super.render(context)
     for entity in spawned {
-      entity.render(context)
+      entity?.render(context)
+    }
+    if data?.debug ?? false {
+      debug(context)
     }
   }
   
