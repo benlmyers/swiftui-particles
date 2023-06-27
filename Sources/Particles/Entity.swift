@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public class Entity<Content>: Identifiable, Renderable where Content: View {
+public class Entity: Identifiable, Renderable, Updatable, Copyable {
   
   // MARK: - Properties
   
@@ -15,7 +15,7 @@ public class Entity<Content>: Identifiable, Renderable where Content: View {
   public var id: UUID = UUID()
   
   /// A reference to the entity's parent system's data.
-  var data: ParticleSystem<Content>.Data<Content>?
+  var data: ParticleSystem.Data?
   
   /// The entity's position.
   var pos: CGPoint = .zero
@@ -39,24 +39,36 @@ public class Entity<Content>: Identifiable, Renderable where Content: View {
     self.acc = a
   }
   
-  init() {
-    
-  }
+  init() {}
   
-  // MARK: - Implementation
+  // MARK: - Conformance
+  
+  required init(copying origin: Entity) {
+    self.data = origin.data
+    self.pos = origin.pos
+    self.vel = origin.vel
+    self.acc = origin.acc
+    self.size = origin.size
+  }
   
   func render(_ context: GraphicsContext) {
     // Do nothing
   }
   
   // MARK: - Methods
+
+  func update() {
+    updatePhysics()
+  }
   
-  func updatePhysics() {
+  func supply(data: ParticleSystem.Data) {
+    self.data = data
+  }
+  
+  private func updatePhysics() {
     pos = pos.apply(vel)
     vel = vel.add(acc)
   }
-  
-  func update() {}
 }
 
 public extension Entity {

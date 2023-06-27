@@ -17,17 +17,11 @@ struct ContentView: View {
       Text("Hello, world!")
       ParticleSystem {
         Emitter {
-          Text("🚀")
-          Text("⭐️")
+          Particle {
+            Text("⭐️")
+          }
         }
-        .particlesInheritVelocity(false)
-        .initialVelocity(x: 0.0, y: 1.0)
-        .emitVelocity(x: 1.0, y: 0.0)
-        Emitter {
-          Text("x")
-          Text("o")
-        }
-        .initialVelocity(x: 2.0, y: 2.0)
+        .emitVelocity(x: 1.0, y: 1.0)
       }
     }
     .padding()

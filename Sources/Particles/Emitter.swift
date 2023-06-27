@@ -7,24 +7,20 @@
 
 import SwiftUI
 
-public class Emitter<Content>: Entity<Content> where Content: View {
+public class Emitter: Entity {
   
   // MARK: - Properties
   
   /// Whether the emitter should fire particles.
   var fire: Bool = true
   /// The rate at which the emitter fires, in particles per second.
-  var rate: Double = 1.0
+  var rate: Double = 3.0
   /// The lifetime to give fired particles.
   var lifetime: TimeInterval = 5.0
   
-  /// The prototypical views that this emitter creates particles for, and their respective system view indices.
-  var protos: [Content]
-  /// The base index registered in the particle system for prototypical views.
-  var baseIndex: Int?
+  /// The prototypical entities this emitter spawns.
+  var spawn: [Entity]
   
-  /// The particles fired by the emitter.
-  var particles: [Particle<Content>] = []
   /// The fire velocity. This may be determined by the amount of particles fired and the amount of time since the emitter was created.
   var fireVelocity: (Int, TimeInterval) -> CGVector = { _, _ in return .zero }
   /// The emit chooser. This is determined by the amount of particles fired and the amount of time since the emitter was created.
@@ -32,6 +28,8 @@ public class Emitter<Content>: Entity<Content> where Content: View {
   /// Whether to spawn particles independent of the emitter's velocity.
   var useInheritedVelocity: Bool = true
   
+  /// The entities spawned by the emitter.
+  var spawned: [Entity] = []
   /// The last time the emitter fired a particle.
   var lastFire: Date?
   /// The amount of particles this emitter has spawned.
@@ -39,40 +37,54 @@ public class Emitter<Content>: Entity<Content> where Content: View {
   
   // MARK: - Initalizers
   
-  public init(@EmitterBuilder views: @escaping () -> [Content]) where Content: View {
-    let views: [Content] = views()
-    self.protos = views
-    self.chooser = { _, _ in return Int.random(in: 0 ..< views.count) }
+  public init(@EntitiesBuilder entities: @escaping () -> [Entity]) {
+    let entities: [Entity] = entities()
+    self.spawn = entities
+    self.chooser = { _, _ in return Int.random(in: 0 ..< entities.count) }
     super.init()
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.00001) {
-      guard let data = self.data else {
-        fatalError("The particle system's data could not be accessed by the particle.")
-      }
-      self.baseIndex = data.views.count
-      for view in views {
-        data.views.append(view)
-      }
-    }
   }
   
-  // MARK: - Override
+  // MARK: - Conformance
   
-  override func update() {
-    for particle in particles {
-      particle.updatePhysics()
-      particle.update()
+  required init(copying origin: Entity) {
+    if let emitter = origin as? Emitter {
+      self.fire = emitter.fire
+      self.rate = emitter.rate
+      self.lifetime = emitter.lifetime
+      self.spawn = emitter.spawn
+      self.fireVelocity = emitter.fireVelocity
+      self.chooser = emitter.chooser
+      self.useInheritedVelocity = emitter.useInheritedVelocity
+      self.spawn = emitter.spawn
+    } else {
+      fatalError("Attempted to copy an entity as an Emitter, but found another origin type (\(type(of: origin))) instead.")
     }
-    if let lastFire {
-      guard Date().timeIntervalSince(lastFire) < 1.0 / rate else { return }
-    }
-    emit()
+    super.init(copying: origin)
   }
   
   // MARK: - Overrides
   
+  override func update() {
+    super.update()
+    for entity in spawned {
+      entity.update()
+    }
+    if let lastFire {
+      guard Date().timeIntervalSince(lastFire) >= 1.0 / rate else { return }
+    }
+    emit()
+  }
+  
   override func render(_ context: GraphicsContext) {
-    for particle in particles {
-      particle.render(context)
+    for entity in spawned {
+      entity.render(context)
+    }
+  }
+  
+  override func supply(data: ParticleSystem.Data) {
+    self.data = data
+    for entity in spawn {
+      entity.supply(data: data)
     }
   }
   
@@ -80,25 +92,30 @@ public class Emitter<Content>: Entity<Content> where Content: View {
   
   func emit() {
     let interval: TimeInterval = Date().timeIntervalSince(inception)
-    let vel: CGVector = fireVelocity(count, interval)
+    let fireVel: CGVector = fireVelocity(count, interval)
     let i: Int = chooser(count, interval)
-    guard let data = self.data else {
-      fatalError("The particle system's data could not be accessed by the particle.")
-    }
-    guard !data.views.isEmpty else {
+    guard let data else {
       return
-      // fatalError("The particle system did not have any prototypical views.")
+      //fatalError("This entity could not access the particle system's data.")
     }
-    guard i < data.views.count else {
-      fatalError("Out of bounds: Your chooser closure looked for content of index \(i), but this emitter only has content up to index \(data.views.count).")
+    guard i < spawn.count else {
+      fatalError("Out of bounds: Your emitter's chooser closure looked for an entity prototype of index \(i), but this emitter only has prototypes up to index \(spawn.count).")
     }
-    guard let baseIndex else {
-      fatalError("No base index was assigned.")
+    let spawn: Entity = spawn[i]
+    var toSpawn: Entity
+    if let particle = spawn as? Particle {
+      toSpawn = Particle(copying: particle)
+    } else if let emitter = spawn as? Emitter {
+      toSpawn = Emitter(copying: emitter)
+    } else {
+      fatalError("Cannot emit an unsupported entity of type \(type(of: spawn)).")
     }
-    let view: Content = data.views[i]
-    let particle: Particle = Particle(view, index: baseIndex + i, p0: pos, v0: useInheritedVelocity ? self.vel.add(vel) : vel, a: .zero)
-    particle.data = self.data
-    self.particles.append(particle)
+    toSpawn.supply(data: data)
+    if useInheritedVelocity {
+      toSpawn.vel = toSpawn.vel.add(self.vel)
+    }
+    toSpawn.vel = toSpawn.vel.add(fireVel)
+    spawned.append(toSpawn)
     lastFire = Date()
     count += 1
   }

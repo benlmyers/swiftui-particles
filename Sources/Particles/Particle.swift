@@ -7,28 +7,47 @@
 
 import SwiftUI
 
-class Particle<Content>: Entity<Content> where Content: View {
+public class Particle: Entity {
   
   // MARK: - Properties
   
-  /// The content this particle displays.
-  var view: Content
-  /// The index of the graphical prototype relative to the `Emitter.proto` index.
-  var index: Int
+  /// The ID of the graphical prototype for use in the particle system's Canvas instance.
+  var viewID: UUID
   
   // MARK: - Initializers
   
-  init(_ view: Content, index: Int, p0: CGPoint, v0: CGVector, a: CGVector) {
-    self.view = view
-    self.index = index
-    super.init(p0, v0, a)
+  public init(@ViewBuilder view: () -> some View) {
+    self.viewID = UUID()
+    super.init(.zero, .zero, .zero)
+    let view = AnyTaggedView(view: AnyView(view()), tag: viewID)
+    DispatchQueue.main.async {
+      guard let data = self.data else {
+        return
+        //fatalError("This entity could not access the particle system's data.")
+      }
+      data.views.append(view)
+    }
   }
   
-  // MARK: - Overrides
+  // MARK: - Conformance
+  
+  required init(copying origin: Entity) {
+    if let particle = origin as? Particle {
+      self.viewID = particle.viewID
+    } else {
+      fatalError("Attempted to copy an entity as a Particle, but found another origin type (\(type(of: origin))) instead.")
+    }
+    super.init(copying: origin)
+  }
   
   override func render(_ context: GraphicsContext) {
     context.drawLayer { context in
-      guard let resolved = context.resolveSymbol(id: index) else { return }
+      print("\nAttempting to render ID \(viewID)")
+      print("Available IDs: \(self.data?.views.map({$0.tag}))")
+      var resolved: GraphicsContext.ResolvedSymbol = context.resolveSymbol(id: "NOT_FOUND")!
+      if let r = context.resolveSymbol(id: viewID) {
+        resolved = r
+      }
       context.draw(resolved, at: pos)
     }
   }

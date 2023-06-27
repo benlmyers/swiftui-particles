@@ -8,7 +8,7 @@
 import SwiftUI
 import Foundation
 
-public struct ParticleSystem<Content>: View where Content: View {
+public struct ParticleSystem: View {
   
   // MARK: - Properties
   
@@ -20,15 +20,16 @@ public struct ParticleSystem<Content>: View where Content: View {
   var async: Bool = true
   
   /// The particle system data to pass to child entities.
-  var data: ParticleSystem.Data<Content> = .init()
+  var data: ParticleSystem.Data = .init()
   
   // MARK: - Views
   
   public var body: some View {
     TimelineView(.animation(paused: paused)) { t in
       Canvas(opaque: true, colorMode: colorMode, rendersAsynchronously: async, renderer: renderer) {
+        Text("❌").tag("NOT_FOUND")
         ForEach(0 ..< data.views.count, id: \.self) { i in
-          data.views[i].tag(i)
+          data.views[i].view.tag(data.views[i].tag)
         }
       }
       .frame(width: 200.0, height: 200.0)
@@ -42,21 +43,19 @@ public struct ParticleSystem<Content>: View where Content: View {
   
   // MARK: - Initalizers
   
-  init(_ entities: [Entity<Content>]) {
-    for entity in entities {
-      self.data.entities.append(entity)
-    }
-    for entity in self.data.entities {
-      entity.data = self.data
-    }
-  }
-  
-  public init(@ParticleSystemBuilder entities: @escaping () -> [Entity<Content>]) {
+  public init(@EntitiesBuilder entities: @escaping () -> [Entity]) {
     let entities = entities()
     self.init(entities)
   }
   
-  public init(copying system: Self) {
+  init(_ entities: [Entity]) {
+    for entity in entities {
+      entity.supply(data: data)
+      self.data.entities.append(entity)
+    }
+  }
+  
+  init(copying system: Self) {
     self.paused = system.paused
     self.async = system.async
     self.colorMode = system.colorMode
@@ -72,13 +71,12 @@ public struct ParticleSystem<Content>: View where Content: View {
   }
   
   func update() {
-    var toRemove: [Entity<Content>.ID] = []
+    var toRemove: [Entity.ID] = []
     for entity in data.entities {
       guard entity.expiration > Date() else {
         toRemove.append(entity.id)
         continue
       }
-      entity.updatePhysics()
       entity.update()
     }
     //entities.removeAll(where: { toRemove.contains($0.id) })
@@ -87,14 +85,14 @@ public struct ParticleSystem<Content>: View where Content: View {
 
 extension ParticleSystem {
   
-  class Data<Content> where Content: View {
+  class Data {
     
     // MARK: - Properties
     
     /// The particle views that the particle system will render.
-    var views: [Content] = []
+    var views: [AnyTaggedView] = []
     /// A (recursive) collection of each active entity in the particle system.
-    var entities: [Entity<Content>] = []
+    var entities: [Entity] = []
     /// Whether to enable debug mode.
     var debug: Bool = false
   }
