@@ -97,3 +97,24 @@ extension ParticleSystem {
     var debug: Bool = false
   }
 }
+
+extension ParticleSystem {
+  
+  func paused(_ flag: Bool) -> ParticleSystem {
+    var new = self
+    new.paused = flag
+    return new
+  }
+  
+  func colorMode(_ mode: ColorRenderingMode) -> ParticleSystem {
+    var new = self
+    new.colorMode = mode
+    return new
+  }
+  
+  func renderAsync(_ flag: Bool) -> ParticleSystem {
+    var new = self
+    new.async = flag
+    return new
+  }
+}

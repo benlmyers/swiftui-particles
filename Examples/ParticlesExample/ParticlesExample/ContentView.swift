@@ -21,7 +21,8 @@ struct ContentView: View {
             Text("⭐️")
           }
         }
-        .emitVelocity(x: 1.0, y: 1.0)
+        .initialVelocity(x: 1.0, y: 1.0)
+        .particlesInheritVelocity(false)
       }
     }
     .padding()

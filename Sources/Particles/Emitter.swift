@@ -115,6 +115,7 @@ public class Emitter: Entity {
       toSpawn.vel = toSpawn.vel.add(self.vel)
     }
     toSpawn.vel = toSpawn.vel.add(fireVel)
+    toSpawn.pos = self.pos
     spawned.append(toSpawn)
     lastFire = Date()
     count += 1
