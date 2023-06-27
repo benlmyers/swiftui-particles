@@ -45,7 +45,7 @@ extension Field {
   
   public enum Effect {
     case gravity(CGVector)
-    case torque(CGFloat)
+    case torque(Angle)
     case custom((Entity) -> Void)
   }
 }

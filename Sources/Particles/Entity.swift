@@ -25,9 +25,9 @@ public class Entity: Identifiable, Renderable, Updatable, Copyable {
   var acc: CGVector = .zero
   
   /// The entity's rotation.
-  var rot: CGFloat = .zero
+  var rot: Angle = .zero
   /// The entity's torque.
-  var tor: CGFloat = .zero
+  var tor: Angle = .zero
   
   /// When the entity was created.
   var inception: Date = Date()
@@ -39,6 +39,7 @@ public class Entity: Identifiable, Renderable, Updatable, Copyable {
   init(_ p0: CGPoint, _ v0: CGVector, _ a: CGVector) {
     self.pos = p0
     self.vel = v0
+    self.acc = a
   }
   
   init() {}
@@ -50,6 +51,8 @@ public class Entity: Identifiable, Renderable, Updatable, Copyable {
     self.pos = origin.pos
     self.vel = origin.vel
     self.acc = origin.acc
+    self.rot = origin.rot
+    self.tor = origin.tor
   }
   
   func render(_ context: GraphicsContext) {
@@ -69,7 +72,8 @@ public class Entity: Identifiable, Renderable, Updatable, Copyable {
   private func updatePhysics() {
     pos = pos.apply(vel)
     vel = vel.add(acc)
-    rot += tor
+    print("Torque: \(tor)")
+    rot = rot + tor
   }
 }
 
@@ -93,11 +97,11 @@ public extension Entity {
   }
   
   func initialRotation(_ angle: Angle) -> Self {
-    self.rot = angle.radians
+    self.rot = angle
     return self
   }
   
-  func initialTorque(_ torque: CGFloat) -> Self {
+  func initialTorque(_ torque: Angle) -> Self {
     self.tor = torque
     return self
   }

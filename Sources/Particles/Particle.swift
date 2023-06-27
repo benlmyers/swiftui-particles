@@ -42,11 +42,13 @@ public class Particle: Entity {
   
   override func render(_ context: GraphicsContext) {
     context.drawLayer { context in
+      context.translateBy(x: pos.x, y: pos.y)
+      context.rotate(by: rot)
       var resolved: GraphicsContext.ResolvedSymbol = context.resolveSymbol(id: "NOT_FOUND")!
       if let r = context.resolveSymbol(id: viewID) {
         resolved = r
       }
-      context.draw(resolved, at: pos)
+      context.draw(resolved, at: .zero)
     }
   }
 }
