@@ -23,8 +23,11 @@ public class Entity: Identifiable, Renderable, Updatable, Copyable {
   var vel: CGVector = .zero
   /// The entity's acceleration.
   var acc: CGVector = .zero
-  /// The entity's size.
-  var size: CGSize = .zero
+  
+  /// The entity's rotation.
+  var rot: CGFloat = .zero
+  /// The entity's torque.
+  var tor: CGFloat = .zero
   
   /// When the entity was created.
   var inception: Date = Date()
@@ -36,7 +39,6 @@ public class Entity: Identifiable, Renderable, Updatable, Copyable {
   init(_ p0: CGPoint, _ v0: CGVector, _ a: CGVector) {
     self.pos = p0
     self.vel = v0
-    self.acc = a
   }
   
   init() {}
@@ -48,7 +50,6 @@ public class Entity: Identifiable, Renderable, Updatable, Copyable {
     self.pos = origin.pos
     self.vel = origin.vel
     self.acc = origin.acc
-    self.size = origin.size
   }
   
   func render(_ context: GraphicsContext) {
@@ -68,18 +69,36 @@ public class Entity: Identifiable, Renderable, Updatable, Copyable {
   private func updatePhysics() {
     pos = pos.apply(vel)
     vel = vel.add(acc)
+    rot += tor
   }
 }
 
 public extension Entity {
+  
+  // MARK: - Modifiers
+  
+  func initialPosition(x: CGFloat, y: CGFloat) -> Self {
+    self.pos = CGPoint(x: x, y: y)
+    return self
+  }
   
   func initialVelocity(x: CGFloat, y: CGFloat) -> Self {
     self.vel = CGVector(dx: x, dy: y)
     return self
   }
   
-  func setAcceleration(x: CGFloat, y: CGFloat) -> Self {
+  func initialAcceleration(x: CGFloat, y: CGFloat) -> Self {
     self.acc = CGVector(dx: x, dy: y)
+    return self
+  }
+  
+  func initialRotation(_ angle: Angle) -> Self {
+    self.rot = angle.radians
+    return self
+  }
+  
+  func initialTorque(_ torque: CGFloat) -> Self {
+    self.tor = torque
     return self
   }
 }

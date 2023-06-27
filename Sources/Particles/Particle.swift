@@ -42,8 +42,6 @@ public class Particle: Entity {
   
   override func render(_ context: GraphicsContext) {
     context.drawLayer { context in
-      print("\nAttempting to render ID \(viewID)")
-      print("Available IDs: \(self.data?.views.map({$0.tag}))")
       var resolved: GraphicsContext.ResolvedSymbol = context.resolveSymbol(id: "NOT_FOUND")!
       if let r = context.resolveSymbol(id: viewID) {
         resolved = r

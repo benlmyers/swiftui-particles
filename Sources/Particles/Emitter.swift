@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public class Emitter: Entity {
+public class Emitter: Entity, Debuggable {
   
   // MARK: - Properties
   
@@ -60,6 +60,13 @@ public class Emitter: Entity {
       fatalError("Attempted to copy an entity as an Emitter, but found another origin type (\(type(of: origin))) instead.")
     }
     super.init(copying: origin)
+  }
+  
+  func debug(_ context: GraphicsContext) {
+    context.stroke(
+      Path(ellipseIn: CGRect(origin: .zero, size: CGSize(width: 5.0, height: 5.0))),
+      with: .color(.yellow),
+      lineWidth: 4)
   }
   
   // MARK: - Overrides

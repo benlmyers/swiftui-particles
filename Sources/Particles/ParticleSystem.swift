@@ -79,7 +79,7 @@ public struct ParticleSystem: View {
       }
       entity.update()
     }
-    //entities.removeAll(where: { toRemove.contains($0.id) })
+    data.entities.removeAll(where: { toRemove.contains($0.id) })
   }
 }
 
@@ -93,6 +93,8 @@ extension ParticleSystem {
     var views: [AnyTaggedView] = []
     /// A (recursive) collection of each active entity in the particle system.
     var entities: [Entity] = []
+    /// A collection of each field in the particle system.
+    var fields: [Field] = []
     /// Whether to enable debug mode.
     var debug: Bool = false
   }
