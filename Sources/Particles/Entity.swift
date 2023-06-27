@@ -72,7 +72,6 @@ public class Entity: Identifiable, Renderable, Updatable, Copyable {
   private func updatePhysics() {
     pos = pos.apply(vel)
     vel = vel.add(acc)
-    print("Torque: \(tor)")
     rot = rot + tor
   }
 }

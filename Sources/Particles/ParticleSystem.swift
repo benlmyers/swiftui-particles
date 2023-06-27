@@ -62,6 +62,20 @@ public struct ParticleSystem: View {
     self.data = system.data
   }
   
+  // MARK: - Static Methods
+  
+  static func destroyExpiredEntities(in collection: inout [Entity]) {
+    var toRemove: [Entity.ID] = []
+    for entity in collection {
+      guard entity.expiration > Date() else {
+        toRemove.append(entity.id)
+        continue
+      }
+      entity.update()
+    }
+    collection.removeAll(where: { toRemove.contains($0.id) })
+  }
+  
   // MARK: - Methods
   
   func renderer(context: inout GraphicsContext, size: CGSize) {
@@ -71,15 +85,7 @@ public struct ParticleSystem: View {
   }
   
   func update() {
-    var toRemove: [Entity.ID] = []
-    for entity in data.entities {
-      guard entity.expiration > Date() else {
-        toRemove.append(entity.id)
-        continue
-      }
-      entity.update()
-    }
-    data.entities.removeAll(where: { toRemove.contains($0.id) })
+    ParticleSystem.destroyExpiredEntities(in: &data.entities)
   }
 }
 

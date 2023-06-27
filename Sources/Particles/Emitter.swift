@@ -16,7 +16,7 @@ public class Emitter: Entity, Debuggable {
   /// The rate at which the emitter fires, in particles per second.
   var rate: Double = 3.0
   /// The lifetime to give fired particles.
-  var lifetime: TimeInterval = 5.0
+  var lifetime: TimeInterval = 0.2
   
   /// The prototypical entities this emitter spawns.
   var spawn: [Entity]
@@ -73,6 +73,7 @@ public class Emitter: Entity, Debuggable {
   
   override func update() {
     super.update()
+    ParticleSystem.destroyExpiredEntities(in: &spawned)
     for entity in spawned {
       entity.update()
     }
@@ -117,6 +118,8 @@ public class Emitter: Entity, Debuggable {
     } else {
       fatalError("Cannot emit an unsupported entity of type \(type(of: spawn)).")
     }
+    toSpawn.inception = Date()
+    toSpawn.expiration = Date().advanced(by: lifetime)
     toSpawn.supply(data: data)
     if useInheritedVelocity {
       toSpawn.vel = toSpawn.vel.add(self.vel)
