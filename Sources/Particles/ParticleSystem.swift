@@ -43,7 +43,7 @@ public struct ParticleSystem: View {
   
   // MARK: - Initalizers
   
-  public init(@EntitiesBuilder entities: @escaping () -> [Entity]) {
+  public init(@ItemsBuilder entities: @escaping () -> [Entity]) {
     let entities = entities()
     self.init(entities)
   }

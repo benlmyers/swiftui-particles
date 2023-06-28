@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public class Field: Debuggable {
+public class Field: Item {
   
   // MARK: - Properties
   
@@ -21,16 +21,18 @@ public class Field: Debuggable {
   init(bounds: Field.Shape, effect: Field.Effect) {
     self.bounds = bounds
     self.effect = effect
+    super.init()
   }
   
   init(bounds: Field.Shape, effect: @escaping (Entity) -> Void) {
     self.bounds = bounds
     self.effect = .custom(effect)
+    super.init()
   }
   
-  // MARK: - Conformance
+  // MARK: - Overrides
   
-  func debug(_ context: GraphicsContext) {
+  override func debug(_ context: GraphicsContext) {
     context.fill(bounds.path, with: .color(.blue.opacity(0.1)))
   }
 }

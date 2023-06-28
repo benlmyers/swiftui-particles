@@ -23,9 +23,11 @@ struct ContentView: View {
           .initialVelocity(x: 3.0, y: 3.0)
           .initialAcceleration(x: 0.0, y: -0.05)
           .initialTorque(.degrees(-1.0))
+          Particle(color: .red, radius: 4.0)
+            .initialAcceleration(x: 0.0, y: 0.01)
         }
-        //.initialVelocity(x: 1.0, y: 1.0)
-        //.particlesInheritVelocity(false)
+        .initialVelocity(x: 1.0, y: 1.0)
+        .particlesInheritVelocity(false)
       }
       .debug()
     }

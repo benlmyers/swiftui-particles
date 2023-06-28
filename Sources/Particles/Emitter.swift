@@ -37,7 +37,7 @@ public class Emitter: Entity {
   
   // MARK: - Initalizers
   
-  public init(@EntitiesBuilder entities: @escaping () -> [Entity]) {
+  public init(@ItemsBuilder entities: @escaping () -> [Entity]) {
     let entities: [Entity] = entities()
     self.spawn = entities
     self.chooser = { _, _ in return Int.random(in: 0 ..< entities.count) }
@@ -67,7 +67,7 @@ public class Emitter: Entity {
   override func debug(_ context: GraphicsContext) {
     super.debug(context)
     context.stroke(
-      Path(ellipseIn: CGRect(origin: .zero, size: CGSize(width: 5.0, height: 5.0))),
+      Path(ellipseIn: CGRect(origin: pos, size: CGSize(width: 5.0, height: 5.0))),
       with: .color(.yellow),
       lineWidth: 4
     )
@@ -89,9 +89,6 @@ public class Emitter: Entity {
     super.render(context)
     for entity in spawned {
       entity?.render(context)
-    }
-    if data?.debug ?? false {
-      debug(context)
     }
   }
   

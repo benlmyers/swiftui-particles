@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public class Entity: Identifiable, Renderable, Updatable, Copyable, Debuggable {
+public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
   
   // MARK: - Properties
   
@@ -40,9 +40,25 @@ public class Entity: Identifiable, Renderable, Updatable, Copyable, Debuggable {
     self.pos = p0
     self.vel = v0
     self.acc = a
+    super.init()
+  }
+
+  // MARK: - Overrides
+  
+  override init() {
+    super.init()
   }
   
-  init() {}
+  override func debug(_ context: GraphicsContext) {
+    context.stroke(
+      Path { build in
+        build.move(to: pos)
+        build.addLine(to: pos.apply(vel.scale(10.0)))
+      },
+      with: .color(.green),
+      lineWidth: 2.0
+    )
+  }
   
   // MARK: - Conformance
   
@@ -59,17 +75,6 @@ public class Entity: Identifiable, Renderable, Updatable, Copyable, Debuggable {
     if data?.debug ?? false {
       debug(context)
     }
-  }
-  
-  func debug(_ context: GraphicsContext) {
-    context.stroke(
-      Path { build in
-        build.move(to: pos)
-        build.addLine(to: pos.apply(vel.scale(10.0)))
-      },
-      with: .color(.green),
-      lineWidth: 2.0
-    )
   }
   
   // MARK: - Methods

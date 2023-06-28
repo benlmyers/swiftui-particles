@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Dispatch
 
 public class Particle: Entity {
   
@@ -20,13 +21,17 @@ public class Particle: Entity {
     self.viewID = UUID()
     super.init(.zero, .zero, .zero)
     let view = AnyTaggedView(view: AnyView(view()), tag: viewID)
-    DispatchQueue.main.async {
-      guard let data = self.data else {
-        return
-        //fatalError("This entity could not access the particle system's data.")
-      }
-      data.views.append(view)
-    }
+    registerView(view)
+  }
+  
+  public init(color: Color, radius: CGFloat) {
+    self.viewID = UUID()
+    super.init(.zero, .zero, .zero)
+    let view = AnyTaggedView(
+      view: AnyView(Circle().foregroundColor(color).frame(width: radius, height: radius)),
+      tag: viewID
+    )
+    registerView(view)
   }
   
   // MARK: - Conformance
@@ -50,6 +55,18 @@ public class Particle: Entity {
         resolved = r
       }
       context.draw(resolved, at: .zero)
+    }
+  }
+  
+  // MARK: - Methods
+  
+  func registerView(_ view: AnyTaggedView) {
+    DispatchQueue.main.async {
+      guard let data = self.data else {
+        return
+        //fatalError("This entity could not access the particle system's data.")
+      }
+      data.views.append(view)
     }
   }
 }
