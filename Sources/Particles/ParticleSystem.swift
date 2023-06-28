@@ -43,15 +43,19 @@ public struct ParticleSystem: View {
   
   // MARK: - Initalizers
   
-  public init(@ItemsBuilder entities: @escaping () -> [Entity]) {
+  public init(@Builder<Item> entities: @escaping () -> [Item]) {
     let entities = entities()
     self.init(entities)
   }
   
-  init(_ entities: [Entity]) {
-    for entity in entities {
-      entity.supply(data: data)
-      self.data.entities.append(entity)
+  init(_ items: [Item]) {
+    for item in items {
+      if let entity = item as? Entity {
+        entity.supply(data: data)
+        self.data.entities.append(entity)
+      } else if let field = item as? Field {
+        self.data.fields.append(field)
+      }
     }
   }
   

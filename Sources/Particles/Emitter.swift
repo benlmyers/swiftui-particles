@@ -37,7 +37,7 @@ public class Emitter: Entity {
   
   // MARK: - Initalizers
   
-  public init(@ItemsBuilder entities: @escaping () -> [Entity]) {
+  public init(@Builder<Entity> entities: @escaping () -> [Entity]) {
     let entities: [Entity] = entities()
     self.spawn = entities
     self.chooser = { _, _ in return Int.random(in: 0 ..< entities.count) }
