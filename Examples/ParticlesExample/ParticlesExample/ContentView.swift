@@ -16,22 +16,19 @@ struct ContentView: View {
         .foregroundColor(.accentColor)
       Text("Hello, world!")
       ParticleSystem {
-        Field(bounds: .all, effect: .torque(.degrees(1.0)))
-        Field(bounds: .circle(center: .zero, radius: 50.0), effect: .gravity(.init(dx: 0.1, dy: 0.0)))
-        Emitter {
+        Field(bounds: .all, effect: .gravity(.init(dx: 0.0, dy: 0.1)))
+        Emitter(rate: 10.0) {
           Particle {
             Text("⭐️")
           }
-          .initialVelocity(x: CGFloat.random(in: 3.0...6.0), y: 3.0)
-          .initialAcceleration(x: 0.0, y: -0.05)
-          //.initialTorque(.degrees(-1.0))
           Particle(color: .red, radius: 4.0)
-            .initialAcceleration(x: 0.0, y: 0.01)
         }
-        .initialVelocity(x: 1.0, y: 1.0)
+        .initialPosition(x: 100.0, y: 100.0)
+        .emitVelocity(x: .random(in: -10.0...10.0), y: .random(in: -10.0...10.0))
         .particlesInheritVelocity(false)
+        .ignoreFields(true)
       }
-      .debug()
+      //.debug()
     }
     .padding()
   }

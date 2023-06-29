@@ -15,8 +15,8 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
   /// The entity's ID.
   public private(set) var id: UUID = UUID()
   
-  /// A reference to the entity's parent system's data.
-  var data: ParticleSystem.Data?
+  /// A reference to the emitter that spawned this entity.
+  var source: Emitter?
   
   /// The entity's position.
   public internal(set) var pos: CGPoint = .zero
@@ -37,10 +37,6 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
   
   /// Whether this entity ignores field effects.
   var ignoreFields: Bool = false
-  
-  var initialPos: Decider<CGPoint>
-  var initialVel: Decider<CGVector>
-  var acc: Decider<CGVector>
   
   // MARK: - Computed Properties
   
@@ -83,13 +79,15 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
   // MARK: - Conformance
   
   required init(copying origin: Entity) {
-    self.data = origin.data
     self.inception = Date()
     self.pos = origin.pos
     self.vel = origin.vel
     self.acc = origin.acc
     self.rot = origin.rot
     self.tor = origin.tor
+    self.lifetime = origin.lifetime
+    super.init()
+    super.data = origin.data
   }
   
   func render(_ context: GraphicsContext) {
@@ -101,6 +99,7 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
   // MARK: - Methods
 
   func update() {
+    acc = .zero
     updatePhysics()
   }
   
@@ -113,13 +112,14 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
   }
   
   private func updatePhysics() {
-    pos = pos.apply(vel)
-    vel = vel.add(acc)
-    rot = rot + tor
     for field in data?.fields ?? [] {
+      guard !ignoreFields else { break }
       guard field.bounds.contains(self.pos) else { continue }
       inherit(effect: field.effect)
     }
+    pos = pos.apply(vel)
+    vel = vel.add(acc)
+    rot = rot + tor
   }
 }
 
@@ -128,22 +128,21 @@ public extension Entity {
   // MARK: - Modifiers
   
   func initialPosition(x: Decider<CGFloat>, y: Decider<CGFloat>) -> Self {
-    self.pos = 
+    self.pos = CGPoint(x: x.decide(self), y: x.decide(self))
+    return self
   }
   
   func initialPosition(x: CGFloat, y: CGFloat) -> Self {
-    self.pos = CGPoint(x: x, y: y)
+    return self.initialPosition(x: .constant(x), y: .constant(y))
+  }
+  
+  func initialVelocity(x: Decider<CGFloat>, y: Decider<CGFloat>) -> Self {
+    self.vel = CGVector(dx: x.decide(self), dy: y.decide(self))
     return self
   }
   
   func initialVelocity(x: CGFloat, y: CGFloat) -> Self {
-    self.vel = CGVector(dx: x, dy: y)
-    return self
-  }
-  
-  func initialAcceleration(x: CGFloat, y: CGFloat) -> Self {
-    self.acc = CGVector(dx: x, dy: y)
-    return self
+    return self.initialVelocity(x: .constant(x), y: .constant(y))
   }
   
   func initialRotation(_ angle: Angle) -> Self {

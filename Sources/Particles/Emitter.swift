@@ -12,16 +12,13 @@ public class Emitter: Entity {
   
   // MARK: - Properties
   
-  /// Whether the emitter should fire particles.
-  var fire: Bool = true
-  /// The rate at which the emitter fires, in particles per second.
-  var rate: Double = 3.0
-  
   /// The prototypical entities this emitter spawns.
   var spawn: [Entity]
   
-  /// The fire velocity. This may be determined by the amount of particles fired and the amount of time since the emitter was created.
-  var fireVelocity: (Int, TimeInterval) -> CGVector = { _, _ in return .zero }
+  /// The rate at which the emitter fires, in particles per second.
+  var rate: Double
+  /// The velocity to fire particles.
+  var fireVelocity: Decider<CGVector> = .constant(.zero)
   /// The emitter's chooser. This determines which particle to emit based on the total number of particles emitted, and the time alive.
   var chooser: (Int, TimeInterval) -> Int
   /// Whether to spawn particles independent of the emitter's velocity.
@@ -36,18 +33,19 @@ public class Emitter: Entity {
   
   // MARK: - Initalizers
   
-  public init(@Builder<Entity> entities: @escaping () -> [Entity]) {
+  public init(rate: CGFloat = 3.0, @Builder<Entity> entities: @escaping () -> [Entity]) {
     let entities: [Entity] = entities()
+    self.rate = rate
     self.spawn = entities
     self.chooser = { _, _ in return Int.random(in: 0 ..< entities.count) }
     super.init()
+    self.lifetime = .infinity
   }
   
   // MARK: - Conformance
   
   required init(copying origin: Entity) {
     if let emitter = origin as? Emitter {
-      self.fire = emitter.fire
       self.rate = emitter.rate
       self.spawn = emitter.spawn
       self.fireVelocity = emitter.fireVelocity
@@ -101,7 +99,7 @@ public class Emitter: Entity {
   
   func emit() {
     let interval: TimeInterval = Date().timeIntervalSince(inception)
-    let fireVel: CGVector = fireVelocity(count, interval)
+    let fireVel: CGVector = fireVelocity.decide(self)
     let i: Int = chooser(count, interval)
     guard let data else {
       return
@@ -124,6 +122,7 @@ public class Emitter: Entity {
       toSpawn.vel = toSpawn.vel.add(self.vel)
     }
     toSpawn.vel = toSpawn.vel.add(fireVel)
+    toSpawn.source = self
     toSpawn.pos = self.pos
     spawned.append(toSpawn)
     lastFire = Date()
@@ -139,15 +138,14 @@ public extension Emitter {
   }
   
   func emitVelocity(x: CGFloat, y: CGFloat) -> Emitter {
-    self.fireVelocity = { _, _ in return CGVector(dx: x, dy: y) }
+    self.fireVelocity = .constant(.init(dx: x, dy: y))
     return self
   }
   
-  func emitVelocity(_ velocityFromParticleCount: @escaping (Int) -> CGVector) {
-    self.fireVelocity = { i, _ in return velocityFromParticleCount(i) }
-  }
-
-  func emitVelocity(_ velocityFromTimeAlive: @escaping (TimeInterval) -> CGVector) {
-    self.fireVelocity = { _, t in return velocityFromTimeAlive(t) }
+  func emitVelocity(x: Decider<CGFloat>, y: Decider<CGFloat>) -> Emitter {
+    self.fireVelocity = Decider { entity in
+      return CGVector(dx: x.decide(entity), dy: y.decide(entity))
+    }
+    return self
   }
 }

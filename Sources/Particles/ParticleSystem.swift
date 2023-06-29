@@ -32,7 +32,6 @@ public struct ParticleSystem: View {
           data.views[i].view.tag(data.views[i].tag)
         }
       }
-      .frame(width: 200.0, height: 200.0)
       .border(Color.red.opacity(data.debug ? 1.0 : 0.1))
       .opacity(t.date == Date() ? 1.0 : 1.0)
       .onChange(of: t.date) { date in
