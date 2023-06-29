@@ -87,7 +87,7 @@ extension Field.Effect {
     case .torque(let t):
       return { e in e.rot += t }
     case .destroy:
-      return { e in e.expiration = Date() }
+      return { e in e.lifetime = 0.0 }
     case .custom(let closure):
       return closure
     }
@@ -95,9 +95,9 @@ extension Field.Effect {
   
   var debugColor: Color {
     switch self {
-    case .gravity(let cGVector):
+    case .gravity(_):
       return .green
-    case .torque(let angle):
+    case .torque(_):
       return .purple
     case .destroy:
       return .red

@@ -16,8 +16,6 @@ public class Emitter: Entity {
   var fire: Bool = true
   /// The rate at which the emitter fires, in particles per second.
   var rate: Double = 3.0
-  /// The lifetime to give fired particles.
-  var lifetime: TimeInterval = 5.0
   
   /// The prototypical entities this emitter spawns.
   var spawn: [Entity]
@@ -51,7 +49,6 @@ public class Emitter: Entity {
     if let emitter = origin as? Emitter {
       self.fire = emitter.fire
       self.rate = emitter.rate
-      self.lifetime = emitter.lifetime
       self.spawn = emitter.spawn
       self.fireVelocity = emitter.fireVelocity
       self.chooser = emitter.chooser
@@ -122,8 +119,6 @@ public class Emitter: Entity {
     } else {
       fatalError("Cannot emit an unsupported entity of type \(type(of: spawn)).")
     }
-    toSpawn.inception = Date()
-    toSpawn.expiration = Date().advanced(by: lifetime)
     toSpawn.supply(data: data)
     if useInheritedVelocity {
       toSpawn.vel = toSpawn.vel.add(self.vel)

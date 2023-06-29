@@ -17,11 +17,12 @@ struct ContentView: View {
       Text("Hello, world!")
       ParticleSystem {
         Field(bounds: .all, effect: .torque(.degrees(1.0)))
+        Field(bounds: .circle(center: .zero, radius: 50.0), effect: .gravity(.init(dx: 0.1, dy: 0.0)))
         Emitter {
           Particle {
             Text("⭐️")
           }
-          .initialVelocity(x: 3.0, y: 3.0)
+          .initialVelocity(x: CGFloat.random(in: 3.0...6.0), y: 3.0)
           .initialAcceleration(x: 0.0, y: -0.05)
           //.initialTorque(.degrees(-1.0))
           Particle(color: .red, radius: 4.0)
