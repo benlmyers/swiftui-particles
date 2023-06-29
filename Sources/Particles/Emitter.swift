@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Foundation
 
 public class Emitter: Entity {
   
@@ -16,14 +17,14 @@ public class Emitter: Entity {
   /// The rate at which the emitter fires, in particles per second.
   var rate: Double = 3.0
   /// The lifetime to give fired particles.
-  var lifetime: TimeInterval = 0.2
+  var lifetime: TimeInterval = 5.0
   
   /// The prototypical entities this emitter spawns.
   var spawn: [Entity]
   
   /// The fire velocity. This may be determined by the amount of particles fired and the amount of time since the emitter was created.
   var fireVelocity: (Int, TimeInterval) -> CGVector = { _, _ in return .zero }
-  /// The emit chooser. This is determined by the amount of particles fired and the amount of time since the emitter was created.
+  /// The emitter's chooser. This determines which particle to emit based on the total number of particles emitted, and the time alive.
   var chooser: (Int, TimeInterval) -> Int
   /// Whether to spawn particles independent of the emitter's velocity.
   var useInheritedVelocity: Bool = true

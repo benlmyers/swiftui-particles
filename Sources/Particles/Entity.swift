@@ -87,10 +87,18 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
     self.data = data
   }
   
+  func inherit(effect: Field.Effect) {
+    effect.closure(self)
+  }
+  
   private func updatePhysics() {
     pos = pos.apply(vel)
     vel = vel.add(acc)
     rot = rot + tor
+    for field in data?.fields ?? [] {
+      guard field.bounds.contains(self.pos) else { continue }
+      inherit(effect: field.effect)
+    }
   }
 }
 
