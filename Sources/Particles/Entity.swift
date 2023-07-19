@@ -35,6 +35,11 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
   /// The lifetime of this entity.
   public internal(set) var lifetime: TimeInterval = 5.0
   
+  /// The particle's custom position over time.
+  var customPos: LifetimeBound<CGPoint>?
+  /// The particle's custom rotation over time.
+  var customRot: LifetimeBound<Angle>?
+  
   /// Whether this entity ignores field effects.
   var ignoreFields: Bool = false
   
@@ -48,6 +53,11 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
   /// The amount of time this particle has been alive.
   public var timeAlive: TimeInterval {
     return Date().timeIntervalSince(inception)
+  }
+  
+  /// The particle's progress from birth to death, a `Double` from `0.0` to `1.0`.
+  public var lifetimeProgress: Double {
+    return timeAlive / lifetime
   }
   
   // MARK: - Initalizers
@@ -86,6 +96,8 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
     self.rot = origin.rot
     self.tor = origin.tor
     self.lifetime = origin.lifetime
+    self.customPos = origin.customPos
+    self.customRot = origin.customRot
     super.init()
     super.data = origin.data
   }
@@ -120,6 +132,12 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
     pos = pos.apply(vel)
     vel = vel.add(acc)
     rot = rot + tor
+    if let customPos {
+      pos = customPos(lifetimeProgress)
+    }
+    if let customRot {
+      rot = customRot(lifetimeProgress)
+    }
   }
 }
 
@@ -162,6 +180,16 @@ public extension Entity {
   
   func lifetime(_ duration: TimeInterval) -> Self {
     self.lifetime = duration
+    return self
+  }
+  
+  func customPosition(_ closure: @escaping LifetimeBound<CGPoint>) -> Self {
+    self.customPos = closure
+    return self
+  }
+
+  func customRot(_ closure: @escaping LifetimeBound<Angle>) -> Self {
+    self.customRot = closure
     return self
   }
 }

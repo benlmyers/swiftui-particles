@@ -21,12 +21,15 @@ struct ContentView: View {
           Particle {
             Text("⭐️")
           }
-          Particle(color: .red, radius: 4.0)
+          .customScale { t in return 1 - t }
+          .lifetime(1.0)
+          //Particle(color: .red, radius: 4.0)
         }
         .initialPosition(x: 100.0, y: 100.0)
         .emitVelocity(x: .random(in: -10.0...10.0), y: .random(in: -10.0...10.0))
         .particlesInheritVelocity(false)
         .ignoreFields(true)
+        
       }
       //.debug()
     }

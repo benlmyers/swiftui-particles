@@ -15,6 +15,16 @@ public class Particle: Entity {
   /// The ID of the graphical prototype for use in the particle system's Canvas instance.
   var viewID: UUID
   
+  /// The scale of this particle.
+  public internal(set) var scale: CGFloat = 1.0
+  /// The opacity of this particle.
+  public internal(set) var opacity: CGFloat = 1.0
+  
+  /// The particle's custom scale over time.
+  var customScale: LifetimeBound<CGFloat>?
+  /// The particle's custom opacity over time.
+  var customOpacity: LifetimeBound<CGFloat>?
+  
   // MARK: - Initializers
   
   public init(@ViewBuilder view: () -> some View) {
@@ -36,26 +46,43 @@ public class Particle: Entity {
   
   // MARK: - Conformance
   
-  required init(copying origin: Entity) {
-    if let particle = origin as? Particle {
-      self.viewID = particle.viewID
-    } else {
-      fatalError("Attempted to copy an entity as a Particle, but found another origin type (\(type(of: origin))) instead.")
-    }
-    super.init(copying: origin)
-  }
-  
   override func render(_ context: GraphicsContext) {
     super.render(context)
     context.drawLayer { context in
       context.translateBy(x: pos.x, y: pos.y)
       context.rotate(by: rot)
+      context.scaleBy(x: scale, y: scale)
       var resolved: GraphicsContext.ResolvedSymbol = context.resolveSymbol(id: "NOT_FOUND")!
       if let r = context.resolveSymbol(id: viewID) {
         resolved = r
       }
       context.draw(resolved, at: .zero)
     }
+  }
+  
+  // MARK: - Overrides
+  
+  override func update() {
+    super.update()
+    if let customScale {
+      self.scale = customScale(lifetimeProgress)
+    }
+    if let customOpacity {
+      self.opacity = customOpacity(lifetimeProgress)
+    }
+  }
+  
+  required init(copying origin: Entity) {
+    if let particle = origin as? Particle {
+      self.viewID = particle.viewID
+      self.opacity = particle.opacity
+      self.scale = particle.scale
+      self.customScale = particle.customScale
+      self.customOpacity = particle.customOpacity
+    } else {
+      fatalError("Attempted to copy an entity as a Particle, but found another origin type (\(type(of: origin))) instead.")
+    }
+    super.init(copying: origin)
   }
   
   // MARK: - Methods
@@ -71,3 +98,15 @@ public class Particle: Entity {
   }
 }
 
+public extension Particle {
+  
+  func customScale(_ closure: @escaping LifetimeBound<CGFloat>) -> Self {
+    self.customScale = closure
+    return self
+  }
+  
+  func customOpacity(_ closure: @escaping LifetimeBound<CGFloat>) -> Self {
+    self.customOpacity = closure
+    return self
+  }
+}
