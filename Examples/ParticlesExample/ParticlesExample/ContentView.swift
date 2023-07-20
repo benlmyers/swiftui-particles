@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import Particles
+import PresetParticles
 
 struct ContentView: View {
   var body: some View {
@@ -15,23 +15,25 @@ struct ContentView: View {
         .imageScale(.large)
         .foregroundColor(.accentColor)
       Text("Hello, world!")
-      ParticleSystem {
-        Field(bounds: .all, effect: .gravity(.init(dx: 0.0, dy: 0.01)))
-        Emitter(rate: 10.0) {
-          Particle {
-            Text("⭐️")
-          }
-          .lifetime(3.0)
-          .floatDownward()
-          .customScale(.inAndOut(strength: 20))
-          Particle(color: .red, radius: 4.0)
-        }
-        .initialPosition(.center)
-        .emitVelocity(x: .random(in: -1.0...1.0), y: .random(in: -1.0...1.0))
-        .particlesInheritVelocity(false)
-        .ignoreFields(true)
-        
-      }
+      ConfettiSystem()
+      
+//      ParticleSystem {
+//        Field(bounds: .all, effect: .gravity(.init(dx: 0.0, dy: 0.01)))
+//        Emitter(rate: 10.0) {
+//          Particle {
+//            Text("⭐️")
+//          }
+//          .lifetime(3.0)
+//          .floatDownward()
+//          .customScale(.inAndOut(strength: 20))
+//          Particle(color: .red, radius: 4.0)
+//        }
+//        .initialPosition(.center)
+//        .emitVelocity(x: .random(in: -1.0...1.0), y: .random(in: -1.0...1.0))
+//        .particlesInheritVelocity(false)
+//        .ignoreFields(true)
+//
+//      }
       //.debug()
     }
     .padding()

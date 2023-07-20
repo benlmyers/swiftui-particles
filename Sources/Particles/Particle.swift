@@ -83,10 +83,11 @@ public class Particle: Entity {
       if !hueRotation.degrees.isZero {
         context.addFilter(.hueRotation(hueRotation))
       }
+      
+      context.scaleBy(x: scale, y: scale)
       if !vectorOffset.isZero {
         context.translateBy(x: vectorOffset.dx, y: vectorOffset.dy)
       }
-      context.scaleBy(x: scale, y: scale)
       context.draw(resolved, at: .zero)
     }
   }
@@ -163,14 +164,22 @@ public class Particle: Entity {
 
 public extension Particle {
   
+  func initialFlip(_ angle: Decider<Angle>) -> Self {
+    self.flip = angle.decide(self)
+    return self
+  }
+  
   func initialFlip(_ angle: Angle) -> Self {
-    self.flip = angle
+    return self.initialFlip(.constant(angle))
+  }
+  
+  func initialFlipTorque(_ torque: Decider<Angle>) -> Self {
+    self.flipTor = torque.decide(self)
     return self
   }
   
   func initialFlipTorque(_ torque: Angle) -> Self {
-    self.flipTor = torque
-    return self
+    return self.initialFlipTorque(.constant(torque))
   }
 }
 
@@ -238,7 +247,7 @@ public extension Particle {
   
   func floatDownward(speed: Double = 1.0) -> Self {
     customVectorOffset { t in
-      return .init(magnitude: 50.0, angle: .degrees(90.0 + 60.0 * sin(t * speed * 4.0 * .pi)))
+      return .init(magnitude: t * 20.0, angle: .degrees(90.0 + 60.0 * sin(t * speed * 4.0 * .pi)))
     }
   }
 }

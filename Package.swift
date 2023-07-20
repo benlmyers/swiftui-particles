@@ -11,6 +11,7 @@ let package = Package(
     .library(
       name: "Particles",
       targets: ["Particles"]),
+    .library(name: "PresetParticles", targets: ["PresetParticles"])
   ],
   dependencies: [
     // Dependencies declare other packages that this package depends on.
@@ -22,5 +23,8 @@ let package = Package(
     .target(
       name: "Particles",
       dependencies: []),
+    .target(
+      name: "PresetParticles",
+      dependencies: ["Particles"]),
   ]
 )

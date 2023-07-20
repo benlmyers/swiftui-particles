@@ -190,14 +190,22 @@ public extension Entity {
     return self.initialVelocity(x: .constant(x), y: .constant(y))
   }
   
+  func initialRotation(_ angle: Decider<Angle>) -> Self {
+    self.rot = angle.decide(self)
+    return self
+  }
+  
   func initialRotation(_ angle: Angle) -> Self {
-    self.rot = angle
+    return self.initialRotation(.constant(angle))
+  }
+  
+  func initialTorque(_ torque: Decider<Angle>) -> Self {
+    self.tor = torque.decide(self)
     return self
   }
   
   func initialTorque(_ torque: Angle) -> Self {
-    self.tor = torque
-    return self
+    return self.initialTorque(.constant(torque))
   }
   
   func ignoreFields(_ flag: Bool) -> Self {

@@ -5,6 +5,7 @@
 //  Created by Ben Myers on 6/29/23.
 //
 
+import SwiftUI
 import Foundation
 
 public struct Decider<Value> {
@@ -27,5 +28,14 @@ public extension Decider where Value == CGFloat {
   
   static func random(in range: ClosedRange<Value>) -> Self {
     return Decider { _ in return Value.random(in: range) }
+  }
+}
+
+public extension Decider where Value == Angle {
+  
+  // MARK: - Static Methods
+  
+  static func random(in range: ClosedRange<Value>) -> Self {
+    return Decider { _ in return Value(degrees: Double.random(in: range.lowerBound.degrees ... range.upperBound.degrees)) }
   }
 }
