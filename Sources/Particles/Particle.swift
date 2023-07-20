@@ -15,6 +15,8 @@ public class Particle: Entity {
   /// The ID of the graphical prototype for use in the particle system's Canvas instance.
   var viewID: UUID
   
+  var show: Bool = false
+  
   /// The scale of this particle.
   public internal(set) var scale: CGFloat = 1.0
   /// The opacity of this particle.
@@ -27,6 +29,8 @@ public class Particle: Entity {
   public internal(set) var blur: CGFloat = .zero
   /// The hue color rotation of this particle.
   public internal(set) var hueRotation: Angle = .zero
+  /// The vector offset of this particle.
+  public internal(set) var vectorOffset: CGVector = .zero
   
   /// The particle's custom scale over time.
   var customScale: LifetimeBound<CGFloat>?
@@ -38,6 +42,8 @@ public class Particle: Entity {
   var customBlur: LifetimeBound<CGFloat>?
   /// The particle's custom hue rotation over time.
   var customHueRotation: LifetimeBound<Angle>?
+  /// The particle's custom vector offset.
+  var customVectorOffset: LifetimeBound<CGVector>?
   
   // MARK: - Initializers
   
@@ -61,22 +67,26 @@ public class Particle: Entity {
   // MARK: - Conformance
   
   override func render(_ context: GraphicsContext) {
+    guard show else { return }
     super.render(context)
     context.drawLayer { context in
       context.translateBy(x: pos.x, y: pos.y)
       context.scaleBy(x: cos(flip.radians), y: 1.0)
       context.rotate(by: rot)
-      context.scaleBy(x: scale, y: scale)
+      if !blur.isZero {
+        context.addFilter(.blur(radius: blur))
+      }
       var resolved: GraphicsContext.ResolvedSymbol = context.resolveSymbol(id: "NOT_FOUND")!
       if let r = context.resolveSymbol(id: viewID) {
         resolved = r
       }
-      if !blur.isZero {
-        context.addFilter(.blur(radius: blur))
-      }
       if !hueRotation.degrees.isZero {
         context.addFilter(.hueRotation(hueRotation))
       }
+      if !vectorOffset.isZero {
+        context.translateBy(x: vectorOffset.dx, y: vectorOffset.dy)
+      }
+      context.scaleBy(x: scale, y: scale)
       context.draw(resolved, at: .zero)
     }
   }
@@ -101,6 +111,10 @@ public class Particle: Entity {
     if let customHueRotation {
       self.hueRotation = customHueRotation.closure(lifetimeProgress)
     }
+    if let customVectorOffset {
+      self.vectorOffset = customVectorOffset.closure(lifetimeProgress)
+    }
+    show = true
   }
   
   required init(copying origin: Entity) {
@@ -111,12 +125,14 @@ public class Particle: Entity {
       self.flip = particle.flip
       self.flipTor = particle.flipTor
       self.blur = particle.blur
+      self.vectorOffset = particle.vectorOffset
       self.hueRotation = particle.hueRotation
       self.customScale = particle.customScale
       self.customOpacity = particle.customOpacity
       self.customFlip = particle.customFlip
       self.customBlur = particle.customBlur
       self.customHueRotation = particle.customHueRotation
+      self.customVectorOffset = particle.customVectorOffset
     } else {
       fatalError("Attempted to copy an entity as a Particle, but found another origin type (\(type(of: origin))) instead.")
     }
@@ -184,6 +200,11 @@ public extension Particle {
     self.customHueRotation = bound
     return self
   }
+  
+  func customVectorOffset(_ bound: LifetimeBound<CGVector>) -> Self {
+    self.customVectorOffset = bound
+    return self
+  }
 }
 
 public extension Particle {
@@ -206,5 +227,18 @@ public extension Particle {
   
   func customHueRotation(_ closure: @escaping (Double) -> Angle) -> Self {
     customHueRotation(.init(closure: closure))
+  }
+  
+  func customVectorOffset(_ closure: @escaping (Double) -> CGVector) -> Self {
+    customVectorOffset(.init(closure: closure))
+  }
+}
+
+public extension Particle {
+  
+  func floatDownward(speed: Double = 1.0) -> Self {
+    customVectorOffset { t in
+      return .init(magnitude: 50.0, angle: .degrees(90.0 + 60.0 * sin(t * speed * 4.0 * .pi)))
+    }
   }
 }

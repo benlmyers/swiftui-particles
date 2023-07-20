@@ -26,6 +26,10 @@ public extension LifetimeBound where T == CGFloat {
     LifetimeBound { t in clamp(finalVal * CGFloat(t), min: 0.0, max: finalVal) }
   }
   
+  static func inAndOut(in range: ClosedRange<T> = 0.0 ... 1.0, strength: UInt = 2) -> LifetimeBound {
+    LifetimeBound { t in range.lowerBound + (range.upperBound - range.lowerBound) * clamp(1 - pow((2 * t - 1), 2 * Double(strength)), min: 0.0, max: 1.0)}
+  }
+  
   /// Gradual decrease during last 10% of lifetime.
   static func decreaseOut(from initialVal: T = 1.0) -> LifetimeBound {
     decreaseAfter(0.9, from: initialVal)

@@ -48,6 +48,7 @@ extension Field {
   public enum Effect {
     case gravity(CGVector)
     case torque(Angle)
+    @available(*, deprecated, message: "Still under development. Avoid using.")
     case bounce
     case destroy
     case custom((Entity) -> Void)

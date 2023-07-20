@@ -23,6 +23,8 @@ public class Emitter: Entity {
   var chooser: (Int, TimeInterval) -> Int
   /// Whether to spawn particles independent of the emitter's velocity.
   var useInheritedVelocity: Bool = true
+  /// The maximum amount of particles this emitter may spawn.
+  var maxCount: Int?
   
   /// The entities spawned by the emitter.
   var spawned: [Entity?] = []
@@ -98,6 +100,11 @@ public class Emitter: Entity {
   // MARK: - Methods
   
   func emit() {
+    if let maxCount: Int {
+      guard count < maxCount else {
+        return
+      }
+    }
     let interval: TimeInterval = Date().timeIntervalSince(inception)
     let fireVel: CGVector = fireVelocity.decide(self)
     let i: Int = chooser(count, interval)
@@ -131,6 +138,11 @@ public class Emitter: Entity {
 }
 
 public extension Emitter {
+  
+  func stopAfter(numberEmitted: Int) -> Emitter {
+    self.maxCount = numberEmitted
+    return self
+  }
   
   func particlesInheritVelocity(_ flag: Bool) -> Emitter {
     self.useInheritedVelocity = flag
