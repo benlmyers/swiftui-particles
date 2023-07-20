@@ -8,8 +8,6 @@
 import SwiftUI
 import Foundation
 
-public typealias LifetimeBound<T> = (Double) -> T
-
 public struct ParticleSystem: View {
   
   // MARK: - Properties

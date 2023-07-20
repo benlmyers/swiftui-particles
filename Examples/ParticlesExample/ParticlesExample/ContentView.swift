@@ -16,17 +16,19 @@ struct ContentView: View {
         .foregroundColor(.accentColor)
       Text("Hello, world!")
       ParticleSystem {
-        Field(bounds: .all, effect: .gravity(.init(dx: 0.0, dy: 0.1)))
+        //Field(bounds: .all, effect: .gravity(.init(dx: 0.0, dy: 0.1)))
         Emitter(rate: 10.0) {
           Particle {
             Text("⭐️")
           }
-          .customScale { t in return 1 - t }
-          .lifetime(1.0)
-          //Particle(color: .red, radius: 4.0)
+          .customScale(.decreaseOut())
+          .customHueRotation(.gradualRotate())
+          .customFlip(.constantIncrease())
+          .customRot(.constantIncrease())
+          Particle(color: .red, radius: 4.0)
         }
         .initialPosition(x: 100.0, y: 100.0)
-        .emitVelocity(x: .random(in: -10.0...10.0), y: .random(in: -10.0...10.0))
+        .emitVelocity(x: .random(in: -1.0...1.0), y: .random(in: -1.0...1.0))
         .particlesInheritVelocity(false)
         .ignoreFields(true)
         

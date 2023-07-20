@@ -133,17 +133,15 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
     vel = vel.add(acc)
     rot = rot + tor
     if let customPos {
-      pos = customPos(lifetimeProgress)
+      pos = customPos.closure(lifetimeProgress)
     }
     if let customRot {
-      rot = customRot(lifetimeProgress)
+      rot = customRot.closure(lifetimeProgress)
     }
   }
 }
 
 public extension Entity {
-  
-  // MARK: - Modifiers
   
   func initialPosition(x: Decider<CGFloat>, y: Decider<CGFloat>) -> Self {
     self.pos = CGPoint(x: x.decide(self), y: x.decide(self))
@@ -182,14 +180,28 @@ public extension Entity {
     self.lifetime = duration
     return self
   }
+}
+
+public extension Entity {
   
-  func customPosition(_ closure: @escaping LifetimeBound<CGPoint>) -> Self {
-    self.customPos = closure
+  func customPosition(_ bound: LifetimeBound<CGPoint>) -> Self {
+    self.customPos = bound
     return self
   }
-
-  func customRot(_ closure: @escaping LifetimeBound<Angle>) -> Self {
-    self.customRot = closure
+  
+  func customRot(_ bound: LifetimeBound<Angle>) -> Self {
+    self.customRot = bound
     return self
+  }
+}
+
+public extension Entity {
+  
+  func customPosition(_ closure: @escaping (Double) -> CGPoint) -> Self {
+    customPosition(.init(closure: closure))
+  }
+  
+  func customRot(_ closure: @escaping (Double) -> Angle) -> Self {
+    customRot(.init(closure: closure))
   }
 }
