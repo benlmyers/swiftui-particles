@@ -80,6 +80,7 @@ public struct ParticleSystem: View {
   // MARK: - Methods
   
   func renderer(context: inout GraphicsContext, size: CGSize) {
+    self.data.size = size
     for entity in data.entities {
       entity?.render(context)
     }
@@ -111,6 +112,8 @@ extension ParticleSystem {
     var fields: [Field] = []
     /// Whether to enable debug mode.
     var debug: Bool = false
+    /// The size of the canvas used to render the particle system.
+    var size: CGSize = .zero
   }
 }
 

@@ -70,7 +70,7 @@ public class Particle: Entity {
     guard show else { return }
     super.render(context)
     context.drawLayer { context in
-      context.translateBy(x: pos.x, y: pos.y)
+      context.translateBy(x: pos.getCG(in: data?.size ?? .zero).x, y: pos.getCG(in: data?.size ?? .zero).y)
       context.scaleBy(x: cos(flip.radians), y: 1.0)
       context.rotate(by: rot)
       if !blur.isZero {
@@ -154,7 +154,7 @@ public class Particle: Entity {
   private func updatePhysics() {
     for field in data?.fields ?? [] {
       guard !ignoreFields else { break }
-      guard field.bounds.contains(self.pos) else { continue }
+      guard field.bounds.contains(self.pos.getCG(in: data?.size ?? .zero)) else { continue }
       inherit(effect: field.effect)
     }
     flip = flip + flipTor

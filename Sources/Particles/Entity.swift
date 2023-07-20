@@ -19,7 +19,7 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
   var source: Emitter?
   
   /// The entity's position.
-  public internal(set) var pos: CGPoint = .zero
+  public internal(set) var pos: Position = .zero
   /// The entity's velocity.
   public internal(set) var vel: CGVector = .zero
   /// The entity's acceleration.
@@ -36,7 +36,7 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
   public internal(set) var lifetime: TimeInterval = 5.0
   
   /// The particle's custom position over time.
-  var customPos: LifetimeBound<CGPoint>?
+  var customPos: LifetimeBound<Position>?
   /// The particle's custom rotation over time.
   var customRot: LifetimeBound<Angle>?
   
@@ -63,12 +63,12 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
   // MARK: - Initalizers
   
   init(_ p0: CGPoint, _ v0: CGVector, _ a: CGVector) {
-    self.pos = p0
+    self.pos = .cg(p0)
     self.vel = v0
     self.acc = a
     super.init()
   }
-
+  
   // MARK: - Overrides
   
   override init() {
@@ -78,8 +78,8 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
   override func debug(_ context: GraphicsContext) {
     context.stroke(
       Path { build in
-        build.move(to: pos)
-        build.addLine(to: pos.apply(vel.scale(10.0)))
+        build.move(to: pos.getCG(in: data?.size ?? .zero))
+        build.addLine(to: pos.getCG(in: data?.size ?? .zero).apply(vel.scale(10.0)))
       },
       with: .color(.green),
       lineWidth: 2.0
@@ -109,7 +109,7 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
   }
   
   // MARK: - Methods
-
+  
   func update() {
     acc = .zero
     updatePhysics()
@@ -126,10 +126,10 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
   private func updatePhysics() {
     for field in data?.fields ?? [] {
       guard !ignoreFields else { break }
-      guard field.bounds.contains(self.pos) else { continue }
+      guard field.bounds.contains(self.pos.getCG(in: data?.size ?? .zero)) else { continue }
       inherit(effect: field.effect)
     }
-    pos = pos.apply(vel)
+    pos = .cg(pos.getCG(in: data?.size ?? .zero).apply(vel))
     vel = vel.add(acc)
     rot = rot + tor
     if let customPos {
@@ -139,17 +139,46 @@ public class Entity: Item, Identifiable, Renderable, Updatable, Copyable {
       rot = customRot.closure(lifetimeProgress)
     }
   }
+  
+  // MARK: - Subtypes
+  
+  public enum Position {
+    case unit(UnitPoint)
+    case cg(CGPoint)
+    
+    static var zero: Self {
+      .cg(.zero)
+    }
+    
+    func getCG(in size: CGSize) -> CGPoint {
+      switch self {
+      case .unit(let unitPoint):
+        return CGPoint(x: size.width * unitPoint.x, y: size.height * unitPoint.y)
+      case .cg(let cgPoint):
+        return cgPoint
+      }
+    }
+  }
 }
 
 public extension Entity {
   
   func initialPosition(x: Decider<CGFloat>, y: Decider<CGFloat>) -> Self {
-    self.pos = CGPoint(x: x.decide(self), y: x.decide(self))
+    self.pos = .cg(CGPoint(x: x.decide(self), y: x.decide(self)))
     return self
   }
   
   func initialPosition(x: CGFloat, y: CGFloat) -> Self {
     return self.initialPosition(x: .constant(x), y: .constant(y))
+  }
+  
+  func initialPosition(_ unitPoint: Decider<UnitPoint>) -> Self {
+    self.pos = .unit(unitPoint.decide(self))
+    return self
+  }
+  
+  func initialPosition(_ unitPoint: UnitPoint) -> Self {
+    return self.initialPosition(.constant(unitPoint))
   }
   
   func initialVelocity(x: Decider<CGFloat>, y: Decider<CGFloat>) -> Self {
@@ -184,7 +213,7 @@ public extension Entity {
 
 public extension Entity {
   
-  func customPosition(_ bound: LifetimeBound<CGPoint>) -> Self {
+  func customPosition(_ bound: LifetimeBound<Position>) -> Self {
     self.customPos = bound
     return self
   }
@@ -198,7 +227,15 @@ public extension Entity {
 public extension Entity {
   
   func customPosition(_ closure: @escaping (Double) -> CGPoint) -> Self {
-    customPosition(.init(closure: closure))
+    customPosition(.init(closure: { t in
+        .cg(closure(t))
+    }))
+  }
+  
+  func customPosition(_ closure: @escaping (Double) -> UnitPoint) -> Self {
+    customPosition(.init(closure: { t in
+        .unit(closure(t))
+    }))
   }
   
   func customRot(_ closure: @escaping (Double) -> Angle) -> Self {

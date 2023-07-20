@@ -65,7 +65,7 @@ public class Emitter: Entity {
   override func debug(_ context: GraphicsContext) {
     super.debug(context)
     context.stroke(
-      Path(ellipseIn: CGRect(origin: pos, size: CGSize(width: 5.0, height: 5.0))),
+      Path(ellipseIn: CGRect(origin: pos.getCG(in: data?.size ?? .zero), size: CGSize(width: 5.0, height: 5.0))),
       with: .color(.yellow),
       lineWidth: 4
     )

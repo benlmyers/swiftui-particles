@@ -26,7 +26,7 @@ struct ContentView: View {
           .customScale(.inAndOut(strength: 20))
           Particle(color: .red, radius: 4.0)
         }
-        .initialPosition(x: 100.0, y: 100.0)
+        .initialPosition(.center)
         .emitVelocity(x: .random(in: -1.0...1.0), y: .random(in: -1.0...1.0))
         .particlesInheritVelocity(false)
         .ignoreFields(true)
