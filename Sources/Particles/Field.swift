@@ -1,23 +1,25 @@
-////
-////  Field.swift
-////
-////
-////  Created by Ben Myers on 6/27/23.
-////
 //
-//import SwiftUI
+//  Field.swift
 //
-//public class Field: Item {
 //
-//  // MARK: - Properties
+//  Created by Ben Myers on 6/27/23.
 //
-//  /// The field's bounds.
-//  var bounds: Shape
-//  /// A closure that applies a physical effect to entities within its bounds.
-//  var effect: Effect
-//
-//  // MARK: - Initalizers
-//
+
+import SwiftUI
+
+public class Field: Entity {
+  
+  typealias Tag = String
+
+  // MARK: - Properties
+
+  /// The field's bounds.
+  @Configured public internal(set) var bounds: Bounds
+  
+  var tag: Tag
+
+  // MARK: - Initalizers
+
 //  public init(bounds: Field.Shape, effect: Field.Effect) {
 //    self.bounds = bounds
 //    self.effect = effect
@@ -29,86 +31,55 @@
 //    self.effect = .custom(effect)
 //    super.init()
 //  }
-//
-//  // MARK: - Overrides
-//
-//  override func debug(_ context: GraphicsContext) {
-//    context.fill(bounds.path, with: .color(effect.debugColor.opacity(0.1)))
-//  }
-//}
-//
-//extension Field {
-//
-//  public enum Shape {
-//    case all
-//    case rect(bounds: CGRect)
-//    case circle(center: CGPoint, radius: CGFloat)
-//  }
-//
-//  public enum Effect {
+
+  // MARK: - Overrides
+  
+  // MARK: - Subtypes
+  
+  public class Bounds {
+    
+  }
+}
+
+extension Field {
+
+  public enum Shape {
+    case all
+    case rect(bounds: CGRect)
+    case circle(center: CGPoint, radius: CGFloat)
+  }
+
+  public enum Effect {
 //    case gravity(CGVector)
 //    case torque(Angle)
 //    @available(*, deprecated, message: "Still under development. Avoid using.")
 //    case bounce
 //    case destroy
 //    case custom((Entity) -> Void)
-//  }
-//}
-//
-//extension Field.Shape {
-//
-//  var path: Path {
-//    switch self {
-//    case .all:
-//      return Path(.infinite)
-//    case .rect(let bounds):
-//      return Path(bounds)
-//    case .circle(let center, let radius):
-//      return Path(ellipseIn: CGRect(origin: center, size: CGSize(width: radius * 2.0, height: radius * 2.0)))
-//    }
-//  }
-//
-//  func contains(_ point: CGPoint) -> Bool {
-//    switch self {
-//    case .all:
-//      return true
-//    case .rect(let bounds):
-//      return bounds.contains(point)
-//    case .circle(let center, let radius):
-//      return center.distance(to: point) <= radius
-//    }
-//  }
-//}
-//
-//extension Field.Effect {
-//
-//  var closure: (Entity) -> Void {
-//    switch self {
-//    case .gravity(let v):
-//      return { e in e.acc = e.acc.add(v) }
-//    case .torque(let t):
-//      return { e in e.rot += t }
-//    case .destroy:
-//      return { e in e.lifetime = 0.0 }
-//    case .custom(let closure):
-//      return closure
-//    case .bounce:
-//      return { e in e.vel = e.vel.scale(-1) }
-//    }
-//  }
-//
-//  var debugColor: Color {
-//    switch self {
-//    case .gravity(_):
-//      return .green
-//    case .torque(_):
-//      return .purple
-//    case .destroy:
-//      return .red
-//    case .custom(_):
-//      return .yellow
-//    case .bounce:
-//      return .yellow
-//    }
-//  }
-//}
+  }
+}
+
+extension Field.Shape {
+
+  var path: Path {
+    switch self {
+    case .all:
+      return Path(.infinite)
+    case .rect(let bounds):
+      return Path(bounds)
+    case .circle(let center, let radius):
+      return Path(ellipseIn: CGRect(origin: center, size: CGSize(width: radius * 2.0, height: radius * 2.0)))
+    }
+  }
+
+  func contains(_ point: CGPoint) -> Bool {
+    switch self {
+    case .all:
+      return true
+    case .rect(let bounds):
+      return bounds.contains(point)
+    case .circle(let center, let radius):
+      return center.distance(to: point) <= radius
+    }
+  }
+}

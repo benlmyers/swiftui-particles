@@ -58,7 +58,7 @@ public struct ParticleSystem {
   }
   
   func destroyExpired() {
-//    data.entities.removeAll(where: { Date() > $0.expiration })
+    data.entities.removeAll(where: { Date() > $0.expiration })
   }
   
   // MARK: - Subtypes
