@@ -64,19 +64,19 @@ public class Entity: Identifiable, Hashable, Equatable {
   
   init() {
     // Default physics configuration
-//    self._pos.setBehavior { entity, pos in
-//      let v = entity.vel
-//      return CGPoint(x: pos.x + v.dx, y: pos.y + v.dy)
-//    }
-//    self._vel.setBehavior { entity, vel in
-//      vel.add(entity.acc)
-//    }
-//    self._rotation.setBehavior { entity, rotation in
-//      Angle(degrees: rotation.degrees + entity.torque.degrees)
-//    }
-//    self._torque.setBehavior { entity, torque in
-//      Angle(degrees: torque.degrees + entity.torqueVariation.degrees)
-//    }
+    self._pos.setBehavior { entity, pos in
+      let v = entity.vel
+      return CGPoint(x: pos.x + v.dx, y: pos.y + v.dy)
+    }
+    self._vel.setBehavior { entity, vel in
+      vel.add(entity.acc)
+    }
+    self._rotation.setBehavior { entity, rotation in
+      Angle(degrees: rotation.degrees + entity.torque.degrees)
+    }
+    self._torque.setBehavior { entity, torque in
+      Angle(degrees: torque.degrees + entity.torqueVariation.degrees)
+    }
   }
   
   public static func == (lhs: Entity, rhs: Entity) -> Bool {
@@ -98,7 +98,14 @@ public class Entity: Identifiable, Hashable, Equatable {
   }
   
   func update() {
-    // TODO: Implement
+    $lifetime.update(in: self)
+    $pos.update(in: self)
+    $vel.update(in: self)
+    $acc.update(in: self)
+    $rotation.update(in: self)
+    $torque.update(in: self)
+    $torqueVariation.update(in: self)
+    $anchor.update(in: self)
   }
   
   func supply(system: ParticleSystem.Data) {
@@ -113,6 +120,10 @@ public class Entity: Identifiable, Hashable, Equatable {
     
     public internal(set) var wrappedValue: T
     private var behaviors: [Behavior] = []
+    
+    public var projectedValue: Configured<T> {
+      return self
+    }
     
     public init(wrappedValue: T) {
       self.wrappedValue = wrappedValue
@@ -159,6 +170,21 @@ public extension Entity {
       return self
     }
     self.pos = CGPoint(x: unitPoint.x * system.size.width, y: unitPoint.y * system.size.height)
+    return self
+  }
+  
+  func initialVelocity(_ vector: CGVector) -> Self {
+    self.vel = vector
+    return self
+  }
+  
+  func constantVelocity(_ vector: CGVector) -> Self {
+    self._vel.set(to: vector)
+    return self
+  }
+  
+  func acceleration(_ vector: CGVector) -> Self {
+    self.acc = vector
     return self
   }
 }

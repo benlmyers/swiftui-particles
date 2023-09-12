@@ -28,8 +28,10 @@ public struct ParticleSystem {
   
   init(_ items: [Entity]) {
     for item in items {
-      item.system = self.data
       self.data.entities.append(item)
+    }
+    for item in self.data.entities {
+      item.supply(system: self.data)
     }
   }
   
@@ -56,7 +58,7 @@ public struct ParticleSystem {
   }
   
   func destroyExpired() {
-    data.entities.removeAll(where: { Date() > $0.expiration })
+//    data.entities.removeAll(where: { Date() > $0.expiration })
   }
   
   // MARK: - Subtypes

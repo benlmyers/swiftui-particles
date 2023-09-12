@@ -84,6 +84,10 @@ public class Particle: Entity {
 
   override func update() {
     super.update()
+    $scaleEffect.update(in: self)
+    $opacity.update(in: self)
+    $blur.update(in: self)
+    $hueRotation.update(in: self)
   }
 
   // MARK: - Methods

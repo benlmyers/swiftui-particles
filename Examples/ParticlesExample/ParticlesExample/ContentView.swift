@@ -21,7 +21,9 @@ struct ContentView: View {
       Text("Hello, world!")
       ParticleSystem {
         Particle(color: .red, radius: 5.0)
-          .starts(at: .center)
+//          .starts(at: .center)
+          .starts(atPoint: .init(x: 100, y: 100))
+          .initialVelocity(.init(dx: 4.0, dy: 4.0))
       }
     }
     .padding()
