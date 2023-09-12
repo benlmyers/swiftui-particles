@@ -9,7 +9,8 @@ import SwiftUI
 
 public class Field: Entity {
   
-  typealias Tag = String
+  public typealias Tag = String
+  public typealias Effect = (Entity) -> Void
 
   // MARK: - Properties
 
@@ -17,49 +18,50 @@ public class Field: Entity {
   @Configured public internal(set) var bounds: Bounds
   
   var tag: Tag
+  
+  var effect: Effect
 
   // MARK: - Initalizers
-
-//  public init(bounds: Field.Shape, effect: Field.Effect) {
-//    self.bounds = bounds
-//    self.effect = effect
-//    super.init()
-//  }
-//
-//  public init(bounds: Field.Shape, effect: @escaping (Entity) -> Void) {
-//    self.bounds = bounds
-//    self.effect = .custom(effect)
-//    super.init()
-//  }
-
+  
+  public init(bounds: Bounds, tag: Tag, effect: @escaping Effect) {
+    self.bounds = bounds
+    self.tag = tag
+    self.effect = effect
+    super.init()
+  }
+  
   // MARK: - Overrides
   
+  override func update() {
+    super.update()
+    guard let system else {
+      return
+    }
+    guard let index = system.entities.firstIndex(of: self) else {
+      return
+    }
+    let count = system.entities.count
+    for i in index + 1 ..< count where i < index && i < count {
+      let entity: Entity = system.entities[i]
+      // Skip field effects
+      if entity is Field {
+        continue
+      }
+      // Update using effects
+      effect(entity)
+    }
+  }
+
   // MARK: - Subtypes
   
-  public class Bounds {
-    
-  }
-}
-
-extension Field {
-
-  public enum Shape {
+  public enum Bounds {
     case all
     case rect(bounds: CGRect)
     case circle(center: CGPoint, radius: CGFloat)
   }
-
-  public enum Effect {
-//    case gravity(CGVector)
-//    case torque(Angle)
-//    @available(*, deprecated, message: "Still under development. Avoid using.")
-//    case bounce
-//    case destroy
-//    case custom((Entity) -> Void)
-  }
 }
 
-extension Field.Shape {
+extension Field.Bounds {
 
   var path: Path {
     switch self {

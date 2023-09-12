@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - Internal
 
-public struct ParticleSystem {
+public struct ParticleSystem: View {
   
   // MARK: - Properties
   
@@ -35,7 +35,7 @@ public struct ParticleSystem {
     }
   }
   
-  init(copying system: Self) {
+  init(copying system: ParticleSystem) {
     self.paused = system.paused
     self.async = system.async
     self.colorMode = system.colorMode
@@ -72,11 +72,6 @@ public struct ParticleSystem {
     var debug: Bool = false
     var size: CGSize = .zero
   }
-}
-
-// MARK: - Public API
-
-extension ParticleSystem: View {
   
   // MARK: - Initalizers
   
@@ -88,16 +83,16 @@ extension ParticleSystem: View {
   // MARK: - Conformance
   
   public var body: some View {
-    TimelineView(.animation(paused: paused.wrappedValue)) { t in
+    TimelineView(.animation(paused: paused.wrappedValue)) { [self] t in
       Canvas(opaque: true, colorMode: colorMode, rendersAsynchronously: async, renderer: renderer) {
         Text("❌").tag("NOT_FOUND")
-        ForEach(0 ..< data.views.count, id: \.self) { i in
+        ForEach(0 ..< data.views.count, id: \.self) { [self] i in
           data.views[i].view.tag(data.views[i].tag)
         }
       }
       .border(Color.red.opacity(data.debug ? 1.0 : 0.1))
       .opacity(t.date == Date() ? 1.0 : 1.0)
-      .onChange(of: t.date) { date in
+      .onChange(of: t.date) { [self] date in
         destroyExpired()
         update()
       }

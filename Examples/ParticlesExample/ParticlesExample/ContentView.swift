@@ -22,8 +22,9 @@ struct ContentView: View {
       ParticleSystem {
         Particle(color: .red, radius: 5.0)
 //          .starts(at: .center)
+          .lifetime(8.0)
           .starts(atPoint: .init(x: 100, y: 100))
-          .initialVelocity(.init(dx: 4.0, dy: 4.0))
+          .initialVelocity(.init(dx: 1.0, dy: 1.5))
       }
     }
     .padding()
