@@ -8,12 +8,14 @@
 import SwiftUI
 import Foundation
 
-public struct ParticleSystem: View {
+// MARK: - Internal
+
+public struct ParticleSystem {
   
   // MARK: - Properties
   
   /// Whether the system's animation is paused.
-  var paused: Bool = false
+  var paused: Binding<Bool> = .constant(false)
   /// The color mode of the renderer.
   var colorMode: ColorRenderingMode = .nonLinear
   /// Whether to render the particles asynchronously.
@@ -22,39 +24,11 @@ public struct ParticleSystem: View {
   /// The particle system data to pass to child entities.
   var data: ParticleSystem.Data = .init()
   
-  // MARK: - Views
-  
-  public var body: some View {
-    TimelineView(.animation(paused: paused)) { t in
-      Canvas(opaque: true, colorMode: colorMode, rendersAsynchronously: async, renderer: renderer) {
-        Text("❌").tag("NOT_FOUND")
-        ForEach(0 ..< data.views.count, id: \.self) { i in
-          data.views[i].view.tag(data.views[i].tag)
-        }
-      }
-      .border(Color.red.opacity(data.debug ? 1.0 : 0.1))
-      .opacity(t.date == Date() ? 1.0 : 1.0)
-      .onChange(of: t.date) { date in
-        update()
-      }
-    }
-  }
-  
   // MARK: - Initalizers
   
-  public init(@Builder<Item> entities: @escaping () -> [Item]) {
-    let entities = entities()
-    self.init(entities)
-  }
-  
-  init(_ items: [Item]) {
+  init(_ items: [Entity]) {
     for item in items {
-      if let entity = item as? Entity {
-        entity.supply(data: data)
-        self.data.entities.append(entity)
-      } else if let field = item as? Field {
-        self.data.fields.append(field)
-      }
+      self.data.entities.append(item)
     }
   }
   
@@ -65,59 +39,72 @@ public struct ParticleSystem: View {
     self.data = system.data
   }
   
-  // MARK: - Static Methods
-  
-  static func destroyExpiredEntities(in collection: inout [Entity?]) {
-    for i in 0 ..< collection.count {
-      guard let entity = collection[i] else { continue }
-      if Date() >= entity.expiration {
-        collection[i] = nil
-      }
-    }
-    collection.removeAll(where: { $0 == nil })
-  }
-  
   // MARK: - Methods
   
   func renderer(context: inout GraphicsContext, size: CGSize) {
     self.data.size = size
     for entity in data.entities {
-      entity?.render(context)
-    }
-    guard data.debug else { return }
-    for field in data.fields {
-      field.debug(context)
+      entity.render(context)
     }
   }
   
   func update() {
-    ParticleSystem.destroyExpiredEntities(in: &data.entities)
     for entity in data.entities {
-      entity?.update()
+      entity.update()
     }
   }
-}
-
-extension ParticleSystem {
+  
+  func destroyExpired() {
+    data.entities.removeAll(where: { Date() > $0.expiration })
+  }
+  
+  // MARK: - Subtypes
   
   class Data {
     
     // MARK: - Properties
     
-    /// The particle views that the particle system will render.
     var views: [AnyTaggedView] = []
-    /// A (recursive) collection of each active entity in the particle system.
-    var entities: [Entity?] = []
-    /// A collection of each field in the particle system.
-    var fields: [Field] = []
-    /// Whether to enable debug mode.
+    var entities: [Entity] = []
     var debug: Bool = false
-    /// The size of the canvas used to render the particle system.
     var size: CGSize = .zero
   }
 }
 
+// MARK: - Public API
+
+extension ParticleSystem: View {
+  
+  // MARK: - Initalizers
+  
+  public init(@Builder<Entity> entities: @escaping () -> [Entity]) {
+    let entities = entities()
+    self.init(entities)
+  }
+  
+  // MARK: - Conformance
+  
+  public var body: some View {
+    TimelineView(.animation(paused: paused.wrappedValue)) { t in
+      Canvas(opaque: true, colorMode: colorMode, rendersAsynchronously: async, renderer: renderer) {
+        Text("❌").tag("NOT_FOUND")
+        ForEach(0 ..< data.views.count, id: \.self) { i in
+          data.views[i].view.tag(data.views[i].tag)
+        }
+      }
+      .border(Color.red.opacity(data.debug ? 1.0 : 0.1))
+      .opacity(t.date == Date() ? 1.0 : 1.0)
+      .onChange(of: t.date) { date in
+        destroyExpired()
+        update()
+      }
+    }
+  }
+}
+
 public extension ParticleSystem {
+  
+  // MARK: - Modifiers
   
   func debug() -> ParticleSystem {
     let new = self
@@ -125,7 +112,7 @@ public extension ParticleSystem {
     return new
   }
   
-  func paused(_ flag: Bool) -> ParticleSystem {
+  func paused(_ flag: Binding<Bool>) -> ParticleSystem {
     var new = self
     new.paused = flag
     return new

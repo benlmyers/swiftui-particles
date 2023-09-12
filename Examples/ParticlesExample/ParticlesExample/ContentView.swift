@@ -6,35 +6,19 @@
 //
 
 import SwiftUI
+import Particles
 import PresetParticles
 
 struct ContentView: View {
+  
+  @State var pause: Bool = false
+  
   var body: some View {
     VStack {
       Image(systemName: "globe")
         .imageScale(.large)
         .foregroundColor(.accentColor)
       Text("Hello, world!")
-      ConfettiSystem()
-      
-//      ParticleSystem {
-//        Field(bounds: .all, effect: .gravity(.init(dx: 0.0, dy: 0.01)))
-//        Emitter(rate: 10.0) {
-//          Particle {
-//            Text("⭐️")
-//          }
-//          .lifetime(3.0)
-//          .floatDownward()
-//          .customScale(.inAndOut(strength: 20))
-//          Particle(color: .red, radius: 4.0)
-//        }
-//        .initialPosition(.center)
-//        .emitVelocity(x: .random(in: -1.0...1.0), y: .random(in: -1.0...1.0))
-//        .particlesInheritVelocity(false)
-//        .ignoreFields(true)
-//
-//      }
-      //.debug()
     }
     .padding()
   }
