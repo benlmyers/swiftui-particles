@@ -28,6 +28,7 @@ public struct ParticleSystem {
   
   init(_ items: [Entity]) {
     for item in items {
+      item.system = self.data
       self.data.entities.append(item)
     }
   }

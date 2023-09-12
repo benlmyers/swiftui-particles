@@ -24,7 +24,7 @@ public class Entity: Identifiable, Hashable, Equatable {
   public internal(set) var inception: Date = Date()
   
   /// The lifetime of this entity.
-  @Configured var lifetime: TimeInterval = 5.0
+  @Configured public internal(set) var lifetime: TimeInterval = 5.0
   
   // Physical Properties
   
@@ -34,8 +34,6 @@ public class Entity: Identifiable, Hashable, Equatable {
   @Configured public internal(set) var vel: CGVector = .zero
   /// The entity's acceleration.
   @Configured public internal(set) var acc: CGVector = .zero
-  /// The entity's bounding size.
-  @Configured public internal(set) var size: CGSize = .square(15.0)
   /// The entity's rotation.
   @Configured public internal(set) var rotation: Angle = .zero
   /// The entity's torque.
@@ -43,7 +41,7 @@ public class Entity: Identifiable, Hashable, Equatable {
   /// The entity's torque variation (change in torque).
   @Configured public internal(set) var torqueVariation: Angle = .zero
   /// The entity's center of rotation.
-  @Configured public internal(set) var anchor: UnitPoint = .center
+  @Configured public internal(set) var anchor: CGVector = .zero
   
   /// When this particle is to be destroyed.
   public var expiration: Date {
@@ -64,29 +62,21 @@ public class Entity: Identifiable, Hashable, Equatable {
   
   // MARK: - Conformance
   
-  init(in system: ParticleSystem) {
-    self.system = system.data
+  init() {
     // Default physics configuration
-    self._pos.setBehavior { entity, pos in
-      let v = entity.vel
-      return CGPoint(x: pos.x + v.dx, y: pos.y + v.dy)
-    }
-    self._vel.setBehavior { entity, vel in
-      vel.add(entity.acc)
-    }
-  }
-  
-  convenience init(copying origin: Entity, in system: ParticleSystem) {
-    self.init(in: system)
-    self.lifetime = origin.lifetime
-    self.pos = origin.pos
-    self.vel = origin.vel
-    self.acc = origin.acc
-    self.size = origin.size
-    self.rotation = origin.rotation
-    self.torque = origin.torque
-    self.torqueVariation = origin.torqueVariation
-    self.anchor = origin.anchor
+//    self._pos.setBehavior { entity, pos in
+//      let v = entity.vel
+//      return CGPoint(x: pos.x + v.dx, y: pos.y + v.dy)
+//    }
+//    self._vel.setBehavior { entity, vel in
+//      vel.add(entity.acc)
+//    }
+//    self._rotation.setBehavior { entity, rotation in
+//      Angle(degrees: rotation.degrees + entity.torque.degrees)
+//    }
+//    self._torque.setBehavior { entity, torque in
+//      Angle(degrees: torque.degrees + entity.torqueVariation.degrees)
+//    }
   }
   
   public static func == (lhs: Entity, rhs: Entity) -> Bool {
@@ -119,20 +109,24 @@ public class Entity: Identifiable, Hashable, Equatable {
   
   @propertyWrapper public class Configured<T> {
     
-    typealias Behavior = (Entity, T) -> T
+    public typealias Behavior = (Entity, T) -> T
     
-    public var wrappedValue: T
+    public internal(set) var wrappedValue: T
     private var behaviors: [Behavior] = []
     
     public init(wrappedValue: T) {
       self.wrappedValue = wrappedValue
     }
     
-    func setBehavior(_ behavior: @escaping Behavior) {
+    public func set(to constant: T) {
+      self.setBehavior { _, _ in constant }
+    }
+    
+    public func setBehavior(_ behavior: @escaping Behavior) {
       self.behaviors = [behavior]
     }
     
-    func addBehavior(_ behavior: @escaping Behavior) {
+    public func addBehavior(_ behavior: @escaping Behavior) {
       self.behaviors.append(behavior)
     }
     
@@ -145,5 +139,26 @@ public class Entity: Identifiable, Hashable, Equatable {
     private func update(behavior: Behavior, in entity: Entity) {
       wrappedValue = behavior(entity, wrappedValue)
     }
+  }
+}
+
+public extension Entity {
+  
+  func lifetime(_ duration: TimeInterval) -> Self {
+    self.lifetime = duration
+    return self
+  }
+  
+  func starts(atPoint point: CGPoint) -> Self {
+    self.pos = point
+    return self
+  }
+  
+  func starts(at unitPoint: UnitPoint) -> Self {
+    guard let system: ParticleSystem.Data else {
+      return self
+    }
+    self.pos = CGPoint(x: unitPoint.x * system.size.width, y: unitPoint.y * system.size.height)
+    return self
   }
 }

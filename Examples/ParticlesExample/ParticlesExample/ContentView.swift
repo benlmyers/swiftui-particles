@@ -19,6 +19,10 @@ struct ContentView: View {
         .imageScale(.large)
         .foregroundColor(.accentColor)
       Text("Hello, world!")
+      ParticleSystem {
+        Particle(color: .red, radius: 5.0)
+          .starts(at: .center)
+      }
     }
     .padding()
   }
