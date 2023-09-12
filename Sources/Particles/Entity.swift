@@ -90,11 +90,11 @@ public class Entity: Identifiable, Hashable, Equatable {
   // MARK: - Initalizers
   
   func render(_ context: GraphicsContext) {
-    // TODO: Render
+    // Do nothing.
   }
   
   func debug(_ context: GraphicsContext) {
-    // TODO: Debug
+    context.fill(Path(ellipseIn: .init(x: pos.x, y: pos.y, width: 2.0, height: 2.0)), with: .color(.red))
   }
   
   func update() {

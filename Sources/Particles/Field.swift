@@ -34,6 +34,7 @@ public class Field: Entity {
   
   override func update() {
     super.update()
+    $bounds.update(in: self)
     guard let system else {
       return
     }

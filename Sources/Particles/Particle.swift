@@ -54,7 +54,7 @@ public class Particle: Entity {
     }
   }
 
-  // MARK: - Conformance
+  // MARK: - Overrides
 
   override func render(_ context: GraphicsContext) {
     super.render(context)
@@ -79,8 +79,6 @@ public class Particle: Entity {
       self.onDraw(context)
     }
   }
-
-  // MARK: - Overrides
 
   override func update() {
     super.update()
