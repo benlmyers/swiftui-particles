@@ -141,6 +141,10 @@ public class Entity: Identifiable, Hashable, Equatable {
       self.behaviors.append(behavior)
     }
     
+    public func bind(to binding: Binding<T>) {
+      self.setBehavior { _, _ in binding.wrappedValue }
+    }
+    
     func update(in entity: Entity) {
       for behavior in behaviors {
         update(behavior: behavior, in: entity)
@@ -155,10 +159,28 @@ public class Entity: Identifiable, Hashable, Equatable {
 
 public extension Entity {
   
-  func lifetime(_ duration: TimeInterval) -> Self {
-    self.lifetime = duration
+  func bind<T>(_ key: KeyPath<Entity, Configured<T>>, to value: Binding<T>) -> Self {
+    self[keyPath: key].bind(to: value)
     return self
   }
+  
+  func setConstant<T>(_ key: KeyPath<Entity, Configured<T>>, to value: T) -> Self {
+    self[keyPath: key].set(to: value)
+    return self
+  }
+  
+  func setInitial<T>(_ key: KeyPath<Entity, Configured<T>>, to value: T) -> Self {
+    self[keyPath: key].wrappedValue = value
+    return self
+  }
+  
+  func setCustom<T>(_ key: KeyPath<Entity, Configured<T>>, onUpdate: @escaping (Entity, T) -> T) -> Self {
+    self[keyPath: key].addBehavior(onUpdate)
+    return self
+  }
+}
+
+public extension Entity {
   
   func starts(atPoint point: CGPoint) -> Self {
     self.pos = point
@@ -179,12 +201,12 @@ public extension Entity {
   }
   
   func constantVelocity(_ vector: CGVector) -> Self {
-    self._vel.set(to: vector)
+    self.$vel.set(to: vector)
     return self
   }
   
-  func acceleration(_ vector: CGVector) -> Self {
-    self.acc = vector
+  func constantAcceleration(_ vector: CGVector) -> Self {
+    self.$acc.set(to: vector)
     return self
   }
 }

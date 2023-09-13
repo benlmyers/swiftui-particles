@@ -12,7 +12,7 @@ import PresetParticles
 struct ContentView: View {
   
   @State var pause: Bool = false
-  @State var lifetime: Double = 5.0
+  @State var vel: CGVector = .init(dx: 0.1, dy: 0.1)
   
   var body: some View {
     VStack {
@@ -20,15 +20,15 @@ struct ContentView: View {
         .imageScale(.large)
         .foregroundColor(.accentColor)
       Text("Hello, world!")
-      Button("Lifetime: \(lifetime)") {
-        lifetime -= 1
+      Button("Vel") {
+        vel = CGVector(dx: 0.1, dy: -0.1)
       }
       ParticleSystem {
         Particle(color: .red, radius: 5.0)
 //          .starts(at: .center)
-          .lifetime(lifetime)
           .starts(atPoint: .init(x: 100, y: 100))
-          .initialVelocity(.init(dx: 1.0, dy: 1.5))
+//          .initialVelocity(.init(dx: 1.0, dy: 1.5))
+          .bind(\.$acc, to: $vel)
       }
       .paused($pause)
     }
