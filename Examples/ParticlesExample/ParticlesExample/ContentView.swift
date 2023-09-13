@@ -23,7 +23,7 @@ struct ContentView: View {
       Button("Lifetime: \(lifetime)") {
         lifetime -= 1
       }
-      ParticleSystem(id: "test") {
+      ParticleSystem {
         Particle(color: .red, radius: 5.0)
 //          .starts(at: .center)
           .lifetime(lifetime)
