@@ -109,7 +109,9 @@ public class Entity: Identifiable, Hashable, Equatable {
   }
   
   func debug(_ context: GraphicsContext) {
-    context.fill(Path(ellipseIn: .init(x: pos.x, y: pos.y, width: 2.0, height: 2.0)), with: .color(.red))
+    context.fill(Path(ellipseIn: .init(x: pos.x, y: pos.y, width: 2.0, height: 2.0)), with: .color(
+      [Color.red, .orange, .yellow, .green, .blue, .purple].randomElement()!
+    ))
   }
   
   func update() {

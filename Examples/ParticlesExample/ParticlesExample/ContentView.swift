@@ -31,6 +31,7 @@ struct ContentView: View {
         .bind(\.$vel, to: $vel)
       }
       .paused($pause)
+      .debug()
     }
     .padding()
   }

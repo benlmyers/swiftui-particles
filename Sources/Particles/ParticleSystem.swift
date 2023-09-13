@@ -48,6 +48,9 @@ public struct ParticleSystem: View {
     self.data.size = size
     for entity in data.entities {
       entity.render(context)
+      if data.debug {
+        entity.debug(context)
+      }
     }
   }
   
