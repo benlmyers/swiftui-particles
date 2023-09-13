@@ -53,11 +53,11 @@ public class Emitter: Entity {
     guard let system else { return }
     let e: Entity = decider(self)
     if let p = e as? Particle {
-      system.entities.append(Particle(copying: p))
+      system.entities.append(Particle(copying: p, from: self))
     } else if let em = e as? Emitter {
-      system.entities.append(Emitter(copying: em))
+      system.entities.append(Emitter(copying: em, from: self))
     } else {
-      system.entities.append(Entity(copying: e))
+      system.entities.append(Entity(copying: e, from: self))
     }
     children.insert(system.entities.last)
     self.lastFire = Date()
@@ -68,12 +68,12 @@ public class Emitter: Entity {
     // Do nothing
   }
   
-  override init(copying e: Entity) {
+  override init(copying e: Entity, from emitter: Emitter) {
     guard let em = e as? Emitter else {
       fatalError("An entity failed to cast to an emitter.")
     }
     self.prototypes = em.prototypes
-    super.init(copying: e)
+    super.init(copying: e, from: emitter)
     self._fireRate = em.$fireRate.copy()
     self._fireVelocity = em.$fireVelocity.copy()
     self._decider = em.$decider.copy()

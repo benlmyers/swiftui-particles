@@ -88,8 +88,8 @@ public class Particle: Entity {
     $hueRotation.update(in: self)
   }
   
-  override init(copying e: Entity) {
-    super.init(copying: e)
+  override init(copying e: Entity, from emitter: Emitter) {
+    super.init(copying: e, from: emitter)
     guard let p = e as? Particle else {
       fatalError("An entity failed to cast to a particle.")
     }

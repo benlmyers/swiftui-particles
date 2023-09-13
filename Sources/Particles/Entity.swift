@@ -64,6 +64,7 @@ public class Entity: Identifiable, Hashable, Equatable {
   
   init() {
     // Default physics configuration
+    self._pos.inheritsFromParent = true
     self._pos.setBehavior { entity, pos in
       let v = entity.vel
       return CGPoint(x: pos.x + v.dx, y: pos.y + v.dy)
@@ -79,15 +80,15 @@ public class Entity: Identifiable, Hashable, Equatable {
     }
   }
   
-  init(copying e: Entity) {
-    self._lifetime = e.$lifetime.copy()
-    self._pos = e.$pos.copy()
-    self._vel = e.$vel.copy()
-    self._acc = e.$acc.copy()
-    self._rotation = e.$rotation.copy()
-    self._torque = e.$torque.copy()
-    self._torqueVariation = e.$torqueVariation.copy()
-    self._anchor = e.$anchor.copy()
+  init(copying e: Entity, from emitter: Emitter) {
+    self._lifetime = e.$lifetime.copy(parentValue: emitter.lifetime)
+    self._pos = e.$pos.copy(parentValue: emitter.pos)
+    self._vel = e.$vel.copy(parentValue: emitter.vel)
+    self._acc = e.$acc.copy(parentValue: emitter.acc)
+    self._rotation = e.$rotation.copy(parentValue: emitter.rotation)
+    self._torque = e.$torque.copy(parentValue: emitter.torque)
+    self._torqueVariation = e.$torqueVariation.copy(parentValue: emitter.torqueVariation)
+    self._anchor = e.$anchor.copy(parentValue: emitter.anchor)
     self.system = e.system
   }
   
@@ -132,8 +133,10 @@ public class Entity: Identifiable, Hashable, Equatable {
     
     public typealias Behavior = (Entity, T) -> T
     
+    private var initialValue: T
     public internal(set) var wrappedValue: T
     private var behaviors: [Behavior] = []
+    public internal(set) var inheritsFromParent: Bool = false
     
     public var projectedValue: Configured<T> {
       return self
@@ -141,6 +144,7 @@ public class Entity: Identifiable, Hashable, Equatable {
     
     public init(wrappedValue: T) {
       self.wrappedValue = wrappedValue
+      self.initialValue = wrappedValue
     }
     
     public func set(to constant: T) {
@@ -165,9 +169,13 @@ public class Entity: Identifiable, Hashable, Equatable {
       }
     }
     
-    func copy() -> Configured<T> {
-      var copy = Configured<T>.init(wrappedValue: wrappedValue)
+    func copy(parentValue: T? = nil) -> Configured<T> {
+      let copy = Configured<T>.init(wrappedValue: initialValue)
       copy.behaviors = behaviors
+      copy.inheritsFromParent = inheritsFromParent
+      if copy.inheritsFromParent, let parentValue {
+        copy.wrappedValue = parentValue
+      }
       return copy
     }
     
@@ -196,6 +204,11 @@ public extension Entity {
   
   func setCustom<T>(_ key: KeyPath<Entity, Configured<T>>, onUpdate: @escaping (Entity, T) -> T) -> Self {
     self[keyPath: key].addBehavior(onUpdate)
+    return self
+  }
+  
+  func inheritsFromParent<T>(_ key: KeyPath<Entity, Configured<T>>, _ flag: Bool) -> Self {
+    self[keyPath: key].inheritsFromParent = flag
     return self
   }
 }

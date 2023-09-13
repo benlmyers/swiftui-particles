@@ -24,13 +24,11 @@ struct ContentView: View {
         vel = CGVector(dx: Double.random(in: -0.5 ... 0.5), dy: Double.random(in: -0.5 ... 0.5))
       }
       ParticleSystem {
-//        Particle(color: .yellow, radius: 5.0)
-//          .starts(atPoint: .init(x: 200, y: 100))
-//          .bind(\.$vel, to: $vel)
         Emitter {
           Particle(color: .red, radius: 5.0)
-            .bind(\.$vel, to: $vel)
+            .setConstant(\.$vel, to: .init(dx: 2, dy: 0))
         }
+        .bind(\.$vel, to: $vel)
       }
       .paused($pause)
     }
