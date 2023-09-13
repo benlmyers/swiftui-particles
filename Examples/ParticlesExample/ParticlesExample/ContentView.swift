@@ -12,7 +12,7 @@ import PresetParticles
 struct ContentView: View {
   
   @State var pause: Bool = false
-  @State var vel: CGVector = .init(dx: 0.1, dy: 0.1)
+  @State var vel: CGVector = .init(dx: 1, dy: 1)
   
   var body: some View {
     VStack {
@@ -21,14 +21,16 @@ struct ContentView: View {
         .foregroundColor(.accentColor)
       Text("Hello, world!")
       Button("Vel") {
-        vel = CGVector(dx: 0.1, dy: -0.1)
+        vel = CGVector(dx: Double.random(in: -0.5 ... 0.5), dy: Double.random(in: -0.5 ... 0.5))
       }
       ParticleSystem {
-        Particle(color: .red, radius: 5.0)
-//          .starts(at: .center)
-          .starts(atPoint: .init(x: 100, y: 100))
-//          .initialVelocity(.init(dx: 1.0, dy: 1.5))
-          .bind(\.$acc, to: $vel)
+//        Particle(color: .yellow, radius: 5.0)
+//          .starts(atPoint: .init(x: 200, y: 100))
+//          .bind(\.$vel, to: $vel)
+        Emitter {
+          Particle(color: .red, radius: 5.0)
+            .bind(\.$vel, to: $vel)
+        }
       }
       .paused($pause)
     }

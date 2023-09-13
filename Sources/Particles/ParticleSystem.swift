@@ -55,6 +55,7 @@ public struct ParticleSystem: View {
     for entity in data.entities {
       entity.update()
     }
+    print(data.entities.map({ $0.pos }))
   }
   
   func destroyExpired() {

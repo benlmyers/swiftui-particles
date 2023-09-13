@@ -87,6 +87,19 @@ public class Particle: Entity {
     $blur.update(in: self)
     $hueRotation.update(in: self)
   }
+  
+  override init(copying e: Entity) {
+    super.init(copying: e)
+    guard let p = e as? Particle else {
+      fatalError("An entity failed to cast to a particle.")
+    }
+    self._scaleEffect = p.$scaleEffect
+    self._opacity = p.$opacity
+    self._blur = p.$blur
+    self._hueRotation = p.$hueRotation
+    self.onDraw = p.onDraw
+    self.viewID = p.viewID
+  }
 
   // MARK: - Methods
 

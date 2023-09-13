@@ -19,7 +19,7 @@ public class Entity: Identifiable, Hashable, Equatable {
   /// The parent of the entity.
   public private(set) weak var parent: Entity?
   /// The children of the entity.
-  public private(set) var children: Set<Entity?> = .init()
+  public internal(set) var children: Set<Entity?> = .init()
   /// When the entity was created.
   public internal(set) var inception: Date = Date()
   
@@ -60,7 +60,7 @@ public class Entity: Identifiable, Hashable, Equatable {
   
   weak var system: ParticleSystem.Data?
   
-  // MARK: - Conformance
+  // MARK: - Initalizers
   
   init() {
     // Default physics configuration
@@ -78,6 +78,20 @@ public class Entity: Identifiable, Hashable, Equatable {
       Angle(degrees: torque.degrees + entity.torqueVariation.degrees)
     }
   }
+  
+  init(copying e: Entity) {
+    self._lifetime = e.$lifetime.copy()
+    self._pos = e.$pos.copy()
+    self._vel = e.$vel.copy()
+    self._acc = e.$acc.copy()
+    self._rotation = e.$rotation.copy()
+    self._torque = e.$torque.copy()
+    self._torqueVariation = e.$torqueVariation.copy()
+    self._anchor = e.$anchor.copy()
+    self.system = e.system
+  }
+  
+  // MARK: - Conformance
   
   public static func == (lhs: Entity, rhs: Entity) -> Bool {
     return lhs.id == rhs.id
@@ -149,6 +163,12 @@ public class Entity: Identifiable, Hashable, Equatable {
       for behavior in behaviors {
         update(behavior: behavior, in: entity)
       }
+    }
+    
+    func copy() -> Configured<T> {
+      var copy = Configured<T>.init(wrappedValue: wrappedValue)
+      copy.behaviors = behaviors
+      return copy
     }
     
     private func update(behavior: Behavior, in entity: Entity) {
