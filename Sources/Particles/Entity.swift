@@ -43,6 +43,9 @@ public class Entity: Identifiable, Hashable, Equatable {
   /// The entity's center of rotation.
   @Configured public internal(set) var anchor: CGVector = .zero
   
+  /// A mask for which fields to enable. Leave `nil` to accept all field effects. Leave an empty set to accept no field effects.
+  public internal(set) var fieldMask: Set<Field.Tag>?
+  
   /// When this particle is to be destroyed.
   public var expiration: Date {
     return inception + lifetime
@@ -187,40 +190,39 @@ public class Entity: Identifiable, Hashable, Equatable {
   }
 }
 
-public extension Entity {
-  
-  func bind<T>(_ key: KeyPath<Entity, Configured<T>>, to value: Binding<T>) -> Self {
-    self[keyPath: key].bind(to: value)
-    return self
-  }
-  
-  func setConstant<T>(_ key: KeyPath<Entity, Configured<T>>, to value: T) -> Self {
-    self[keyPath: key].set(to: value)
-    return self
-  }
-  
-  func setInitial<T>(_ key: KeyPath<Entity, Configured<T>>, to value: T) -> Self {
-    self[keyPath: key].wrappedValue = value
-    return self
-  }
-  
-  func setCustom<T>(_ key: KeyPath<Entity, Configured<T>>, onUpdate: @escaping (Entity, T) -> T) -> Self {
-    self[keyPath: key].addBehavior(onUpdate)
-    return self
-  }
-  
-  func inheritsFromParent<T>(_ key: KeyPath<Entity, Configured<T>>, _ flag: Bool) -> Self {
-    self[keyPath: key].inheritsFromParent = flag
-    return self
-  }
-}
+//public extension Entity {
+//
+//  func bind<T>(_ key: KeyPath<Entity, Configured<T>>, to value: Binding<T>) -> Self {
+//    self[keyPath: key].bind(to: value)
+//    return self
+//  }
+//
+//  func setConstant<T>(_ key: KeyPath<Entity, Configured<T>>, to value: T) -> Self {
+//    self[keyPath: key].set(to: value)
+//    return self
+//  }
+//
+//  func setInitial<T>(_ key: KeyPath<Entity, Configured<T>>, to value: T) -> Self {
+//    self[keyPath: key].wrappedValue = value
+//    return self
+//  }
+//
+//  func setCustom<T>(_ key: KeyPath<Entity, Configured<T>>, onUpdate: @escaping (Entity, T) -> T) -> Self {
+//    self[keyPath: key].addBehavior(onUpdate)
+//    return self
+//  }
+//
+//  func inheritsFromParent<T>(_ key: KeyPath<Entity, Configured<T>>, _ flag: Bool) -> Self {
+//    self[keyPath: key].inheritsFromParent = flag
+//    return self
+//  }
+//}
 
 public extension Entity {
   
-  func starts(atPoint point: CGPoint) -> Self {
-    self.pos = point
-    return self
-  }
+//  func starts(atPoint point: CGPoint) -> Self {
+//    self.setInitial(\.$pos, to: point)
+//  }
   
   func starts(at unitPoint: UnitPoint) -> Self {
     guard let system: ParticleSystem.Data else {

@@ -10,7 +10,7 @@ import SwiftUI
 public class Field: Entity {
   
   public typealias Tag = String
-  public typealias Effect = (Entity) -> Void
+  public typealias Effect = (Entity, Field) -> Void
 
   // MARK: - Properties
 
@@ -42,14 +42,17 @@ public class Field: Entity {
       return
     }
     let count = system.entities.count
-    for i in index + 1 ..< count where i < index && i < count {
+    for i in index + 1 ..< count {
       let entity: Entity = system.entities[i]
       // Skip field effects
       if entity is Field {
         continue
       }
+      if let mask = entity.fieldMask, !mask.contains(tag) {
+        continue
+      }
       // Update using effects
-      effect(entity)
+      effect(entity, self)
     }
   }
 
