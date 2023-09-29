@@ -63,18 +63,19 @@ public class Entity: Identifiable, Hashable, Equatable {
   // MARK: - Initalizers
   
   init() {
+    self._lifetime.inheritsFromParent = false
     // Default physics configuration
-    self._pos.behavior = { entity, pos in
+    self._pos.setBehavior { entity, pos in
       let v = entity.vel
       return CGPoint(x: pos.x + v.dx, y: pos.y + v.dy)
     }
-    self._vel.behavior = { entity, vel in
+    self._vel.setBehavior { entity, vel in
       vel.add(entity.acc)
     }
-    self._rotation.behavior = { entity, rotation in
+    self._rotation.setBehavior { entity, rotation in
       Angle(degrees: rotation.degrees + entity.torque.degrees)
     }
-    self._torque.behavior = { entity, torque in
+    self._torque.setBehavior { entity, torque in
       Angle(degrees: torque.degrees + entity.torqueVariation.degrees)
     }
   }
@@ -134,10 +135,11 @@ public class Entity: Identifiable, Hashable, Equatable {
     
     public typealias Behavior = (Entity, T) -> T
     
-    private var initialValue: T
     public internal(set) var wrappedValue: T
-    var behavior: (Entity, T) -> T
     public internal(set) var inheritsFromParent: Bool = true
+    
+    private var initialValue: T
+    private var behavior: (Entity, T) -> T
     
     public var projectedValue: Configured<T> {
       return self
@@ -152,6 +154,7 @@ public class Entity: Identifiable, Hashable, Equatable {
     public func setInitial(to value: T) {
       self.initialValue = value
       self.wrappedValue = value
+      self.inheritsFromParent = false
     }
     
     public func fix(to constant: T) {
@@ -164,6 +167,10 @@ public class Entity: Identifiable, Hashable, Equatable {
       self.behavior = { _, _ in
         return binding.wrappedValue
       }
+    }
+    
+    public func setBehavior(to behavior: @escaping (Entity, T) -> T) {
+      self.behavior = behavior
     }
     
     func update(in entity: Entity) {
@@ -180,5 +187,30 @@ public class Entity: Identifiable, Hashable, Equatable {
       }
       return copy
     }
+  }
+}
+
+extension Entity {
+  
+  public func with<V>(_ key: KeyPath<Entity, Configured<V>>, startingAt val: V) -> Entity {
+    self[keyPath: key].setInitial(to: val)
+    return self
+  }
+  
+  public func with<V>(_ key: KeyPath<Entity, Configured<V>>, fixedAt val: V) -> Entity {
+    self[keyPath: key].fix(to: val)
+    return self
+  }
+  
+  public func with<V>(_ key: KeyPath<Entity, Configured<V>>, boundTo binding: Binding<V>) -> Entity {
+    self[keyPath: key].bind(to: binding)
+    return self
+  }
+  
+  public func with<V>(_ key: KeyPath<Entity, Configured<V>>, using closure: @escaping (Entity) -> V) -> Entity {
+    self[keyPath: key].setBehavior(to: { e, _ in
+      closure(e)
+    })
+    return self
   }
 }

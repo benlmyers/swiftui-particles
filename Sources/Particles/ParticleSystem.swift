@@ -14,8 +14,6 @@ public struct ParticleSystem: View {
   
   // MARK: - Properties
   
-  /// Whether the system's animation is paused.
-  var paused: Binding<Bool> = .constant(false)
   /// The color mode of the renderer.
   var colorMode: ColorRenderingMode = .nonLinear
   /// Whether to render the particles asynchronously.
@@ -36,7 +34,6 @@ public struct ParticleSystem: View {
   }
   
   init(copying system: ParticleSystem) {
-    self.paused = system.paused
     self.async = system.async
     self.colorMode = system.colorMode
     self.data = system.data
@@ -86,7 +83,7 @@ public struct ParticleSystem: View {
   // MARK: - Conformance
   
   public var body: some View {
-    TimelineView(.animation(paused: paused.wrappedValue)) { [self] t in
+    TimelineView(.animation(paused: false)) { [self] t in
       Canvas(opaque: true, colorMode: colorMode, rendersAsynchronously: async, renderer: renderer) {
         Text("❌").tag("NOT_FOUND")
         ForEach(0 ..< data.views.count, id: \.self) { [self] i in
@@ -110,12 +107,6 @@ public extension ParticleSystem {
   func debug() -> ParticleSystem {
     let new = self
     new.data.debug = true
-    return new
-  }
-  
-  func paused(_ flag: Binding<Bool>) -> ParticleSystem {
-    var new = self
-    new.paused = flag
     return new
   }
   
