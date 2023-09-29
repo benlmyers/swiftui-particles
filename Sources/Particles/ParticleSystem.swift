@@ -43,7 +43,7 @@ public struct ParticleSystem: View {
   
   func renderer(context: inout GraphicsContext, size: CGSize) {
     self.data.size = size
-    for entity in data.entities {
+    for entity in data.entities.compactMap({ $0 as? PhysicalEntity }) {
       entity.render(context)
       if data.debug {
         entity.debug(context)
@@ -52,13 +52,16 @@ public struct ParticleSystem: View {
   }
   
   func update() {
-    for entity in data.entities {
+    for entity in data.entities.compactMap({ $0 as? PhysicalEntity }) {
       entity.update()
     }
   }
   
   func destroyExpired() {
-    data.entities.removeAll(where: { Date() > $0.expiration })
+    data.entities.removeAll(where: { e in
+      guard let p = e as? PhysicalEntity else { return false }
+      return Date() > p.expiration
+    })
   }
   
   // MARK: - Subtypes

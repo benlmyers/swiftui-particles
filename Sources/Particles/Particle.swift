@@ -8,7 +8,7 @@
 import SwiftUI
 import Dispatch
 
-public class Particle: Entity {
+public class Particle: PhysicalEntity {
 
   // MARK: - Properties
   
@@ -88,7 +88,7 @@ public class Particle: Entity {
     $hueRotation.update(in: self)
   }
   
-  override init(copying e: Entity, from emitter: Emitter) {
+  override init(copying e: PhysicalEntity, from emitter: Emitter) {
     super.init(copying: e, from: emitter)
     guard let p = e as? Particle else {
       fatalError("An entity failed to cast to a particle.")

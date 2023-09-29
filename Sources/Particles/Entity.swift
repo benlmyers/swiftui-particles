@@ -10,24 +10,45 @@ import Foundation
 
 public class Entity: Identifiable, Hashable, Equatable {
   
-  // MARK: - Properties
-  
-  // Identity
-  
   /// The entity's ID.
   public private(set) var id: UUID = UUID()
   /// The parent of the entity.
   public private(set) weak var parent: Entity?
   /// The children of the entity.
   public internal(set) var children: Set<Entity?> = .init()
+  
+  weak var system: ParticleSystem.Data?
+  
+  // MARK: - Initalizers
+  
+  init() {}
+  
+  // MARK: - Conformance
+  
+  public static func == (lhs: Entity, rhs: Entity) -> Bool {
+    return lhs.id == rhs.id
+  }
+  
+  public func hash(into hasher: inout Hasher) {
+    return id.hash(into: &hasher)
+  }
+  
+  // MARK: - Methods
+  
+  func supply(system: ParticleSystem.Data) {
+    self.system = system
+  }
+}
+
+public class PhysicalEntity: Entity {
+  
+  // MARK: - Properties
+  
   /// When the entity was created.
   public internal(set) var inception: Date = Date()
   
   /// The lifetime of this entity.
   @Configured public internal(set) var lifetime: TimeInterval = 5.0
-  
-  // Physical Properties
-  
   /// The entity's position.
   @Configured public internal(set) var pos: CGPoint = .zero
   /// The entity's velocity.
@@ -58,11 +79,10 @@ public class Entity: Identifiable, Hashable, Equatable {
     return timeAlive / lifetime
   }
   
-  weak var system: ParticleSystem.Data?
-  
   // MARK: - Initalizers
   
-  init() {
+  override init() {
+    super.init()
     self._lifetime.inheritsFromParent = false
     // Default physics configuration
     self._pos.setBehavior { entity, pos in
@@ -80,7 +100,8 @@ public class Entity: Identifiable, Hashable, Equatable {
     }
   }
   
-  init(copying e: Entity, from emitter: Emitter) {
+  init(copying e: PhysicalEntity, from emitter: Emitter) {
+    super.init()
     self._lifetime = e.$lifetime.copy(parentValue: emitter.lifetime)
     self._pos = e.$pos.copy(parentValue: emitter.pos)
     self._vel = e.$vel.copy(parentValue: emitter.vel)
@@ -90,16 +111,6 @@ public class Entity: Identifiable, Hashable, Equatable {
     self._torqueVariation = e.$torqueVariation.copy(parentValue: emitter.torqueVariation)
     self._anchor = e.$anchor.copy(parentValue: emitter.anchor)
     self.system = e.system
-  }
-  
-  // MARK: - Conformance
-  
-  public static func == (lhs: Entity, rhs: Entity) -> Bool {
-    return lhs.id == rhs.id
-  }
-  
-  public func hash(into hasher: inout Hasher) {
-    return id.hash(into: &hasher)
   }
   
   // MARK: - Initalizers
@@ -125,21 +136,17 @@ public class Entity: Identifiable, Hashable, Equatable {
     $anchor.update(in: self)
   }
   
-  func supply(system: ParticleSystem.Data) {
-    self.system = system
-  }
-  
   // MARK: - Subtypes
   
   @propertyWrapper public class Configured<T> {
     
-    public typealias Behavior = (Entity, T) -> T
+    public typealias Behavior = (PhysicalEntity, T) -> T
     
     public internal(set) var wrappedValue: T
     public internal(set) var inheritsFromParent: Bool = true
     
     private var initialValue: T
-    private var behavior: (Entity, T) -> T
+    private var behavior: Behavior
     
     public var projectedValue: Configured<T> {
       return self
@@ -169,11 +176,11 @@ public class Entity: Identifiable, Hashable, Equatable {
       }
     }
     
-    public func setBehavior(to behavior: @escaping (Entity, T) -> T) {
+    public func setBehavior(to behavior: @escaping Behavior) {
       self.behavior = behavior
     }
     
-    func update(in entity: Entity) {
+    func update(in entity: PhysicalEntity) {
       // 1. Apply behavior
       wrappedValue = behavior(entity, wrappedValue)
     }
@@ -190,24 +197,24 @@ public class Entity: Identifiable, Hashable, Equatable {
   }
 }
 
-extension Entity {
+extension PhysicalEntity {
   
-  public func with<V>(_ key: KeyPath<Entity, Configured<V>>, startingAt val: V) -> Entity {
+  public func with<V>(_ key: KeyPath<PhysicalEntity, Configured<V>>, startingAt val: V) -> PhysicalEntity {
     self[keyPath: key].setInitial(to: val)
     return self
   }
   
-  public func with<V>(_ key: KeyPath<Entity, Configured<V>>, fixedAt val: V) -> Entity {
+  public func with<V>(_ key: KeyPath<PhysicalEntity, Configured<V>>, fixedAt val: V) -> PhysicalEntity {
     self[keyPath: key].fix(to: val)
     return self
   }
   
-  public func with<V>(_ key: KeyPath<Entity, Configured<V>>, boundTo binding: Binding<V>) -> Entity {
+  public func with<V>(_ key: KeyPath<PhysicalEntity, Configured<V>>, boundTo binding: Binding<V>) -> PhysicalEntity {
     self[keyPath: key].bind(to: binding)
     return self
   }
   
-  public func with<V>(_ key: KeyPath<Entity, Configured<V>>, using closure: @escaping (Entity) -> V) -> Entity {
+  public func with<V>(_ key: KeyPath<PhysicalEntity, Configured<V>>, using closure: @escaping (Entity) -> V) -> PhysicalEntity {
     self[keyPath: key].setBehavior(to: { e, _ in
       closure(e)
     })

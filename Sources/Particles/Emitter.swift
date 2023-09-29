@@ -8,7 +8,7 @@
 import SwiftUI
 import Foundation
 
-public class Emitter: Entity {
+public class Emitter: PhysicalEntity {
 
   // MARK: - Properties
   
@@ -17,19 +17,19 @@ public class Emitter: Entity {
   /// The velocity to fire entity.
   @Configured public internal(set) var fireVelocity: CGVector = .zero
   /// A closure used to decide which entity to fire.
-  @Configured public internal(set) var decider: (Emitter) -> Entity = { e in e.prototypes.randomElement()! }
+  @Configured public internal(set) var decider: (Emitter) -> PhysicalEntity = { e in e.prototypes.randomElement()! }
   /// The maximum amount of entities this emitter may spawn.
   @Configured public internal(set) var maxChildren: Int?
   
   /// The last time the emitter fired a particle.
   var lastFire: Date?
   /// The prototypes this emitter can spawn.
-  var prototypes: [Entity]
+  var prototypes: [PhysicalEntity]
 
   // MARK: - Initalizers
 
   public init(rate: Double = 3.0, @Builder<Entity> entities: @escaping () -> [Entity]) {
-    self.prototypes = entities()
+    self.prototypes = entities().compactMap({ $0 as? PhysicalEntity })
     super.init()
     self.lifetime = .infinity
     self.fireRate = rate
@@ -51,13 +51,13 @@ public class Emitter: Entity {
     }
     // Spawn a new entity
     guard let system else { return }
-    let e: Entity = decider(self)
+    let e: PhysicalEntity = decider(self)
     if let p = e as? Particle {
       system.entities.append(Particle(copying: p, from: self))
     } else if let em = e as? Emitter {
       system.entities.append(Emitter(copying: em, from: self))
     } else {
-      system.entities.append(Entity(copying: e, from: self))
+      system.entities.append(PhysicalEntity(copying: e, from: self))
     }
     children.insert(system.entities.last)
     self.lastFire = Date()
@@ -68,7 +68,7 @@ public class Emitter: Entity {
     // Do nothing
   }
   
-  override init(copying e: Entity, from emitter: Emitter) {
+  override init(copying e: PhysicalEntity, from emitter: Emitter) {
     guard let em = e as? Emitter else {
       fatalError("An entity failed to cast to an emitter.")
     }
