@@ -31,13 +31,12 @@ struct ContentView: View {
           .with(\.$lifetime, fixedAt: 40.0)
         Emitter {
           Particle(color: .red, radius: 5.0)
-//            .with(\.$pos, startingAt: .init(x: 20, y: 10))
             .with(\.$vel, startingAt: .init(dx: 1.0, dy: 1.0))
             .with(\.$acc, fixedAt: .init(dx: 0.0, dy: 0.1))
         }
-        .with(\.$vel, fixedAt: .init(dx: 1.0, dy: 0.0))
+        .with(\.$vel, boundTo: $velocity)
       }
-//      .debug()
+      .debug()
     }
     .padding()
   }
