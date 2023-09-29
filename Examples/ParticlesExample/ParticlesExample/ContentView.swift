@@ -30,9 +30,6 @@ struct ContentView: View {
         }
       }
       ParticleSystem {
-        Field(bounds: .all, tag: "gravity") { e, _ in
-          e.$acc.set(to: .init(dx: 0.0, dy: 1.0))
-        }
         Emitter {
           Particle(color: .red, radius: 5.0)
 //            .setConstant(\.$vel, to: .init(dx: 2, dy: 0))
@@ -40,7 +37,6 @@ struct ContentView: View {
 //              Angle(degrees: e.pos.x)
 //            }
         }
-        .setConstant(\.$vel, to: velocity)
       }
       .paused($pause)
       .debug()

@@ -93,10 +93,10 @@ public class Particle: Entity {
     guard let p = e as? Particle else {
       fatalError("An entity failed to cast to a particle.")
     }
-    self._scaleEffect = p.$scaleEffect
-    self._opacity = p.$opacity
-    self._blur = p.$blur
-    self._hueRotation = p.$hueRotation
+    self._scaleEffect = p.$scaleEffect.copy()
+    self._opacity = p.$opacity.copy()
+    self._blur = p.$blur.copy()
+    self._hueRotation = p.$hueRotation.copy()
     self.onDraw = p.onDraw
     self.viewID = p.viewID
   }
@@ -107,37 +107,8 @@ public class Particle: Entity {
     DispatchQueue.main.async {
       guard let data: ParticleSystem.Data = super.system else {
         fatalError("This entity could not access the particle system's data.")
-//        return
       }
       data.views.append(view)
     }
-  }
-}
-
-public extension Particle {
-  
-  func bind<T>(_ key: KeyPath<Particle, Configured<T>>, to value: Binding<T>) -> Self {
-    self[keyPath: key].bind(to: value)
-    return self
-  }
-  
-  func setConstant<T>(_ key: KeyPath<Particle, Configured<T>>, to value: T) -> Self {
-    self[keyPath: key].set(to: value)
-    return self
-  }
-  
-  func setInitial<T>(_ key: KeyPath<Particle, Configured<T>>, to value: T) -> Self {
-    self[keyPath: key].wrappedValue = value
-    return self
-  }
-  
-  func setCustom<T>(_ key: KeyPath<Particle, Configured<T>>, onUpdate: @escaping (Entity, T) -> T) -> Self {
-    self[keyPath: key].addBehavior(onUpdate)
-    return self
-  }
-  
-  func inheritsFromParent<T>(_ key: KeyPath<Particle, Configured<T>>, _ flag: Bool) -> Self {
-    self[keyPath: key].inheritsFromParent = flag
-    return self
   }
 }

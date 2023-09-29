@@ -80,31 +80,3 @@ public class Emitter: Entity {
     self._maxChildren = em.$maxChildren.copy()
   }
 }
-
-public extension Emitter {
-  
-  func bind<T>(_ key: KeyPath<Emitter, Configured<T>>, to value: Binding<T>) -> Self {
-    self[keyPath: key].bind(to: value)
-    return self
-  }
-  
-  func setConstant<T>(_ key: KeyPath<Emitter, Configured<T>>, to value: T) -> Self {
-    self[keyPath: key].set(to: value)
-    return self
-  }
-  
-  func setInitial<T>(_ key: KeyPath<Emitter, Configured<T>>, to value: T) -> Self {
-    self[keyPath: key].wrappedValue = value
-    return self
-  }
-  
-  func setCustom<T>(_ key: KeyPath<Emitter, Configured<T>>, onUpdate: @escaping (Entity, T) -> T) -> Self {
-    self[keyPath: key].addBehavior(onUpdate)
-    return self
-  }
-  
-  func inheritsFromParent<T>(_ key: KeyPath<Emitter, Configured<T>>, _ flag: Bool) -> Self {
-    self[keyPath: key].inheritsFromParent = flag
-    return self
-  }
-}
