@@ -39,7 +39,6 @@ public class Emitter: PhysicalEntity {
 
   override func debug(_ context: GraphicsContext) {
     super.debug(context)
-    // TODO: Debug
   }
 
   override func update() {
@@ -78,5 +77,27 @@ public class Emitter: PhysicalEntity {
     self._fireVelocity = em.$fireVelocity.copy()
     self._decider = em.$decider.copy()
     self._maxChildren = em.$maxChildren.copy()
+  }
+  
+  // MARK: - Methods
+  
+  public func with<V>(_ key: KeyPath<Emitter, Configured<V>>, startingAt val: V) -> Self {
+    self[keyPath: key].setInitial(to: val)
+    return self
+  }
+  
+  public func with<V>(_ key: KeyPath<Emitter, Configured<V>>, fixedAt val: V) -> Self {
+    self[keyPath: key].fix(to: val)
+    return self
+  }
+  
+  public func with<V>(_ key: KeyPath<Emitter, Configured<V>>, boundTo binding: Binding<V>) -> Self {
+    self[keyPath: key].bind(to: binding)
+    return self
+  }
+  
+  public func with<V>(_ key: KeyPath<Emitter, Configured<V>>, using closure: @escaping (Entity) -> V) -> Self {
+    self[keyPath: key].setBehavior(to: closure)
+    return self
   }
 }

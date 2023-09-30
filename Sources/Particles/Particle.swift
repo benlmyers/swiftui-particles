@@ -55,6 +55,26 @@ public class Particle: PhysicalEntity {
   }
 
   // MARK: - Overrides
+  
+  public func with<V>(_ key: KeyPath<Particle, Configured<V>>, startingAt val: V) -> Self {
+    self[keyPath: key].setInitial(to: val)
+    return self
+  }
+  
+  public func with<V>(_ key: KeyPath<Particle, Configured<V>>, fixedAt val: V) -> Self {
+    self[keyPath: key].fix(to: val)
+    return self
+  }
+  
+  public func with<V>(_ key: KeyPath<Particle, Configured<V>>, boundTo binding: Binding<V>) -> Self {
+    self[keyPath: key].bind(to: binding)
+    return self
+  }
+  
+  public func with<V>(_ key: KeyPath<Particle, Configured<V>>, using closure: @escaping (Entity) -> V) -> Self {
+    self[keyPath: key].setBehavior(to: closure)
+    return self
+  }
 
   override func render(_ context: GraphicsContext) {
     super.render(context)

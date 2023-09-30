@@ -53,18 +53,19 @@ public class PhysicalEntity: Entity {
     super.init()
     self._lifetime.inheritsFromParent = false
     // Default physics configuration
-    self._pos.setBehavior { entity, pos in
+    self._pos.setBehavior { entity in
       let v = entity.vel
+      let pos = entity.pos
       return CGPoint(x: pos.x + v.dx, y: pos.y + v.dy)
     }
-    self._vel.setBehavior { entity, vel in
-      vel.add(entity.acc)
+    self._vel.setBehavior { entity in
+      entity.vel.add(entity.acc)
     }
-    self._rotation.setBehavior { entity, rotation in
-      Angle(degrees: rotation.degrees + entity.torque.degrees)
+    self._rotation.setBehavior { entity in
+      Angle(degrees: entity.rotation.degrees + entity.torque.degrees)
     }
-    self._torque.setBehavior { entity, torque in
-      Angle(degrees: torque.degrees + entity.torqueVariation.degrees)
+    self._torque.setBehavior { entity in
+      Angle(degrees: entity.torque.degrees + entity.torqueVariation.degrees)
     }
   }
   
@@ -81,7 +82,7 @@ public class PhysicalEntity: Entity {
     self.system = e.system
   }
   
-  // MARK: - Initalizers
+  // MARK: - Methods
   
   func render(_ context: GraphicsContext) {
     // Do nothing.
@@ -108,13 +109,13 @@ public class PhysicalEntity: Entity {
   
   @propertyWrapper public class Configured<T> {
     
-    public typealias Behavior = (PhysicalEntity, T) -> T
+    public typealias Behavior = (PhysicalEntity) -> T?
     
     public internal(set) var wrappedValue: T
     public internal(set) var inheritsFromParent: Bool = true
     
     private var initialValue: T
-    private var behavior: Behavior
+    private var behavior: Behavior = { _ in return nil }
     
     public var projectedValue: Configured<T> {
       return self
@@ -123,7 +124,6 @@ public class PhysicalEntity: Entity {
     public init(wrappedValue: T) {
       self.wrappedValue = wrappedValue
       self.initialValue = wrappedValue
-      self.behavior = { _, v in return v }
     }
     
     public func setInitial(to value: T) {
@@ -133,13 +133,13 @@ public class PhysicalEntity: Entity {
     }
     
     public func fix(to constant: T) {
-      self.behavior = { _, _ in
+      self.behavior = { _ in
         return constant
       }
     }
     
     public func bind(to binding: Binding<T>) {
-      self.behavior = { _, _ in
+      self.behavior = { _ in
         return binding.wrappedValue
       }
     }
@@ -149,8 +149,9 @@ public class PhysicalEntity: Entity {
     }
     
     func update(in entity: PhysicalEntity) {
-      // 1. Apply behavior
-      wrappedValue = behavior(entity, wrappedValue)
+      if let newValue = behavior(entity) {
+        wrappedValue = newValue
+      }
     }
     
     func copy(parentValue: T? = nil) -> Configured<T> {
@@ -162,30 +163,5 @@ public class PhysicalEntity: Entity {
       }
       return copy
     }
-  }
-}
-
-extension PhysicalEntity {
-  
-  public func with<V>(_ key: KeyPath<PhysicalEntity, Configured<V>>, startingAt val: V) -> PhysicalEntity {
-    self[keyPath: key].setInitial(to: val)
-    return self
-  }
-  
-  public func with<V>(_ key: KeyPath<PhysicalEntity, Configured<V>>, fixedAt val: V) -> PhysicalEntity {
-    self[keyPath: key].fix(to: val)
-    return self
-  }
-  
-  public func with<V>(_ key: KeyPath<PhysicalEntity, Configured<V>>, boundTo binding: Binding<V>) -> PhysicalEntity {
-    self[keyPath: key].bind(to: binding)
-    return self
-  }
-  
-  public func with<V>(_ key: KeyPath<PhysicalEntity, Configured<V>>, using closure: @escaping (Entity) -> V) -> PhysicalEntity {
-    self[keyPath: key].setBehavior(to: { e, _ in
-      closure(e)
-    })
-    return self
   }
 }
