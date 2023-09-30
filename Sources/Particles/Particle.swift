@@ -56,23 +56,28 @@ public class Particle: PhysicalEntity {
 
   // MARK: - Overrides
   
-  public func with<V>(_ key: KeyPath<Particle, Configured<V>>, startingAt val: V) -> Self {
-    self[keyPath: key].setInitial(to: val)
+  public func start<V>(_ key: KeyPath<Particle, Configured<V>>, at val: V) -> Self {
+    self[keyPath: key].setSpawnBehavior(to: { _ in return val })
     return self
   }
   
-  public func with<V>(_ key: KeyPath<Particle, Configured<V>>, fixedAt val: V) -> Self {
+  public func start<V>(_ key: KeyPath<Particle, Configured<V>>, from closure: @escaping (PhysicalEntity) -> V) -> Self {
+    self[keyPath: key].setSpawnBehavior(to: closure)
+    return self
+  }
+  
+  public func fix<V>(_ key: KeyPath<Particle, Configured<V>>, at val: V) -> Self {
     self[keyPath: key].fix(to: val)
     return self
   }
   
-  public func with<V>(_ key: KeyPath<Particle, Configured<V>>, boundTo binding: Binding<V>) -> Self {
+  public func bind<V>(_ key: KeyPath<Particle, Configured<V>>, to binding: Binding<V>) -> Self {
     self[keyPath: key].bind(to: binding)
     return self
   }
   
-  public func with<V>(_ key: KeyPath<Particle, Configured<V>>, using closure: @escaping (Entity) -> V) -> Self {
-    self[keyPath: key].setBehavior(to: closure)
+  public func update<V>(_ key: KeyPath<Particle, Configured<V>>, from closure: @escaping (PhysicalEntity) -> V) -> Self {
+    self[keyPath: key].setUpdateBehavior(to: closure)
     return self
   }
 
@@ -113,10 +118,10 @@ public class Particle: PhysicalEntity {
     guard let p = e as? Particle else {
       fatalError("An entity failed to cast to a particle.")
     }
-    self._scaleEffect = p.$scaleEffect.copy()
-    self._opacity = p.$opacity.copy()
-    self._blur = p.$blur.copy()
-    self._hueRotation = p.$hueRotation.copy()
+    self._scaleEffect = p.$scaleEffect.copy(in: self)
+    self._opacity = p.$opacity.copy(in: self)
+    self._blur = p.$blur.copy(in: self)
+    self._hueRotation = p.$hueRotation.copy(in: self)
     self.onDraw = p.onDraw
     self.viewID = p.viewID
   }

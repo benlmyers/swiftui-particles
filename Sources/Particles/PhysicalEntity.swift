@@ -53,32 +53,32 @@ public class PhysicalEntity: Entity {
     super.init()
     self._lifetime.inheritsFromParent = false
     // Default physics configuration
-    self._pos.setBehavior { entity in
+    self._pos.setUpdateBehavior { entity in
       let v = entity.vel
       let pos = entity.pos
       return CGPoint(x: pos.x + v.dx, y: pos.y + v.dy)
     }
-    self._vel.setBehavior { entity in
+    self._vel.setUpdateBehavior { entity in
       entity.vel.add(entity.acc)
     }
-    self._rotation.setBehavior { entity in
+    self._rotation.setUpdateBehavior { entity in
       Angle(degrees: entity.rotation.degrees + entity.torque.degrees)
     }
-    self._torque.setBehavior { entity in
+    self._torque.setUpdateBehavior { entity in
       Angle(degrees: entity.torque.degrees + entity.torqueVariation.degrees)
     }
   }
   
   init(copying e: PhysicalEntity, from emitter: Emitter) {
     super.init()
-    self._lifetime = e.$lifetime.copy(parentValue: emitter.lifetime)
-    self._pos = e.$pos.copy(parentValue: emitter.pos)
-    self._vel = e.$vel.copy(parentValue: emitter.vel)
-    self._acc = e.$acc.copy(parentValue: emitter.acc)
-    self._rotation = e.$rotation.copy(parentValue: emitter.rotation)
-    self._torque = e.$torque.copy(parentValue: emitter.torque)
-    self._torqueVariation = e.$torqueVariation.copy(parentValue: emitter.torqueVariation)
-    self._anchor = e.$anchor.copy(parentValue: emitter.anchor)
+    self._lifetime = e.$lifetime.copy(parentValue: emitter.lifetime, in: e)
+    self._pos = e.$pos.copy(parentValue: emitter.pos, in: e)
+    self._vel = e.$vel.copy(parentValue: emitter.vel, in: e)
+    self._acc = e.$acc.copy(parentValue: emitter.acc, in: e)
+    self._rotation = e.$rotation.copy(parentValue: emitter.rotation, in: self)
+    self._torque = e.$torque.copy(parentValue: emitter.torque, in: self)
+    self._torqueVariation = e.$torqueVariation.copy(parentValue: emitter.torqueVariation, in: self)
+    self._anchor = e.$anchor.copy(parentValue: emitter.anchor, in: self)
     self.system = e.system
   }
   
@@ -103,65 +103,5 @@ public class PhysicalEntity: Entity {
     $torque.update(in: self)
     $torqueVariation.update(in: self)
     $anchor.update(in: self)
-  }
-  
-  // MARK: - Subtypes
-  
-  @propertyWrapper public class Configured<T> {
-    
-    public typealias Behavior = (PhysicalEntity) -> T?
-    
-    public internal(set) var wrappedValue: T
-    public internal(set) var inheritsFromParent: Bool = true
-    
-    private var initialValue: T
-    private var behavior: Behavior = { _ in return nil }
-    
-    public var projectedValue: Configured<T> {
-      return self
-    }
-    
-    public init(wrappedValue: T) {
-      self.wrappedValue = wrappedValue
-      self.initialValue = wrappedValue
-    }
-    
-    public func setInitial(to value: T) {
-      self.initialValue = value
-      self.wrappedValue = value
-      self.inheritsFromParent = false
-    }
-    
-    public func fix(to constant: T) {
-      self.behavior = { _ in
-        return constant
-      }
-    }
-    
-    public func bind(to binding: Binding<T>) {
-      self.behavior = { _ in
-        return binding.wrappedValue
-      }
-    }
-    
-    public func setBehavior(to behavior: @escaping Behavior) {
-      self.behavior = behavior
-    }
-    
-    func update(in entity: PhysicalEntity) {
-      if let newValue = behavior(entity) {
-        wrappedValue = newValue
-      }
-    }
-    
-    func copy(parentValue: T? = nil) -> Configured<T> {
-      let copy = Configured<T>.init(wrappedValue: initialValue)
-      copy.behavior = behavior
-      copy.inheritsFromParent = inheritsFromParent
-      if copy.inheritsFromParent, let parentValue {
-        copy.wrappedValue = parentValue
-      }
-      return copy
-    }
   }
 }

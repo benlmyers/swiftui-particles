@@ -73,31 +73,36 @@ public class Emitter: PhysicalEntity {
     }
     self.prototypes = em.prototypes
     super.init(copying: e, from: emitter)
-    self._fireRate = em.$fireRate.copy()
-    self._fireVelocity = em.$fireVelocity.copy()
-    self._decider = em.$decider.copy()
-    self._maxChildren = em.$maxChildren.copy()
+    self._fireRate = em.$fireRate.copy(in: self)
+    self._fireVelocity = em.$fireVelocity.copy(in: self)
+    self._decider = em.$decider.copy(in: self)
+    self._maxChildren = em.$maxChildren.copy(in: self)
   }
   
   // MARK: - Methods
   
-  public func with<V>(_ key: KeyPath<Emitter, Configured<V>>, startingAt val: V) -> Self {
-    self[keyPath: key].setInitial(to: val)
+  public func start<V>(_ key: KeyPath<Emitter, Configured<V>>, at val: V) -> Self {
+    self[keyPath: key].setSpawnBehavior(to: { _ in return val })
     return self
   }
   
-  public func with<V>(_ key: KeyPath<Emitter, Configured<V>>, fixedAt val: V) -> Self {
+  public func start<V>(_ key: KeyPath<Emitter, Configured<V>>, from closure: @escaping (PhysicalEntity) -> V) -> Self {
+    self[keyPath: key].setSpawnBehavior(to: closure)
+    return self
+  }
+  
+  public func fix<V>(_ key: KeyPath<Emitter, Configured<V>>, at val: V) -> Self {
     self[keyPath: key].fix(to: val)
     return self
   }
   
-  public func with<V>(_ key: KeyPath<Emitter, Configured<V>>, boundTo binding: Binding<V>) -> Self {
+  public func bind<V>(_ key: KeyPath<Emitter, Configured<V>>, to binding: Binding<V>) -> Self {
     self[keyPath: key].bind(to: binding)
     return self
   }
   
-  public func with<V>(_ key: KeyPath<Emitter, Configured<V>>, using closure: @escaping (Entity) -> V) -> Self {
-    self[keyPath: key].setBehavior(to: closure)
+  public func update<V>(_ key: KeyPath<Emitter, Configured<V>>, from closure: @escaping (PhysicalEntity) -> V) -> Self {
+    self[keyPath: key].setUpdateBehavior(to: closure)
     return self
   }
 }

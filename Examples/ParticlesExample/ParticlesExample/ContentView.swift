@@ -26,15 +26,15 @@ struct ContentView: View {
         }
       }
       ParticleSystem {
-        Particle(color: .yellow, radius: 5.0)
-          .with(\.$pos, startingAt: .init(x: 75, y: 10))
-          .with(\.$lifetime, fixedAt: 40.0)
+        let p = Particle(color: .red, radius: 5.0)
+//          .fix(\.$vel, at: .init(dx: 3.0, dy: 0.0))
+          .start(\.$vel) { _ in
+            return .init(dx: Double.random(in: -1.0 ... 1.0), dy: Double.random(in: -1.0 ... 1.0))
+          }
         Emitter {
-          Particle(color: .red, radius: 5.0)
-            .with(\.$vel, startingAt: .init(dx: 1.0, dy: 1.0))
-            .with(\.$acc, fixedAt: .init(dx: 0.0, dy: 0.1))
+          p
         }
-        .with(\.$vel, boundTo: $velocity)
+        .fix(\.$pos, at: .init(x: 100.0, y: 100.0))
       }
       .debug()
     }
