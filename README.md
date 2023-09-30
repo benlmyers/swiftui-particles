@@ -17,3 +17,5 @@ var body: some View {
 ```
 
 Improved features, documentation, and tutorials are coming in the near future. If you want to use this Swift package in your project, ensure that you do so under the dependency rule on branch `main`.
+
+// TODO: Make copying start value behavior based off emitter as input (not existing Entity or prototype Entity)

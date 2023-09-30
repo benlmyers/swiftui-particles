@@ -28,8 +28,8 @@ struct ContentView: View {
       ParticleSystem {
         let p = Particle(color: .red, radius: 5.0)
 //          .fix(\.$vel, at: .init(dx: 3.0, dy: 0.0))
-          .start(\.$vel) { _ in
-            return .init(dx: Double.random(in: -1.0 ... 1.0), dy: Double.random(in: -1.0 ... 1.0))
+          .start(\.$vel) { e in
+            return .init(dx: cos(e.timeAlive), dy: sin(e.timeAlive))
           }
         Emitter {
           p
