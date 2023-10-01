@@ -8,13 +8,13 @@
 import SwiftUI
 import Foundation
 
-protocol Entity {
+public protocol Entity {
   associatedtype Proxy: EntityProxy
   
   var systemData: ParticleSystem.Data? { get set }
   var modifiers: [EntityModifier] { get set }
   
-  func makeProxy(source: Emitter.Proxy?) -> Proxy
+  func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy
 }
 
 extension Entity {
@@ -27,7 +27,15 @@ extension Entity {
   }
 }
 
-struct EntityModifier {
+public struct AnyEntity {
+  var entity: Any
+  
+  public init(entity: some Entity) {
+    self.entity = entity
+  }
+}
+
+public struct EntityModifier {
   
   var path: AnyKeyPath
   var behavior: Behavior
@@ -37,14 +45,14 @@ struct EntityModifier {
   }
 }
 
-class EntityProxy: Identifiable, Hashable, Equatable {
+public class EntityProxy: Identifiable, Hashable, Equatable {
   
-  var id: UUID = UUID()
+  public let id: UUID = UUID()
   
   var inception: Date = Date()
   var lifetime: TimeInterval = 5.0
   
-  var position: CGPoint = .zero
+  var position: CGPoint = .init(x: 50.0, y: 50.0)
   var velocity: CGVector = .zero
   var rotation: Angle = .zero
   
@@ -62,7 +70,7 @@ class EntityProxy: Identifiable, Hashable, Equatable {
     return timeAlive / lifetime
   }
   
-  static func == (lhs: EntityProxy, rhs: EntityProxy) -> Bool {
+  public static func == (lhs: EntityProxy, rhs: EntityProxy) -> Bool {
     return lhs.id == rhs.id
   }
   
@@ -70,31 +78,30 @@ class EntityProxy: Identifiable, Hashable, Equatable {
   func onBirth() {}
   func onDeath() {}
   
-  func hash(into hasher: inout Hasher) {
+  public func hash(into hasher: inout Hasher) {
     return id.hash(into: &hasher)
   }
-  
 }
 
-struct Particle: Entity {
+public struct Particle: Entity {
   
-  weak var systemData: ParticleSystem.Data?
-  var modifiers: [EntityModifier] = []
+  public weak var systemData: ParticleSystem.Data?
+  public var modifiers: [EntityModifier] = []
   var taggedView: AnyTaggedView?
   
   private var onDraw: (inout GraphicsContext) -> Void
   
-  init(color: Color, radius: CGFloat = 4.0) {
+  public init(color: Color, radius: CGFloat = 4.0) {
     self.onDraw = { context in
       context.fill(Path(ellipseIn: .init(origin: .zero, size: .init(width: radius * 2.0, height: radius * 2.0))), with: .color(color))
     }
   }
   
-  init(onDraw: @escaping (inout GraphicsContext) -> Void) {
+  public init(onDraw: @escaping (inout GraphicsContext) -> Void) {
     self.onDraw = onDraw
   }
   
-  init(@ViewBuilder view: () -> some View) {
+  public init(@ViewBuilder view: () -> some View) {
     let taggedView = AnyTaggedView(view: AnyView(view()), tag: UUID())
     self.taggedView = taggedView
     self.onDraw = { context in
@@ -106,12 +113,16 @@ struct Particle: Entity {
     }
   }
   
-  func makeProxy(source: Emitter.Proxy?) -> Proxy {
-    systemData!.views.insert(taggedView!)
-    return Proxy(onDraw: onDraw)
+  public func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
+    if let taggedView {
+      data.views.insert(taggedView)
+    }
+    let newProxy = Proxy(onDraw: onDraw)
+    newProxy.systemData = data
+    return newProxy
   }
   
-  class Proxy: EntityProxy {
+  public class Proxy: EntityProxy {
     
     var opacity: Double = 1.0
     var scaleEffect: CGFloat = 1.0
@@ -144,24 +155,28 @@ struct Particle: Entity {
   }
 }
 
-struct Emitter: Entity {
+public struct Emitter: Entity {
   
-  weak var systemData: ParticleSystem.Data?
-  var modifiers: [EntityModifier] = []
+  public weak var systemData: ParticleSystem.Data?
+  public var modifiers: [EntityModifier] = []
   
   private var entities: (Self.Proxy) -> [any Entity]
   
-  init(@Builder<Entity> entities: @escaping (Self.Proxy) -> [any Entity]) {
+  public init(@Builder<Entity> entities: @escaping (Self.Proxy) -> [any Entity]) {
     self.entities = entities
   }
   
-  func makeProxy(source: Emitter.Proxy?) -> Proxy {
+  public init(@Builder<Entity> entities: @escaping () -> [any Entity]) {
+    self.entities = { _ in entities() }
+  }
+  
+  public func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
     let result = Proxy()
     result.prototypes = entities(result)
     return result
   }
   
-  class Proxy: EntityProxy {
+  public class Proxy: EntityProxy {
     
     var prototypes: [any Entity] = []
     var lastEmitted: Date?
@@ -185,7 +200,7 @@ struct Emitter: Entity {
         return
       }
       let prototype: any Entity = prototypes[decider(self) % prototypes.count]
-      let newProxy = prototype.makeProxy(source: self)
+      let newProxy = prototype.makeProxy(source: self, data: systemData)
       systemData.proxies.insert(newProxy)
       lastEmitted = Date()
       emittedCount += 1
@@ -194,14 +209,14 @@ struct Emitter: Entity {
   }
 }
 
-struct ParticleSystem: View {
+public struct ParticleSystem: View {
   
   private var colorMode: ColorRenderingMode = .nonLinear
   private var async: Bool = true
   
   var data: Self.Data
   
-  var body: some View {
+  public var body: some View {
     TimelineView(.animation(paused: false)) { [self] t in
       Canvas(opaque: true, colorMode: colorMode, rendersAsynchronously: async, renderer: renderer) {
         Text("❌").tag("NOT_FOUND")
@@ -216,9 +231,9 @@ struct ParticleSystem: View {
     }
   }
   
-  init(@Builder<Entity> entities: @escaping () -> [any Entity]) {
+  public init(_ entity:Particle) {
     self.data = Data()
-    self.data.proxies = Set(entities().map({ $0.makeProxy(source: nil) }))
+    self.data.proxies = [entity.makeProxy(source: nil, data: data)]
   }
   
   func renderer(context: inout GraphicsContext, size: CGSize) {
@@ -234,21 +249,10 @@ struct ParticleSystem: View {
     })
   }
   
-  class Data {
+  public class Data {
     var views: Set<AnyTaggedView> = .init()
     var proxies: Set<EntityProxy> = .init()
     var debug: Bool = false
     var systemSize: CGSize = .zero
-  }
-}
-
-struct SampleView: View {
-  var body: some View {
-    ParticleSystem {
-      Particle(color: .red)
-      Emitter { proxy in
-        Particle(color: .yellow)
-      }
-    }
   }
 }

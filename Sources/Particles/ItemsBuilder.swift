@@ -26,3 +26,11 @@ public struct Builder<Block> {
     return components
   }
 }
+
+@resultBuilder
+public struct SystemBuilder {
+  
+  public static func buildBlock<T>(_ components: T...) -> [AnyEntity] where T: Entity {
+    return components.map({ .init(entity: $0) })
+  }
+}
