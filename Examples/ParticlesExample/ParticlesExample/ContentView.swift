@@ -25,7 +25,9 @@ struct ContentView: View {
           velocity = CGVector(dx: Double.random(in: -0.5 ... 0.5), dy: Double.random(in: -0.5 ... 0.5))
         }
       }
-      ParticleSystem(Particle(color: .red))
+      ParticleSystem {
+        Particle(color: .red)
+      }
     }
     .padding()
   }
