@@ -25,18 +25,7 @@ struct ContentView: View {
           velocity = CGVector(dx: Double.random(in: -0.5 ... 0.5), dy: Double.random(in: -0.5 ... 0.5))
         }
       }
-      ParticleSystem {
-        let p = Particle(color: .red, radius: 5.0)
-//          .fix(\.$vel, at: .init(dx: 3.0, dy: 0.0))
-          .start(\.$vel) { e in
-            return .init(dx: cos(e.timeAlive), dy: sin(e.timeAlive))
-          }
-        Emitter {
-          p
-        }
-        .fix(\.$pos, at: .init(x: 100.0, y: 100.0))
-      }
-      .debug()
+      
     }
     .padding()
   }
