@@ -10,7 +10,7 @@ import Foundation
 
 public class Entity {
   
-  var modifiers: [EntityModifier] = []
+  var modifiers: [Modifier] = []
   
   func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
     let newProxy = Proxy(data: data)
@@ -18,9 +18,37 @@ public class Entity {
     return newProxy
   }
   
+  public struct Modifier {
+    
+    var path: AnyKeyPath
+    var valueModifier: ValueModifier
+    
+    enum ValueModifier {
+      case startsAt(Any)
+    }
+    
+    init<T, V>(path: KeyPath<T, V>, _ valueModifier: ValueModifier) where T: Entity, V: NodeInitializable {
+      self.path = path
+      self.valueModifier = valueModifier
+    }
+    
+//    private func apply<T>(_ proxy: inout T) where T: Entity.Proxy {
+//      switch valueModifier {
+//      case .startsAt(let any):
+//        let valueType = type(of: any) as! NodeInitializable.Type
+//        valueType.write(keyPath: path, object: &proxy, value: any)
+//      }
+//    }
+  }
+  
   public class Proxy: Identifiable, Hashable, Equatable {
     
+    typealias Behavior = (Any) -> Void
+    
     final weak var systemData: ParticleSystem.Data?
+    
+    final var birthBehaviors: [Behavior] = []
+    final var updateBehaviors: [Behavior] = []
     
     public final let id: UUID = UUID()
     
@@ -58,26 +86,28 @@ public class Entity {
     public func hash(into hasher: inout Hasher) {
       return id.hash(into: &hasher)
     }
+    
+    func modify(with modifiers: [Modifier]) {
+      for modifier in modifiers {
+        apply(modifier)
+      }
+    }
+    
+    private func apply(_ modifier: Modifier) {
+      switch modifier.valueModifier {
+      case .startsAt(let any):
+        let valueType = type(of: any) as! NodeInitializable.Type
+        valueType.write(keyPath: modifier.path, object: self, value: any)
+      }
+    }
   }
 }
 
 extension Entity {
   
-  func start<T, V>(_ path: KeyPath<T, V>, at value: V) -> Self where T: Entity {
-    let copy = self
-    let modifier = EntityModifier(path: path, behavior: .startsAt(value))
-    copy.modifiers.append(modifier)
-    return copy
-  }
-}
-
-public struct EntityModifier {
-  
-  var path: AnyKeyPath
-  var behavior: Behavior
-  
-  enum Behavior {
-    case startsAt(Any)
+  func start<T, V>(_ path: WritableKeyPath<T, V>, at value: V) -> Self where T: Entity, V: NodeInitializable {
+    self.modifiers.append(Modifier(path: path, .startsAt(value)))
+    return self
   }
 }
 
