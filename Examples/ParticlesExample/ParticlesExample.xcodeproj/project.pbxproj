@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EE783EDF2A6929930016CB96 /* PresetParticles in Frameworks */ = {isa = PBXBuildFile; productRef = EE783EDE2A6929930016CB96 /* PresetParticles */; };
+		EE695F0C2ACB767E002D8F5B /* Particles in Frameworks */ = {isa = PBXBuildFile; productRef = EE695F0B2ACB767E002D8F5B /* Particles */; };
 		EED626832A4990B300A3C3F4 /* ParticlesExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED626822A4990B300A3C3F4 /* ParticlesExampleApp.swift */; };
 		EED626852A4990B300A3C3F4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED626842A4990B300A3C3F4 /* ContentView.swift */; };
 		EED626872A4990B500A3C3F4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EED626862A4990B500A3C3F4 /* Assets.xcassets */; };
@@ -29,7 +29,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EE783EDF2A6929930016CB96 /* PresetParticles in Frameworks */,
+				EE695F0C2ACB767E002D8F5B /* Particles in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,7 +106,7 @@
 			);
 			name = ParticlesExample;
 			packageProductDependencies = (
-				EE783EDE2A6929930016CB96 /* PresetParticles */,
+				EE695F0B2ACB767E002D8F5B /* Particles */,
 			);
 			productName = ParticlesExample;
 			productReference = EED6267F2A4990B300A3C3F4 /* ParticlesExample.app */;
@@ -379,9 +379,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		EE783EDE2A6929930016CB96 /* PresetParticles */ = {
+		EE695F0B2ACB767E002D8F5B /* Particles */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = PresetParticles;
+			productName = Particles;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

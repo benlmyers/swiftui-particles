@@ -9,11 +9,11 @@ import SwiftUI
 import Foundation
 
 /// An entity declaration class. This class cannot be initialized.
-public class Entity {
+open class Entity {
   
   // MARK: - Properties
   
-  private var birthActions: [(Entity.Proxy, Emitter.Proxy?) -> Void] = [
+  private final var birthActions: [(Entity.Proxy, Emitter.Proxy?) -> Void] = [
     { entityProxy, emitterProxy in
       if let emitterProxy {
         entityProxy.position = emitterProxy.position
@@ -21,9 +21,9 @@ public class Entity {
     }
   ]
   
-  private var deathActions: [(Entity.Proxy) -> Void] = []
+  private final var deathActions: [(Entity.Proxy) -> Void] = []
   
-  private var updateActions: [(Entity.Proxy) -> Void] = [
+  private final var updateActions: [(Entity.Proxy) -> Void] = [
     { proxy in
       let v: CGVector = proxy.velocity
       let a: CGVector = proxy.acceleration
@@ -38,15 +38,65 @@ public class Entity {
   
   // MARK: - Methods
   
+  /// Modifies the behavior of the entity upon birth.
+  ///
+  /// If the entity came from an emitter, this method is called when the particle is emitted.
+  /// If the entity was declared in a `ParticleSystem` or elsewhere, this method is called when the system's view appears.
+  /// - Parameter action: The action to perform upon birth. If the entity was spawned from an `Emitter`, its proxy is passed in the closure.
+  /// - Returns: The updated entity declaration. This is an entity modifier.
+  final func onBirth(perform action: @escaping (Entity.Proxy, Emitter.Proxy?) -> Void) -> Self {
+    self.birthActions.append(action)
+    return self
+  }
+  
+  /// Modifies the behavior of the entity upon update.
+  ///
+  /// This method is called each frame the `Canvas` powering the particle system updates.
+  /// - Parameter action: The action to perform on update.
+  /// - Returns: The updated entity declaration. This is an entity modifier.
+  final func onUpdate(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
+    self.updateActions.append(action)
+    return self
+  }
+  
+  /// Modifies the behavior of the entity upon death.
+  ///
+  /// This method is called after an entity despawns.
+  /// - Parameter action: The action to perform on death.
+  /// - Returns: The updated entity declaration. This is an entity modifier.
+  final func onDeath(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
+    self.deathActions.append(action)
+    return self
+  }
+  
+  public func start<T, V>(_ path: ReferenceWritableKeyPath<T, V>, at value: V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
+    self.onBirth { proxy, _ in
+      guard let cast = proxy as? T else { fatalError("oops") }
+      cast[keyPath: path] = value
+    }
+  }
+  
+//  public func start<T, V>(_ path: ReferenceWritableKeyPath<T, V>, at value: @escaping () -> V) -> Self where T: Entity.Proxy {
+//    self.onBirth { proxy, _ in
+//      guard let cast = proxy as? T else {
+//        print("[Particles] Warning: You used a modifier with a key path that uses an unsupported type. Please check your declared system's modifiers for any mismatches.")
+//        return
+//      }
+//      cast[keyPath: path] = value()
+//    }
+//  }
+  
   func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
     let proxy = Proxy(systemData: data, entityData: self)
     return proxy
   }
   
+  // MARK: - Subtypes
+  
   /// An entity proxy.
   ///
   /// This is the data used to represent an entity in the system. It contains information like the entity's position, velocity, acceleration, rotation, and more.
-  public class Proxy: Identifiable, Hashable, Equatable {
+  public class Proxy {
     
     typealias Behavior = (Any) -> Void
     
@@ -55,7 +105,7 @@ public class Entity {
     final weak var systemData: ParticleSystem.Data?
     private final var entityData: Entity
     
-    public final let id: UUID = UUID()
+    private final let id: UUID = UUID()
     
     private var inception: Date = Date()
     
@@ -84,16 +134,6 @@ public class Entity {
       self.entityData = entityData
     }
     
-    // MARK: - Conformance
-    
-    public static func == (lhs: Proxy, rhs: Proxy) -> Bool {
-      return lhs.id == rhs.id
-    }
-    
-    public func hash(into hasher: inout Hasher) {
-      return id.hash(into: &hasher)
-    }
-    
     // MARK: - Methods
     
     func onUpdate(_ context: inout GraphicsContext) {
@@ -113,39 +153,5 @@ public class Entity {
         onDeath(self)
       }
     }
-  }
-}
-
-public extension Entity {
-  
-  /// Modifies the behavior of the entity upon birth.
-  ///
-  /// If the entity came from an emitter, this method is called when the particle is emitted.
-  /// If the entity was declared in a `ParticleSystem` or elsewhere, this method is called when the system's view appears.
-  /// - Parameter action: The action to perform upon birth. If the entity was spawned from an `Emitter`, its proxy is passed in the closure.
-  /// - Returns: The updated entity declaration. This is an entity modifier.
-  func onBirth(perform action: @escaping (Entity.Proxy, Emitter.Proxy?) -> Void) -> Self {
-    self.birthActions.append(action)
-    return self
-  }
-  
-  /// Modifies the behavior of the entity upon update.
-  ///
-  /// This method is called each frame the `Canvas` powering the particle system updates.
-  /// - Parameter action: The action to perform on update.
-  /// - Returns: The updated entity declaration. This is an entity modifier.
-  func onUpdate(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
-    self.updateActions.append(action)
-    return self
-  }
-  
-  /// Modifies the behavior of the entity upon death.
-  ///
-  /// This method is called after an entity despawns.
-  /// - Parameter action: The action to perform on death.
-  /// - Returns: The updated entity declaration. This is an entity modifier.
-  func onDeath(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
-    self.deathActions.append(action)
-    return self
   }
 }

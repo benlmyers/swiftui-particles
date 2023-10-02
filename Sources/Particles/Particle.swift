@@ -22,7 +22,7 @@ import Foundation
 ///   }
 /// }
 /// ```
-public class Particle: Entity {
+open class Particle: Entity {
   
   // MARK: - Properties
   
@@ -63,14 +63,18 @@ public class Particle: Entity {
   
   // MARK: - Overrides
   
-  override func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Entity.Proxy {
+  override public func start<T, V>(_ path: ReferenceWritableKeyPath<T, V>, at value: V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
+    super.start(path, at: value, in: kind)
+  }
+  
+  override final func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Entity.Proxy {
     if let taggedView {
       data.views.insert(taggedView)
     }
     return Proxy(onDraw: onDraw, systemData: data, entityData: self)
   }
   
-  // MARK: - Subclasses
+  // MARK: - Subtypes
   
   /// A particle proxy.
   ///

@@ -26,33 +26,10 @@ struct ContentView: View {
         }
       }
       ParticleSystem {
-        Particle(color: .red)
-          .onBirth { e, _ in
-            e.velocity = .init(dx: 1, dy: 1)
-          }
-          .onDeath { e in
-            print("HELLO")
-          }
         Emitter {
-          Emitter {
-            Particle(color: .yellow)
-              .onBirth { e, _ in
-                e.velocity = .init(dx: 0.5, dy: -1)
-              }
-          }
-          Particle {
-            Text("Hi")
-          }
-          .onBirth { e, _ in
-            e.velocity = .init(dx: 0, dy: 1)
-            if let p = e as? Particle.Proxy {
-              p.opacity = 0.5
-            }
-          }
-        }
-        .onBirth { e, _ in
-          e.position = .init(x: 200.0, y: 100.0)
-          e.velocity = .init(dx: 1.0, dy: 0.0)
+          Particle(color: .red)
+            .start(\.hueRotation, at: .degrees(180.0))
+            .start(\.velocity, at: .init(dx: 1.0, dy: 1.0))
         }
       }
     }

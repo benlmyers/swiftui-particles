@@ -51,9 +51,11 @@ public struct ParticleSystem: View {
   
   // MARK: - Initalizers
   
+  /// Creates a particle system using the declared entities.
+  /// - Parameter entities: Any number of ``Entity``s, such as ``Particle``s or ``Emitter``s.
   public init(@Builder<Entity> entities: @escaping () -> [Entity]) {
     self.data = Data()
-    self.data.proxies = Set(entities().map({ $0.makeProxy(source: nil, data: data) }))
+    self.data.proxies = entities().map({ $0.makeProxy(source: nil, data: data) })
     for proxy in self.data.proxies {
       proxy.onBirth(nil)
     }
@@ -69,19 +71,21 @@ public struct ParticleSystem: View {
   }
   
   func destroyExpired() {
-    data.proxies = data.proxies.filter({ proxy in
-      let result = Date() < proxy.expiration
-      if !result {
+    data.proxies.removeAll { proxy in
+      let kill = Date() >= proxy.expiration
+      if kill {
         proxy.onDeath()
       }
-      return result
-    })
+      return kill
+    }
   }
+  
+  // MARK: - Subtypes
   
   public class Data {
     var views: Set<AnyTaggedView> = .init()
-    var proxies: Set<Entity.Proxy> = .init()
+    var proxies: [Entity.Proxy] = []
     var debug: Bool = false
-    var systemSize: CGSize = .zero
+    public internal(set) var systemSize: CGSize = .zero
   }
 }
