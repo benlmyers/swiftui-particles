@@ -34,7 +34,7 @@ public class Entity {
   ]
   
   func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
-    let proxy = Proxy(source: source, systemData: data, entityData: self)
+    let proxy = Proxy(systemData: data, entityData: self)
 //    proxy.onBirth()
     return proxy
   }
@@ -46,7 +46,6 @@ public class Entity {
     final weak var systemData: ParticleSystem.Data?
     
     final private var entityData: Entity
-    final private var source: Emitter.Proxy?
     
     public final let id: UUID = UUID()
     
@@ -70,10 +69,9 @@ public class Entity {
       return timeAlive / lifetime
     }
     
-    init(source: Emitter.Proxy?, systemData: ParticleSystem.Data, entityData: Entity) {
+    init(systemData: ParticleSystem.Data, entityData: Entity) {
       self.systemData = systemData
       self.entityData = entityData
-      self.source = source
     }
     
     public static func == (lhs: Proxy, rhs: Proxy) -> Bool {
@@ -86,7 +84,7 @@ public class Entity {
       }
     }
     
-    func onBirth() {
+    func onBirth(_ source: Emitter.Proxy?) {
       for onBirth in entityData.birthActions {
         onBirth(self, source)
       }
@@ -167,7 +165,7 @@ public class Particle: Entity {
     
     init(onDraw: @escaping (inout GraphicsContext) -> Void, systemData: ParticleSystem.Data, entityData: Entity) {
       self.onDraw = onDraw
-      super.init(source: nil, systemData: systemData, entityData: entityData)
+      super.init(systemData: systemData, entityData: entityData)
     }
     
     override func onUpdate(_ context: inout GraphicsContext) {
@@ -205,16 +203,17 @@ public class Emitter: Entity {
   
   public class Proxy: Entity.Proxy {
     
-    var prototypes: [Entity]
-    var lastEmitted: Date?
-    var emittedCount: Int = 0
+    private var prototypes: [Entity]
     
-    var fireRate: Double = 1.0
-    var decider: (Proxy) -> Int = { _ in Int.random(in: 0 ... .max) }
+    public private(set) var lastEmitted: Date?
+    public private(set) var emittedCount: Int = 0
+    
+    public var fireRate: Double = 1.0
+    public var decider: (Proxy) -> Int = { _ in Int.random(in: 0 ... .max) }
     
     init(prototypes: [Entity], systemData: ParticleSystem.Data, entityData: Entity) {
       self.prototypes = prototypes
-      super.init(source: nil, systemData: systemData, entityData: entityData)
+      super.init(systemData: systemData, entityData: entityData)
     }
     
     override func onUpdate(_ context: inout GraphicsContext) {
@@ -238,7 +237,7 @@ public class Emitter: Entity {
       systemData.proxies.insert(newProxy)
       lastEmitted = Date()
       emittedCount += 1
-      newProxy.onBirth()
+      newProxy.onBirth(self)
     }
   }
 }
@@ -281,7 +280,7 @@ public struct ParticleSystem: View {
     self.data = Data()
     self.data.proxies = Set(entities().map({ $0.makeProxy(source: nil, data: data) }))
     for proxy in self.data.proxies {
-      proxy.onBirth()
+      proxy.onBirth(nil)
     }
   }
   

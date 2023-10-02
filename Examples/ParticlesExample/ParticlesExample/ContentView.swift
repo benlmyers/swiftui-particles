@@ -34,18 +34,25 @@ struct ContentView: View {
             print("HELLO")
           }
         Emitter {
+          Emitter {
+            Particle(color: .yellow)
+              .onBirth { e, _ in
+                e.velocity = .init(dx: 0.5, dy: -1)
+              }
+          }
           Particle {
             Text("Hi")
           }
-          .onUpdate { e in
+          .onBirth { e, _ in
             e.velocity = .init(dx: 0, dy: 1)
             if let p = e as? Particle.Proxy {
               p.opacity = 0.5
             }
           }
         }
-        .onUpdate { e in
+        .onBirth { e, _ in
           e.position = .init(x: 200.0, y: 100.0)
+          e.velocity = .init(dx: 1.0, dy: 0.0)
         }
       }
     }
