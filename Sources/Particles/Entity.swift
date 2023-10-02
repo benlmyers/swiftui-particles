@@ -10,27 +10,11 @@ import Foundation
 
 public class Entity {
   
-  var modifiers: [Modifier] = []
+  private var birthActions: [(Entity.Proxy) -> Void] = []
+  private var updateActions: [(Entity.Proxy) -> Void] = []
   
   func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
-    let newProxy = Proxy(data: data)
-    newProxy.systemData = data
-    return newProxy
-  }
-  
-  public struct Modifier {
-    
-    var path: AnyKeyPath
-    var valueModifier: ValueModifier
-    
-    enum ValueModifier {
-      case startsAt(Any)
-    }
-    
-    init<T, V>(path: KeyPath<T, V>, _ valueModifier: ValueModifier) where T: Entity.Proxy, V: NodeInitializable {
-      self.path = path
-      self.valueModifier = valueModifier
-    }
+    return Proxy(source: nil, systemData: data, entityData: self)
   }
   
   public class Proxy: Identifiable, Hashable, Equatable {
@@ -38,18 +22,18 @@ public class Entity {
     typealias Behavior = (Any) -> Void
     
     final weak var systemData: ParticleSystem.Data?
+    final weak var source: Emitter?
     
-    final var birthBehaviors: [Behavior] = []
-    final var updateBehaviors: [Behavior] = []
+    private var entityData: Entity
     
     public final let id: UUID = UUID()
     
     private var inception: Date = Date()
     
-    public private(set) var lifetime: TimeInterval = 5.0
-    public private(set) var position: CGPoint = .zero
-    public private(set) var velocity: CGVector = .zero
-    public private(set) var rotation: Angle = .zero
+    public var lifetime: TimeInterval = 5.0
+    public var position: CGPoint = .zero
+    public var velocity: CGVector = .zero
+    public var rotation: Angle = .zero
     
     var expiration: Date {
       return inception + lifetime
@@ -63,47 +47,45 @@ public class Entity {
       return timeAlive / lifetime
     }
     
-    init(data: ParticleSystem.Data) {
-      self.systemData = data
+    init(source: Emitter.Proxy?, systemData: ParticleSystem.Data, entityData: Entity) {
+      self.systemData = systemData
+      self.entityData = entityData
     }
     
     public static func == (lhs: Proxy, rhs: Proxy) -> Bool {
       return lhs.id == rhs.id
     }
     
-    func onUpdate(_ context: inout GraphicsContext) {}
-    func onBirth() {}
+    func onUpdate(_ context: inout GraphicsContext) {
+      for onUpdate in entityData.updateActions {
+        onUpdate(self)
+      }
+    }
+    
+    func onBirth() {
+      for onUpdate in entityData.birthActions {
+        onUpdate(self)
+      }
+    }
+    
     func onDeath() {}
     
     public func hash(into hasher: inout Hasher) {
       return id.hash(into: &hasher)
     }
-    
-    func modify(with modifiers: [Modifier]) {
-      for modifier in modifiers {
-        apply(modifier)
-      }
-    }
-    
-    private func apply(_ modifier: Modifier) {
-      switch modifier.valueModifier {
-      case .startsAt(let any):
-        let valueType = type(of: any) as! NodeInitializable.Type
-        valueType.write(keyPath: modifier.path, object: self, value: any)
-      }
-    }
   }
 }
 
 public extension Entity {
-  
-  func start<T, V>(_ path: KeyPath<T, V>, in t: T.Type, at value: V) -> Self where T: Entity.Proxy, V: NodeInitializable {
-    self.modifiers.append(Modifier(path: path, .startsAt(value)))
+ 
+  func onBirth(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
+    self.birthActions.append(action)
     return self
   }
   
-  func onBirth<T>(perform action: (T) -> Void) {
-    self.modifiers
+  func onUpdate(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
+    self.updateActions.append(action)
+    return self
   }
 }
 
@@ -134,13 +116,11 @@ public class Particle: Entity {
     }
   }
   
-  public override func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
+  override func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Entity.Proxy {
     if let taggedView {
       data.views.insert(taggedView)
     }
-    let newProxy = Proxy(onDraw: onDraw, data: data)
-    newProxy.systemData = data
-    return newProxy
+    return Proxy(onDraw: onDraw, systemData: data, entityData: self)
   }
   
   public class Proxy: Entity.Proxy {
@@ -152,12 +132,13 @@ public class Particle: Entity {
     
     private var onDraw: (inout GraphicsContext) -> Void
     
-    init(onDraw: @escaping (inout GraphicsContext) -> Void, data: ParticleSystem.Data) {
+    init(onDraw: @escaping (inout GraphicsContext) -> Void, systemData: ParticleSystem.Data, entityData: Entity) {
       self.onDraw = onDraw
-      super.init(data: data)
+      super.init(source: nil, systemData: systemData, entityData: entityData)
     }
     
     override func onUpdate(_ context: inout GraphicsContext) {
+      super.onUpdate(&context)
       context.drawLayer { context in
         context.translateBy(x: position.x, y: position.y)
         context.rotate(by: rotation)
@@ -186,8 +167,7 @@ public class Emitter: Entity {
   }
   
   public override func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
-    let result = Proxy(prototypes: prototypes, data: data)
-    return result
+    return Proxy(prototypes: prototypes, systemData: data, entityData: self)
   }
   
   public class Proxy: Entity.Proxy {
@@ -199,9 +179,9 @@ public class Emitter: Entity {
     var fireRate: Double = 1.0
     var decider: (Proxy) -> Int = { _ in Int.random(in: 0 ... .max) }
     
-    init(prototypes: [Entity], data: ParticleSystem.Data) {
+    init(prototypes: [Entity], systemData: ParticleSystem.Data, entityData: Entity) {
       self.prototypes = prototypes
-      super.init(data: data)
+      super.init(source: nil, systemData: systemData, entityData: entityData)
     }
     
     override func onUpdate(_ context: inout GraphicsContext) {
@@ -248,11 +228,6 @@ public struct ParticleSystem: View {
         destroyExpired()
       }
     }
-  }
-  
-  public init(_ entity:Particle) {
-    self.data = Data()
-    self.data.proxies = [entity.makeProxy(source: nil, data: data)]
   }
   
   public init(@Builder<Entity> entities: @escaping () -> [Entity]) {

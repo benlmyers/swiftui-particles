@@ -27,7 +27,9 @@ struct ContentView: View {
       }
       ParticleSystem {
         Particle(color: .red)
-          .start(\Particle.Proxy.position, in: Particle.Proxy.self, at: .init(x: 50, y: 10))
+          .onUpdate { e in
+            e.position = .init(x: 100.0, y: 100.0)
+          }
       }
     }
     .padding()
