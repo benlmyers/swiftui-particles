@@ -27,18 +27,10 @@ public class Entity {
       case startsAt(Any)
     }
     
-    init<T, V>(path: KeyPath<T, V>, _ valueModifier: ValueModifier) where T: Entity, V: NodeInitializable {
+    init<T, V>(path: KeyPath<T, V>, _ valueModifier: ValueModifier) where T: Entity.Proxy, V: NodeInitializable {
       self.path = path
       self.valueModifier = valueModifier
     }
-    
-//    private func apply<T>(_ proxy: inout T) where T: Entity.Proxy {
-//      switch valueModifier {
-//      case .startsAt(let any):
-//        let valueType = type(of: any) as! NodeInitializable.Type
-//        valueType.write(keyPath: path, object: &proxy, value: any)
-//      }
-//    }
   }
   
   public class Proxy: Identifiable, Hashable, Equatable {
@@ -52,12 +44,12 @@ public class Entity {
     
     public final let id: UUID = UUID()
     
-    var inception: Date = Date()
-    var lifetime: TimeInterval = 5.0
+    private var inception: Date = Date()
     
-    var position: CGPoint = .zero
-    var velocity: CGVector = .zero
-    var rotation: Angle = .zero
+    public private(set) var lifetime: TimeInterval = 5.0
+    public private(set) var position: CGPoint = .zero
+    public private(set) var velocity: CGVector = .zero
+    public private(set) var rotation: Angle = .zero
     
     var expiration: Date {
       return inception + lifetime
@@ -103,11 +95,15 @@ public class Entity {
   }
 }
 
-extension Entity {
+public extension Entity {
   
-  func start<T, V>(_ path: WritableKeyPath<T, V>, at value: V) -> Self where T: Entity, V: NodeInitializable {
+  func start<T, V>(_ path: KeyPath<T, V>, in t: T.Type, at value: V) -> Self where T: Entity.Proxy, V: NodeInitializable {
     self.modifiers.append(Modifier(path: path, .startsAt(value)))
     return self
+  }
+  
+  func onBirth<T>(perform action: (T) -> Void) {
+    self.modifiers
   }
 }
 

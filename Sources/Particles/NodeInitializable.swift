@@ -5,9 +5,10 @@
 //  Created by Ben Myers on 10/1/23.
 //
 
+import SwiftUI
 import Foundation
 
-protocol NodeInitializable {
+public protocol NodeInitializable {
 }
 
 extension NodeInitializable {
@@ -17,3 +18,5 @@ extension NodeInitializable {
 
   }
 }
+
+extension CGPoint: NodeInitializable {}
