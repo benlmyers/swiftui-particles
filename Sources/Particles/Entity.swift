@@ -11,7 +11,20 @@ import Foundation
 public class Entity {
   
   private var birthActions: [(Entity.Proxy) -> Void] = []
-  private var updateActions: [(Entity.Proxy) -> Void] = []
+  private var deathActions: [(Entity.Proxy) -> Void] = []
+  
+  private var updateActions: [(Entity.Proxy) -> Void] = [
+    { proxy in
+      let v: CGVector = proxy.velocity
+      let a: CGVector = proxy.acceleration
+      proxy.velocity = CGVector(dx: v.dx + a.dx, dy: v.dy + a.dy)
+    },
+    { proxy in
+      let p: CGPoint = proxy.position
+      let v: CGVector = proxy.velocity
+      proxy.position = CGPoint(x: p.x + v.dx, y: p.y + v.dy)
+    }
+  ]
   
   func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
     return Proxy(source: nil, systemData: data, entityData: self)
@@ -33,6 +46,7 @@ public class Entity {
     public var lifetime: TimeInterval = 5.0
     public var position: CGPoint = .zero
     public var velocity: CGVector = .zero
+    public var acceleration: CGVector = .zero
     public var rotation: Angle = .zero
     
     var expiration: Date {
@@ -63,12 +77,16 @@ public class Entity {
     }
     
     func onBirth() {
-      for onUpdate in entityData.birthActions {
-        onUpdate(self)
+      for onBirth in entityData.birthActions {
+        onBirth(self)
       }
     }
     
-    func onDeath() {}
+    func onDeath() {
+      for onDeath in entityData.deathActions {
+        onDeath(self)
+      }
+    }
     
     public func hash(into hasher: inout Hasher) {
       return id.hash(into: &hasher)
@@ -85,6 +103,11 @@ public extension Entity {
   
   func onUpdate(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
     self.updateActions.append(action)
+    return self
+  }
+  
+  func onDeath(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
+    self.deathActions.append(action)
     return self
   }
 }
@@ -244,7 +267,11 @@ public struct ParticleSystem: View {
   
   func destroyExpired() {
     data.proxies = data.proxies.filter({ proxy in
-      Date() < proxy.expiration
+      let result = Date() < proxy.expiration
+      if !result {
+        proxy.onDeath()
+      }
+      return result
     })
   }
   

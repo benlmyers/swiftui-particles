@@ -28,7 +28,10 @@ struct ContentView: View {
       ParticleSystem {
         Particle(color: .red)
           .onUpdate { e in
-            e.position = .init(x: 100.0, y: 100.0)
+            e.velocity = .init(dx: 1, dy: 1)
+          }
+          .onDeath { e in
+            print("HELLO")
           }
       }
     }
