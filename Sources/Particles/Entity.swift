@@ -10,7 +10,14 @@ import Foundation
 
 public class Entity {
   
-  private var birthActions: [(Entity.Proxy) -> Void] = []
+  private var birthActions: [(Entity.Proxy, Emitter.Proxy?) -> Void] = [
+    { entityProxy, emitterProxy in
+      if let emitterProxy {
+        entityProxy.position = emitterProxy.position
+      }
+    }
+  ]
+  
   private var deathActions: [(Entity.Proxy) -> Void] = []
   
   private var updateActions: [(Entity.Proxy) -> Void] = [
@@ -27,7 +34,9 @@ public class Entity {
   ]
   
   func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
-    return Proxy(source: nil, systemData: data, entityData: self)
+    let proxy = Proxy(source: source, systemData: data, entityData: self)
+//    proxy.onBirth()
+    return proxy
   }
   
   public class Proxy: Identifiable, Hashable, Equatable {
@@ -35,9 +44,9 @@ public class Entity {
     typealias Behavior = (Any) -> Void
     
     final weak var systemData: ParticleSystem.Data?
-    final weak var source: Emitter?
     
-    private var entityData: Entity
+    final private var entityData: Entity
+    final private var source: Emitter.Proxy?
     
     public final let id: UUID = UUID()
     
@@ -64,6 +73,7 @@ public class Entity {
     init(source: Emitter.Proxy?, systemData: ParticleSystem.Data, entityData: Entity) {
       self.systemData = systemData
       self.entityData = entityData
+      self.source = source
     }
     
     public static func == (lhs: Proxy, rhs: Proxy) -> Bool {
@@ -78,7 +88,7 @@ public class Entity {
     
     func onBirth() {
       for onBirth in entityData.birthActions {
-        onBirth(self)
+        onBirth(self, source)
       }
     }
     
@@ -96,7 +106,7 @@ public class Entity {
 
 public extension Entity {
  
-  func onBirth(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
+  func onBirth(perform action: @escaping (Entity.Proxy, Emitter.Proxy?) -> Void) -> Self {
     self.birthActions.append(action)
     return self
   }
@@ -148,10 +158,10 @@ public class Particle: Entity {
   
   public class Proxy: Entity.Proxy {
     
-    var opacity: Double = 1.0
-    var scaleEffect: CGFloat = 1.0
-    var blur: CGFloat = .zero
-    var hueRotation: Angle = .zero
+    public var opacity: Double = 1.0
+    public var scaleEffect: CGFloat = 1.0
+    public var blur: CGFloat = .zero
+    public var hueRotation: Angle = .zero
     
     private var onDraw: (inout GraphicsContext) -> Void
     
@@ -208,6 +218,8 @@ public class Emitter: Entity {
     }
     
     override func onUpdate(_ context: inout GraphicsContext) {
+      super.onUpdate(&context)
+      context.stroke(.init(ellipseIn: .init(x: position.x, y: position.y, width: 2.0, height: 2.0)), with: .color(.white))
       if let lastEmitted {
         guard Date().timeIntervalSince(lastEmitted) >= 1.0 / fireRate else {
           return
@@ -227,6 +239,18 @@ public class Emitter: Entity {
       lastEmitted = Date()
       emittedCount += 1
       newProxy.onBirth()
+    }
+  }
+}
+
+class MyParticle: Particle {
+  
+  var color: Color
+  
+  init(color: Color) {
+    self.color = color
+    super.init { context in
+      context.stroke(Path(roundedRect: .init(origin: .zero, size: .init(width: 10.0, height: 10.0)), cornerSize: .zero), with: .color(color))
     }
   }
 }
@@ -256,6 +280,9 @@ public struct ParticleSystem: View {
   public init(@Builder<Entity> entities: @escaping () -> [Entity]) {
     self.data = Data()
     self.data.proxies = Set(entities().map({ $0.makeProxy(source: nil, data: data) }))
+    for proxy in self.data.proxies {
+      proxy.onBirth()
+    }
   }
   
   func renderer(context: inout GraphicsContext, size: CGSize) {

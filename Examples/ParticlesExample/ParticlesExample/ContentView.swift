@@ -27,12 +27,26 @@ struct ContentView: View {
       }
       ParticleSystem {
         Particle(color: .red)
-          .onUpdate { e in
+          .onBirth { e, _ in
             e.velocity = .init(dx: 1, dy: 1)
           }
           .onDeath { e in
             print("HELLO")
           }
+        Emitter {
+          Particle {
+            Text("Hi")
+          }
+          .onUpdate { e in
+            e.velocity = .init(dx: 0, dy: 1)
+            if let p = e as? Particle.Proxy {
+              p.opacity = 0.5
+            }
+          }
+        }
+        .onUpdate { e in
+          e.position = .init(x: 200.0, y: 100.0)
+        }
       }
     }
     .padding()
