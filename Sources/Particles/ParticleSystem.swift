@@ -58,9 +58,6 @@ public struct ParticleSystem: View {
   public init(data: Self.Data = .init(), @Builder<Entity> entities: @escaping () -> [Entity]) {
     self.data = data
     self.data.refresh(entities())
-    for proxy in self.data.proxies {
-      proxy.onBirth(nil)
-    }
   }
   
   // MARK: - Methods
@@ -119,6 +116,9 @@ public struct ParticleSystem: View {
       self.proxies = entities.map({ $0.makeProxy(source: nil, data: self) })
       self.rootEntities = entities
       self.prepared = true
+      for proxy in self.proxies {
+        proxy.onBirth(nil)
+      }
     }
     
     private func update(_ entities: [Entity], with new: [Entity]) {
