@@ -7,7 +7,6 @@
 
 import SwiftUI
 import Particles
-import PresetParticles
 
 struct ContentView: View {
   
@@ -35,7 +34,7 @@ struct ContentView: View {
             .start(\.velocity) { .random(magnitudeIn: 1.0 ... 3.0) }
             .fix(\.acceleration, at: acceleration)
         }
-        .fix(\.fireRate, at: 10.0)
+        .fix(\.fireRate, at: 50.0)
         .start(\.position, at: UnitPoint.center)
       }
     }
