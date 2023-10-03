@@ -96,7 +96,8 @@ public class Emitter: Entity {
     /// ```
     public var decider: (Proxy) -> Int = { _ in Int.random(in: 0 ... .max) }
     
-    public var canFire: (Proxy) -> Bool = { _ in true }
+    /// Whether the emitter can fire entities.
+    public var canFire: Bool = true
     
     // MARK: - Initalizers
     
@@ -111,7 +112,7 @@ public class Emitter: Entity {
     override func onUpdate(_ context: inout GraphicsContext) {
       super.onUpdate(&context)
       context.stroke(.init(ellipseIn: .init(x: position.x, y: position.y, width: 2.0, height: 2.0)), with: .color(.white))
-      guard canFire(self) else {
+      guard canFire else {
         return
       }
       if let lastEmitted {

@@ -35,6 +35,9 @@ open class Entity: Identifiable {
       let p: CGPoint = proxy.position
       let v: CGVector = proxy.velocity
       proxy.position = CGPoint(x: p.x + v.dx, y: p.y + v.dy)
+    },
+    { proxy in
+      proxy.rotation = Angle(degrees: proxy.rotation.degrees + proxy.torque.degrees)
     }
   ]
   
@@ -71,6 +74,16 @@ open class Entity: Identifiable {
   public final func onDeath(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
     self.deathActions.append(action)
     return self
+  }
+
+  /// Emits an entity upon death.
+  /// - Parameter onDeath: The closure that creates and returns the emitted entity.
+  /// - Returns: The updated entity declaration. This is an entity modifier.
+  public final func emit(onDeath: @escaping () -> Entity) -> Self {
+    self.onDeath { proxy in
+      let newProxy = proxy.entityData.makeProxy(source: nil, data: proxy.systemData!)
+      proxy.systemData!.proxies.append(newProxy)
+    }
   }
   
   /// Starts a particular value of the entity upon birth.
@@ -161,6 +174,7 @@ open class Entity: Identifiable {
     public var velocity: CGVector = .zero
     public var acceleration: CGVector = .zero
     public var rotation: Angle = .zero
+    public var torque: Angle = .zero
     
     public var expiration: Date {
       return inception + lifetime

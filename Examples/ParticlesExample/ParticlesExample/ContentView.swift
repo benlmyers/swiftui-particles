@@ -34,7 +34,7 @@ struct ContentView: View {
             .start(\.velocity) { .random(magnitudeIn: 1.0 ... 3.0) }
             .fix(\.acceleration, at: acceleration)
         }
-        .fix(\.fireRate, at: 50.0)
+        .fix(\.fireRate, at: 500.0)
         .startPosition(.center)
       }
     }
