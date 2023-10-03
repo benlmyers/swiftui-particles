@@ -143,7 +143,7 @@ open class Entity: Identifiable {
   /// An entity proxy.
   ///
   /// This is the data used to represent an entity in the system. It contains information like the entity's position, velocity, acceleration, rotation, and more.
-  public class Proxy {
+  open class Proxy {
     
     typealias Behavior = (Any) -> Void
     

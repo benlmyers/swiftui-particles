@@ -92,7 +92,7 @@ open class Particle: Entity {
   ///
   /// This is the data used to represent the particle in the system. It contains information like the particle's position, velocity, acceleration, rotation, and more.
   /// `Particle.Proxy` also contains properties related to its opacity, scale effect, blur, and more.
-  public class Proxy: Entity.Proxy {
+  open class Proxy: Entity.Proxy {
     
     // MARK: - Properties
     
