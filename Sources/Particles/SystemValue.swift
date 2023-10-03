@@ -1,28 +1,20 @@
 //
-//  File.swift
-//  
+//  SystemValue.swift
+//
 //
 //  Created by Ben Myers on 10/2/23.
 //
 
 import SwiftUI
 
-//public struct SystemValue<V> {
-//  var getValue: (ParticleSystem.Data, Entity.Proxy) -> V
-//}
-//
-//extension SystemValue where V == CGPoint {
-//  
-//  public init(_ position: UnitPoint) {
-//    self.getValue = { data, _ in
-//      let size = data.systemSize
-//      return CGPoint(x: position.x * size.width, y: position.y * size.height)
-//    }
-//  }
-//}
-
+/// A protocol defining a type as one that can be derived from its system.
 public protocol SystemValue {
+  
   associatedtype Value
+  
+  /// Derives the value from a proxy and its environment.
+  /// - Parameter proxy: The proxy to obtain a value from.
+  /// - Returns: The value derived from the proxy's properties.
   func getValue(from proxy: Entity.Proxy) -> Value
 }
 
