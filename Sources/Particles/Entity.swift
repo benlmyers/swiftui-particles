@@ -76,15 +76,12 @@ open class Entity {
     }
   }
   
-//  public func start<T, V>(_ path: ReferenceWritableKeyPath<T, V>, at value: @escaping () -> V) -> Self where T: Entity.Proxy {
-//    self.onBirth { proxy, _ in
-//      guard let cast = proxy as? T else {
-//        print("[Particles] Warning: You used a modifier with a key path that uses an unsupported type. Please check your declared system's modifiers for any mismatches.")
-//        return
-//      }
-//      cast[keyPath: path] = value()
-//    }
-//  }
+  public func start<T, V>(_ path: ReferenceWritableKeyPath<T, V>, with value: @escaping () -> V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
+    self.onBirth { proxy, _ in
+      guard let cast = proxy as? T else { fatalError("oops") }
+      cast[keyPath: path] = value()
+    }
+  }
   
   func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
     let proxy = Proxy(systemData: data, entityData: self)

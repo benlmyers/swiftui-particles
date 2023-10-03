@@ -52,10 +52,15 @@ public struct ParticleSystem: View {
   // MARK: - Initalizers
   
   /// Creates a particle system using the declared entities.
-  /// - Parameter entities: Any number of ``Entity``s, such as ``Particle``s or ``Emitter``s.
-  public init(@Builder<Entity> entities: @escaping () -> [Entity]) {
-    self.data = Data()
-    self.data.proxies = entities().map({ $0.makeProxy(source: nil, data: data) })
+  /// - Parameters:
+  ///   - data: The particle system's data. Provide your own to enable state updates.
+  ///   - entities: Any number of ``Entity``s, such as ``Particle``s or ``Emitter``s.
+  public init(data: Self.Data = .init(), @Builder<Entity> entities: @escaping () -> [Entity]) {
+    self.data = data
+    if !self.data.prepared {
+      self.data.proxies = entities().map({ $0.makeProxy(source: nil, data: data) })
+      self.data.prepared = true
+    }
     for proxy in self.data.proxies {
       proxy.onBirth(nil)
     }
@@ -83,9 +88,12 @@ public struct ParticleSystem: View {
   // MARK: - Subtypes
   
   public class Data {
+    var prepared: Bool = false
     var views: Set<AnyTaggedView> = .init()
     var proxies: [Entity.Proxy] = []
     var debug: Bool = false
     public internal(set) var systemSize: CGSize = .zero
+    
+    public init() {}
   }
 }

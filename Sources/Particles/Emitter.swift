@@ -85,6 +85,7 @@ public class Emitter: Entity {
     init(prototypes: [Entity], systemData: ParticleSystem.Data, entityData: Entity) {
       self.prototypes = prototypes
       super.init(systemData: systemData, entityData: entityData)
+      self.lifetime = .infinity
     }
     
     // MARK: - Overrides

@@ -14,6 +14,8 @@ struct ContentView: View {
   @State var velocity: CGVector = .init(dx: 1, dy: 1)
   @State var opacity: CGFloat = 1.0
   
+  @State var systemData = ParticleSystem.Data()
+  
   var body: some View {
     VStack {
       Image(systemName: "globe")
@@ -25,11 +27,11 @@ struct ContentView: View {
           velocity = CGVector(dx: Double.random(in: -0.5 ... 0.5), dy: Double.random(in: -0.5 ... 0.5))
         }
       }
-      ParticleSystem {
+      ParticleSystem(data: systemData) {
         Emitter {
           Particle(color: .red)
             .start(\.hueRotation, at: .degrees(180.0))
-            .start(\.velocity, at: .init(dx: 1.0, dy: 1.0))
+            .start(\.velocity, with: { velocity })
         }
       }
     }
