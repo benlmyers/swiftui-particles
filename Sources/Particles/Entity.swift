@@ -9,9 +9,11 @@ import SwiftUI
 import Foundation
 
 /// An entity declaration class. This class cannot be initialized.
-open class Entity {
+open class Entity: Identifiable {
   
   // MARK: - Properties
+  
+  public private(set) var id: UUID = UUID()
   
   private final var birthActions: [(Entity.Proxy, Emitter.Proxy?) -> Void] = [
     { entityProxy, emitterProxy in
@@ -88,6 +90,12 @@ open class Entity {
     return proxy
   }
   
+  func updateBehaviors(from entity: Entity) {
+    self.birthActions = entity.birthActions
+    self.updateActions = entity.updateActions
+    self.deathActions = entity.deathActions
+  }
+  
   // MARK: - Subtypes
   
   /// An entity proxy.
@@ -100,7 +108,7 @@ open class Entity {
     // MARK: - Properties
     
     final weak var systemData: ParticleSystem.Data?
-    private final var entityData: Entity
+    final var entityData: Entity
     
     private final let id: UUID = UUID()
     

@@ -57,10 +57,7 @@ public struct ParticleSystem: View {
   ///   - entities: Any number of ``Entity``s, such as ``Particle``s or ``Emitter``s.
   public init(data: Self.Data = .init(), @Builder<Entity> entities: @escaping () -> [Entity]) {
     self.data = data
-    if !self.data.prepared {
-      self.data.proxies = entities().map({ $0.makeProxy(source: nil, data: data) })
-      self.data.prepared = true
-    }
+    self.data.refresh(entities())
     for proxy in self.data.proxies {
       proxy.onBirth(nil)
     }
@@ -88,12 +85,72 @@ public struct ParticleSystem: View {
   // MARK: - Subtypes
   
   public class Data {
+    
+    // MARK: - Properties
+    
     var prepared: Bool = false
     var views: Set<AnyTaggedView> = .init()
     var proxies: [Entity.Proxy] = []
     var debug: Bool = false
+    
+    private var rootEntities: [Entity] = []
+    
+    private var entityStructure: [EntityStructure] {
+      return transform(rootEntities)
+    }
+    
     public internal(set) var systemSize: CGSize = .zero
     
+    // MARK: - Initalizers
+    
     public init() {}
+    
+    // MARK: - Methods
+    
+    func refresh(_ entities: [Entity]) {
+      if prepared {
+        update(rootEntities, with: entities)
+      } else {
+        prepare(entities)
+      }
+    }
+    
+    private func prepare(_ entities: [Entity]) {
+      self.proxies = entities.map({ $0.makeProxy(source: nil, data: self) })
+      self.rootEntities = entities
+      self.prepared = true
+    }
+    
+    private func update(_ entities: [Entity], with new: [Entity]) {
+      guard entities.count == new.count else {
+        // FIXME: Improve
+        fatalError("Something went wrong.")
+      }
+      for (current, new) in zip(entities, new) {
+        current.updateBehaviors(from: new)
+        if let currentEmitter = current as? Emitter, let newEmitter = new as? Emitter {
+          update(currentEmitter.prototypes, with: newEmitter.prototypes)
+        }
+      }
+    }
+    
+    private func transform(_ entities: [Entity]) -> [EntityStructure] {
+      var result: [EntityStructure] = []
+      for entity in entities {
+        if let emitter = entity as? Emitter {
+          result.append(.parent(emitter, transform(emitter.prototypes)))
+        } else {
+          result.append(.simple(entity))
+        }
+      }
+      return result
+    }
+    
+    // MARK: - Subtypes
+    
+    indirect enum EntityStructure {
+      case simple(Entity)
+      case parent(Entity, [EntityStructure])
+    }
   }
 }

@@ -21,7 +21,7 @@ public class Emitter: Entity {
   
   // MARK: - Properties
   
-  private final var prototypes: [Entity]
+  final var prototypes: [Entity]
   
   // MARK: - Initalizers
   
@@ -36,6 +36,14 @@ public class Emitter: Entity {
   
   final override func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
     return Proxy(prototypes: prototypes, systemData: data, entityData: self)
+  }
+  
+  override public func start<T, V>(_ path: ReferenceWritableKeyPath<T, V>, at value: V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
+    super.start(path, at: value, in: kind)
+  }
+  
+  override public func start<T, V>(_ path: ReferenceWritableKeyPath<T, V>, with value: @escaping () -> V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
+    super.start(path, with: value, in: kind)
   }
   
   // MARK: - Subtypes
@@ -80,6 +88,8 @@ public class Emitter: Entity {
     /// ```
     public var decider: (Proxy) -> Int = { _ in Int.random(in: 0 ... .max) }
     
+    public var canFire: (Proxy) -> Bool = { _ in true }
+    
     // MARK: - Initalizers
     
     init(prototypes: [Entity], systemData: ParticleSystem.Data, entityData: Entity) {
@@ -93,6 +103,9 @@ public class Emitter: Entity {
     override func onUpdate(_ context: inout GraphicsContext) {
       super.onUpdate(&context)
       context.stroke(.init(ellipseIn: .init(x: position.x, y: position.y, width: 2.0, height: 2.0)), with: .color(.white))
+      guard canFire(self) else {
+        return
+      }
       if let lastEmitted {
         guard Date().timeIntervalSince(lastEmitted) >= 1.0 / fireRate else {
           return
