@@ -91,6 +91,10 @@ open class Particle: Entity {
     super.fix(path, with: value, in: kind)
   }
   
+  override public func fix<T, V>(_ path: ReferenceWritableKeyPath<T, V>, updatingFrom value: @escaping (V) -> V, in kind: T.Type = Proxy.self) -> Self where T : Entity.Proxy {
+    super.fix(path, updatingFrom: value, in: kind)
+  }
+  
   override final func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Entity.Proxy {
     if let taggedView {
       data.views.insert(taggedView)
@@ -135,13 +139,13 @@ open class Particle: Entity {
       context.drawLayer { context in
         context.rotate(by: rotation)
         context.opacity = opacity
-        if scaleEffect != 1.0 {
-          context.scaleBy(x: scaleEffect, y: scaleEffect)
-        }
         if !hueRotation.degrees.isZero {
           context.addFilter(.hueRotation(hueRotation))
         }
         context.translateBy(x: position.x, y: position.y)
+        if scaleEffect != 1.0 {
+          context.scaleBy(x: scaleEffect, y: scaleEffect)
+        }
         self.onDraw(&context)
       }
     }

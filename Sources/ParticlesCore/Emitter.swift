@@ -62,6 +62,10 @@ public class Emitter: Entity {
     super.fix(path, with: value, in: kind)
   }
   
+  override public func fix<T, V>(_ path: ReferenceWritableKeyPath<T, V>, updatingFrom value: @escaping (V) -> V, in kind: T.Type = Proxy.self) -> Self where T : Entity.Proxy {
+    super.fix(path, updatingFrom: value, in: kind)
+  }
+  
   final override func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
     return Proxy(prototypes: prototypes, systemData: data, entityData: self)
   }
@@ -123,7 +127,7 @@ public class Emitter: Entity {
     
     override func onUpdate(_ context: inout GraphicsContext) {
       super.onUpdate(&context)
-      context.stroke(.init(ellipseIn: .init(x: position.x, y: position.y, width: 2.0, height: 2.0)), with: .color(.white))
+//      context.stroke(.init(ellipseIn: .init(x: position.x, y: position.y, width: 2.0, height: 2.0)), with: .color(.white))
       guard canFire else {
         return
       }
@@ -142,10 +146,12 @@ public class Emitter: Entity {
       }
       let prototype: Entity = prototypes[decider(self) % prototypes.count]
       let newProxy = prototype.makeProxy(source: self, data: systemData)
-      systemData.proxies.append(newProxy)
+      systemData.addProxy(newProxy)
       lastEmitted = Date()
       emittedCount += 1
-      newProxy.onBirth(self)
+      DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.05) {
+        newProxy.onBirth(self)
+      }
     }
   }
 }

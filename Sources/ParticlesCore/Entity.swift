@@ -154,6 +154,19 @@ open class Entity: Identifiable {
     }
   }
   
+  /// Fixes a particular value of the entity upon update.
+  /// - Parameters:
+  ///   - path: A key path pointing to the proxy value to update.
+  ///   - value: A closure returning the desired fixed value of the property.
+  ///   - kind: The root type of the key path, some subclass of ``Entity.Proxy``.
+  /// - Returns: The updated entity declaration. This is an entity modifier.
+  public func fix<T, V>(_ path: ReferenceWritableKeyPath<T, V>, updatingFrom value: @escaping (V) -> V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
+    self.onUpdate { proxy in
+      guard let cast = proxy as? T else { fatalError("Something went wrong. Please submit a Github issue if you encounter this issue.") }
+      cast[keyPath: path] = value(cast[keyPath: path])
+    }
+  }
+  
   // Implementation
   
   func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {

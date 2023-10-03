@@ -41,6 +41,10 @@ open class AdvancedParticle: Particle {
     super.fix(path, with: value, in: kind)
   }
   
+  override public func fix<T, V>(_ path: ReferenceWritableKeyPath<T, V>, updatingFrom value: @escaping (V) -> V, in kind: T.Type = Proxy.self) -> Self where T : Entity.Proxy {
+    super.fix(path, updatingFrom: value, in: kind)
+  }
+  
   // MARK: - Subtypes
   
   /// A particle proxy.
