@@ -112,18 +112,10 @@ open class Particle: Entity {
     public var opacity: Double = 1.0
     /// The scale effect of the particle. Default `1.0`.
     public var scaleEffect: CGFloat = 1.0
-    /// The blur of the particle. Default `0.0`.
-    public var blur: CGFloat = .zero
     /// The hue rotation of the particle. Default `0.0`.
     public var hueRotation: Angle = .zero
-    /// The blend mode of the particle.
-    public var blendMode: GraphicsContext.BlendMode = .normal
-    /// The three-dimensional rotation of the particle.
-    public var rotation3D: Rotation3D = .zero
-    /// The three-dimensional torque of the particle.
-    public var torque3D: Rotation3D = .zero
     
-    private var onDraw: (inout GraphicsContext) -> Void
+    private(set) var onDraw: (inout GraphicsContext) -> Void
     
     // MARK: - Initalizers
     
@@ -137,16 +129,10 @@ open class Particle: Entity {
     override func onUpdate(_ context: inout GraphicsContext) {
       super.onUpdate(&context)
       context.drawLayer { context in
-        // TODO: Incorporate 3D rotation using affineTransform
-//        context.transform = rotation3D.affineTransform
         context.rotate(by: rotation)
         context.opacity = opacity
-        context.blendMode = blendMode
         if scaleEffect != 1.0 {
           context.scaleBy(x: scaleEffect, y: scaleEffect)
-        }
-        if !blur.isZero {
-          context.addFilter(.blur(radius: blur))
         }
         if !hueRotation.degrees.isZero {
           context.addFilter(.hueRotation(hueRotation))
