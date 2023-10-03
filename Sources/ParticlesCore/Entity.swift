@@ -48,7 +48,7 @@ open class Entity: Identifiable {
   /// If the entity was declared in a `ParticleSystem` or elsewhere, this method is called when the system's view appears.
   /// - Parameter action: The action to perform upon birth. If the entity was spawned from an `Emitter`, its proxy is passed in the closure.
   /// - Returns: The updated entity declaration. This is an entity modifier.
-  final func onBirth(perform action: @escaping (Entity.Proxy, Emitter.Proxy?) -> Void) -> Self {
+  public final func onBirth(perform action: @escaping (Entity.Proxy, Emitter.Proxy?) -> Void) -> Self {
     self.birthActions.append(action)
     return self
   }
@@ -58,7 +58,7 @@ open class Entity: Identifiable {
   /// This method is called each frame the `Canvas` powering the particle system updates.
   /// - Parameter action: The action to perform on update.
   /// - Returns: The updated entity declaration. This is an entity modifier.
-  final func onUpdate(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
+  public final func onUpdate(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
     self.updateActions.append(action)
     return self
   }
@@ -68,7 +68,7 @@ open class Entity: Identifiable {
   /// This method is called after an entity despawns.
   /// - Parameter action: The action to perform on death.
   /// - Returns: The updated entity declaration. This is an entity modifier.
-  final func onDeath(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
+  public final func onDeath(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
     self.deathActions.append(action)
     return self
   }
@@ -83,19 +83,6 @@ open class Entity: Identifiable {
     self.onBirth { proxy, _ in
       guard let cast = proxy as? T else { fatalError("Something went wrong. Please submit a Github issue if you encounter this issue.") }
       cast[keyPath: path] = value
-    }
-  }
-  
-  /// Starts a particular value of the entity upon birth.
-  /// - Parameters:
-  ///   - path: A key path pointing to the proxy value to update.
-  ///   - systemValue: The initial value of the property.
-  ///   - kind: The root type of the key path, some subclass of ``Entity.Proxy``.
-  /// - Returns: The updated entity declaration. This is an entity modifier.
-  public func start<T, V, U>(_ path: ReferenceWritableKeyPath<T, V>, at systemValue: U, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy, U: SystemValue, U.Value == V {
-    self.onBirth { proxy, _ in
-      guard let cast = proxy as? T else { fatalError("Something went wrong. Please submit a Github issue if you encounter this issue.") }
-      cast[keyPath: path] = systemValue.getValue(from: proxy)
     }
   }
   
@@ -122,19 +109,6 @@ open class Entity: Identifiable {
     self.onUpdate { proxy in
       guard let cast = proxy as? T else { fatalError("Something went wrong. Please submit a Github issue if you encounter this issue.") }
       cast[keyPath: path] = value
-    }
-  }
-  
-  /// Fixes a particular value of the entity upon update.
-  /// - Parameters:
-  ///   - path: A key path pointing to the proxy value to update.
-  ///   - systemValue: The fixed value of the property.
-  ///   - kind: The root type of the key path, some subclass of ``Entity.Proxy``.
-  /// - Returns: The updated entity declaration. This is an entity modifier.
-  public func fix<T, V, U>(_ path: ReferenceWritableKeyPath<T, V>, at systemValue: U, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy, U: SystemValue, U.Value == V {
-    self.onUpdate { proxy in
-      guard let cast = proxy as? T else { fatalError("Something went wrong. Please submit a Github issue if you encounter this issue.") }
-      cast[keyPath: path] = systemValue.getValue(from: proxy)
     }
   }
   
@@ -175,7 +149,7 @@ open class Entity: Identifiable {
     
     // MARK: - Properties
     
-    final weak var systemData: ParticleSystem.Data?
+    public internal(set) final weak var systemData: ParticleSystem.Data?
     final var entityData: Entity
     
     private final let id: UUID = UUID()

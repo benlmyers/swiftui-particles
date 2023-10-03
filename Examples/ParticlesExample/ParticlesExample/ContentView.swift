@@ -35,7 +35,7 @@ struct ContentView: View {
             .fix(\.acceleration, at: acceleration)
         }
         .fix(\.fireRate, at: 50.0)
-        .start(\.position, at: UnitPoint.center)
+        .startPosition(.center)
       }
     }
     .padding()

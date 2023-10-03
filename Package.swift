@@ -8,19 +8,19 @@ let package = Package(
   platforms: [.iOS(.v15), .macOS(.v12), .watchOS(.v8)],
   products: [
     .library(
-      name: "Particles",
-      targets: ["Particles"]),
-//    .library(name: "PresetParticles", targets: ["PresetParticles"])
+      name: "ParticlesCore",
+      targets: ["ParticlesCore"]),
+    .library(name: "Particles", targets: ["Particles"])
   ],
   dependencies: [
     // .package(url: /* package url */, from: "1.0.0"),
   ],
   targets: [
     .target(
-      name: "Particles",
+      name: "ParticlesCore",
       dependencies: []),
-//    .target(
-//      name: "PresetParticles",
-//      dependencies: ["Particles"]),
+    .target(
+      name: "Particles",
+      dependencies: ["ParticlesCore"]),
   ]
 )
