@@ -33,6 +33,9 @@ struct ContentView: View {
             .start(\.hueRotation, at: .degrees(180.0))
             .start(\.velocity) { .random(magnitudeIn: 1.0 ... 3.0) }
             .fix(\.acceleration, at: acceleration)
+            .onBirth { particle, _ in
+              particle.hueRotation = .random()
+            }
         }
         .fix(\.fireRate, at: 500.0)
         .startPosition(.center)

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Dispatch
 import Foundation
 
 /// An entity declaration class. This class cannot be initialized.
@@ -25,7 +26,7 @@ open class Entity: Identifiable {
   
   private final var deathActions: [(Entity.Proxy) -> Void] = []
   
-  private final var updateActions: [(Entity.Proxy) -> Void] = [
+  var updateActions: [(Entity.Proxy) -> Void] = [
     { proxy in
       let v: CGVector = proxy.velocity
       let a: CGVector = proxy.acceleration
@@ -38,6 +39,12 @@ open class Entity: Identifiable {
     },
     { proxy in
       proxy.rotation = Angle(degrees: proxy.rotation.degrees + proxy.torque.degrees)
+    },
+    { proxy in
+      guard let particle = proxy as? Particle.Proxy else { return }
+      let r = particle.rotation3D
+      let t = particle.torque3D
+      particle.rotation3D = Rotation3D(theta: r.theta + t.theta, phi: r.phi + t.theta)
     }
   ]
   
@@ -51,8 +58,10 @@ open class Entity: Identifiable {
   /// If the entity was declared in a `ParticleSystem` or elsewhere, this method is called when the system's view appears.
   /// - Parameter action: The action to perform upon birth. If the entity was spawned from an `Emitter`, its proxy is passed in the closure.
   /// - Returns: The updated entity declaration. This is an entity modifier.
-  public final func onBirth(perform action: @escaping (Entity.Proxy, Emitter.Proxy?) -> Void) -> Self {
-    self.birthActions.append(action)
+  public func onBirth<T>(kind: T.Type = Proxy.self, perform action: @escaping (T, Emitter.Proxy?) -> Void) -> Self where T: Entity.Proxy {
+    self.birthActions.append { proxy, emitter in
+      action(proxy as! T, emitter)
+    }
     return self
   }
   
@@ -61,8 +70,10 @@ open class Entity: Identifiable {
   /// This method is called each frame the `Canvas` powering the particle system updates.
   /// - Parameter action: The action to perform on update.
   /// - Returns: The updated entity declaration. This is an entity modifier.
-  public final func onUpdate(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
-    self.updateActions.append(action)
+  public func onUpdate<T>(kind: T.Type = Proxy.self, perform action: @escaping (T) -> Void) -> Self where T: Entity.Proxy {
+    self.updateActions.append { proxy in
+      action(proxy as! T)
+    }
     return self
   }
   
@@ -71,8 +82,10 @@ open class Entity: Identifiable {
   /// This method is called after an entity despawns.
   /// - Parameter action: The action to perform on death.
   /// - Returns: The updated entity declaration. This is an entity modifier.
-  public final func onDeath(perform action: @escaping (Entity.Proxy) -> Void) -> Self {
-    self.deathActions.append(action)
+  public func onDeath<T>(kind: T.Type = Proxy.self, perform action: @escaping (T) -> Void) -> Self where T: Entity.Proxy {
+    self.deathActions.append { proxy in
+      action(proxy as! T)
+    }
     return self
   }
 
@@ -80,9 +93,12 @@ open class Entity: Identifiable {
   /// - Parameter onDeath: The closure that creates and returns the emitted entity.
   /// - Returns: The updated entity declaration. This is an entity modifier.
   public final func emit(onDeath: @escaping () -> Entity) -> Self {
+    // FIXME: This function doesn't work.
     self.onDeath { proxy in
       let newProxy = proxy.entityData.makeProxy(source: nil, data: proxy.systemData!)
-      proxy.systemData!.proxies.append(newProxy)
+      DispatchQueue.global(qos: .userInitiated).async {
+        proxy.systemData!.addProxy(proxy)
+      }
     }
   }
   

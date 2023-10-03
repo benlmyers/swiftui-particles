@@ -110,6 +110,12 @@ public struct ParticleSystem: View {
     
     // MARK: - Methods
     
+    func addProxy(_ proxy: Entity.Proxy) {
+      Task {
+        self.proxies.append(proxy)
+      }
+    }
+    
     func refresh(_ entities: [Entity]) {
       if prepared {
         update(rootEntities, with: entities)

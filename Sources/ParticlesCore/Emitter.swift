@@ -34,6 +34,18 @@ public class Emitter: Entity {
   
   // MARK: - Overrides
   
+  override public func onBirth<T>(kind: T.Type = Proxy.self, perform action: @escaping (T, Emitter.Proxy?) -> Void) -> Self where T : Entity.Proxy {
+    super.onBirth(kind: kind, perform: action)
+  }
+  
+  override public func onUpdate<T>(kind: T.Type = Proxy.self, perform action: @escaping (T) -> Void) -> Self where T : Entity.Proxy {
+    super.onUpdate(kind: kind, perform: action)
+  }
+  
+  override public func onDeath<T>(kind: T.Type = Proxy.self, perform action: @escaping (T) -> Void) -> Self where T : Entity.Proxy {
+    super.onDeath(kind: kind, perform: action)
+  }
+  
   override public func start<T, V>(_ path: ReferenceWritableKeyPath<T, V>, at value: V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
     super.start(path, at: value, in: kind)
   }

@@ -63,6 +63,18 @@ open class Particle: Entity {
   
   // MARK: - Overrides
   
+  override public func onBirth<T>(kind: T.Type = Proxy.self, perform action: @escaping (T, Emitter.Proxy?) -> Void) -> Self where T : Entity.Proxy {
+    super.onBirth(kind: kind, perform: action)
+  }
+  
+  override public func onUpdate<T>(kind: T.Type = Proxy.self, perform action: @escaping (T) -> Void) -> Self where T : Entity.Proxy {
+    super.onUpdate(kind: kind, perform: action)
+  }
+  
+  override public func onDeath<T>(kind: T.Type = Proxy.self, perform action: @escaping (T) -> Void) -> Self where T : Entity.Proxy {
+    super.onDeath(kind: kind, perform: action)
+  }
+  
   override public func start<T, V>(_ path: ReferenceWritableKeyPath<T, V>, at value: V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
     super.start(path, at: value, in: kind)
   }
@@ -104,6 +116,12 @@ open class Particle: Entity {
     public var blur: CGFloat = .zero
     /// The hue rotation of the particle. Default `0.0`.
     public var hueRotation: Angle = .zero
+    /// The blend mode of the particle.
+    public var blendMode: GraphicsContext.BlendMode = .normal
+    /// The three-dimensional rotation of the particle.
+    public var rotation3D: Rotation3D = .zero
+    /// The three-dimensional torque of the particle.
+    public var torque3D: Rotation3D = .zero
     
     private var onDraw: (inout GraphicsContext) -> Void
     
@@ -119,9 +137,11 @@ open class Particle: Entity {
     override func onUpdate(_ context: inout GraphicsContext) {
       super.onUpdate(&context)
       context.drawLayer { context in
-        context.translateBy(x: position.x, y: position.y)
+        // TODO: Incorporate 3D rotation using affineTransform
+//        context.transform = rotation3D.affineTransform
         context.rotate(by: rotation)
         context.opacity = opacity
+        context.blendMode = blendMode
         if scaleEffect != 1.0 {
           context.scaleBy(x: scaleEffect, y: scaleEffect)
         }
@@ -131,6 +151,7 @@ open class Particle: Entity {
         if !hueRotation.degrees.isZero {
           context.addFilter(.hueRotation(hueRotation))
         }
+        context.translateBy(x: position.x, y: position.y)
         self.onDraw(&context)
       }
     }
