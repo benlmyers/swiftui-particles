@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Dispatch
 import Foundation
 
 /// A particle system declaration.
@@ -35,16 +36,21 @@ public struct ParticleSystem: View {
   // MARK: - Body View
   
   public var body: some View {
-    TimelineView(.animation(paused: false)) { [self] t in
-      Canvas(opaque: true, colorMode: colorMode, rendersAsynchronously: async, renderer: renderer) {
-        Text("❌").tag("NOT_FOUND")
-        ForEach(Array(data.views), id: \.tag) { taggedView in
-          taggedView.view.tag(taggedView.tag)
+    GeometryReader { proxy in
+      TimelineView(.animation(paused: false)) { [self] t in
+        Canvas(opaque: true, colorMode: colorMode, rendersAsynchronously: async, renderer: renderer) {
+          Text("❌").tag("NOT_FOUND")
+          ForEach(Array(data.views), id: \.tag) { taggedView in
+            taggedView.view.tag(taggedView.tag)
+          }
+        }
+        .border(Color.red.opacity(data.debug ? 1.0 : 0.1))
+        .onChange(of: t.date) { _ in
+          destroyExpired()
         }
       }
-      .border(Color.red.opacity(data.debug ? 1.0 : 0.1))
-      .onChange(of: t.date) { _ in
-        destroyExpired()
+      .task {
+        data.systemSize = proxy.size
       }
     }
   }
@@ -63,7 +69,7 @@ public struct ParticleSystem: View {
   // MARK: - Methods
   
   func renderer(context: inout GraphicsContext, size: CGSize) {
-    self.data.systemSize = size
+//    self.data.systemSize = size
     for proxy in data.proxies {
       proxy.onUpdate(&context)
     }
@@ -113,11 +119,13 @@ public struct ParticleSystem: View {
     }
     
     private func prepare(_ entities: [Entity]) {
-      self.proxies = entities.map({ $0.makeProxy(source: nil, data: self) })
-      self.rootEntities = entities
-      self.prepared = true
-      for proxy in self.proxies {
-        proxy.onBirth(nil)
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) { [self] in
+        self.proxies = entities.map({ $0.makeProxy(source: nil, data: self) })
+        self.rootEntities = entities
+        self.prepared = true
+        for proxy in self.proxies {
+          proxy.onBirth(nil)
+        }
       }
     }
     

@@ -24,11 +24,8 @@ struct ContentView: View {
         .foregroundColor(.accentColor)
       Text("Hello, world!")
       HStack {
-        Button("Vel") {
-          velocity = CGVector(dx: Double.random(in: -1.0 ... 1.0), dy: Double.random(in: -1.0 ... 1.0))
-        }
         Button("Acc") {
-          
+          acceleration = .random(magnitude: 0.05)
         }
       }
       ParticleSystem(data: systemData) {
@@ -36,7 +33,9 @@ struct ContentView: View {
           Particle(color: .red)
             .start(\.hueRotation, at: .degrees(180.0))
             .start(\.velocity) { .random(magnitudeIn: 1.0 ... 3.0) }
+            .fix(\.acceleration, at: acceleration)
         }
+        .fix(\.fireRate, at: 10.0)
         .start(\.position, at: UnitPoint.center)
       }
     }
