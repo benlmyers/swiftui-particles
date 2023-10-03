@@ -11,3 +11,4 @@ import ParticlesCore
 public typealias ParticleSystem = ParticlesCore.ParticleSystem
 public typealias Emitter = ParticlesCore.Emitter
 public typealias Particle = ParticlesCore.Particle
+public typealias AdvancedParticle = ParticlesCore.AdvancedParticle

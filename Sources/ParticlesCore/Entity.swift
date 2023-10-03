@@ -97,7 +97,7 @@ open class Entity: Identifiable {
     self.onDeath { proxy in
       let newProxy = proxy.entityData.makeProxy(source: nil, data: proxy.systemData!)
       DispatchQueue.global(qos: .userInitiated).async {
-        proxy.systemData!.addProxy(proxy)
+        proxy.systemData!.addProxy(newProxy)
       }
     }
   }
@@ -110,7 +110,7 @@ open class Entity: Identifiable {
   /// - Returns: The updated entity declaration. This is an entity modifier.
   public func start<T, V>(_ path: ReferenceWritableKeyPath<T, V>, at value: V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
     self.onBirth { proxy, _ in
-      guard let cast = proxy as? T else { fatalError("Something went wrong. Please submit a Github issue if you encounter this issue.") }
+      let cast = proxy as! T
       cast[keyPath: path] = value
     }
   }

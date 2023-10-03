@@ -115,7 +115,11 @@ open class Particle: Entity {
     /// The hue rotation of the particle. Default `0.0`.
     public var hueRotation: Angle = .zero
     
-    private(set) var onDraw: (inout GraphicsContext) -> Void
+    /// The action to perform on draw.
+    ///
+    /// All of the particle's effects such as position, hue rotation, etc. are applied before this closure is called.
+    /// Thus, only a basic render of the desired particle is needed in the closure.
+    public private(set) var onDraw: (inout GraphicsContext) -> Void
     
     // MARK: - Initalizers
     
