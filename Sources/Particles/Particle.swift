@@ -71,6 +71,14 @@ open class Particle: Entity {
     super.start(path, with: value, in: kind)
   }
   
+  override public func fix<T, V>(_ path: ReferenceWritableKeyPath<T, V>, at value: V, in kind: T.Type = Proxy.self) -> Self where T : Entity.Proxy {
+    super.fix(path, at: value, in: kind)
+  }
+  
+  override public func fix<T, V>(_ path: ReferenceWritableKeyPath<T, V>, with value: @escaping () -> V, in kind: T.Type = Proxy.self) -> Self where T : Entity.Proxy {
+    super.fix(path, with: value, in: kind)
+  }
+  
   override final func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Entity.Proxy {
     if let taggedView {
       data.views.insert(taggedView)

@@ -34,16 +34,24 @@ public class Emitter: Entity {
   
   // MARK: - Overrides
   
-  final override func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
-    return Proxy(prototypes: prototypes, systemData: data, entityData: self)
-  }
-  
   override public func start<T, V>(_ path: ReferenceWritableKeyPath<T, V>, at value: V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
     super.start(path, at: value, in: kind)
   }
   
   override public func start<T, V>(_ path: ReferenceWritableKeyPath<T, V>, with value: @escaping () -> V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
     super.start(path, with: value, in: kind)
+  }
+  
+  override public func fix<T, V>(_ path: ReferenceWritableKeyPath<T, V>, at value: V, in kind: T.Type = Proxy.self) -> Self where T : Entity.Proxy {
+    super.fix(path, at: value, in: kind)
+  }
+  
+  override public func fix<T, V>(_ path: ReferenceWritableKeyPath<T, V>, with value: @escaping () -> V, in kind: T.Type = Proxy.self) -> Self where T : Entity.Proxy {
+    super.fix(path, with: value, in: kind)
+  }
+  
+  final override func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
+    return Proxy(prototypes: prototypes, systemData: data, entityData: self)
   }
   
   // MARK: - Subtypes

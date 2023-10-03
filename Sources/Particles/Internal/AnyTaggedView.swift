@@ -9,14 +9,20 @@ import SwiftUI
 
 struct AnyTaggedView: Hashable {
   
+  // MARK: - Properties
+  
   var view: AnyView
   var tag: UUID
   
-  func hash(into hasher: inout Hasher) {
-    return tag.hash(into: &hasher)
-  }
+  // MARK: - Static Methods
   
   static func == (lhs: AnyTaggedView, rhs: AnyTaggedView) -> Bool {
     return lhs.tag == rhs.tag
+  }
+  
+  // MARK: - Methods
+  
+  func hash(into hasher: inout Hasher) {
+    return tag.hash(into: &hasher)
   }
 }

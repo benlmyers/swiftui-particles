@@ -12,6 +12,7 @@ import PresetParticles
 struct ContentView: View {
   
   @State var velocity: CGVector = .init(dx: 1, dy: 1)
+  @State var acceleration: CGVector = .zero
   @State var opacity: CGFloat = 1.0
   
   private let systemData = ParticleSystem.Data()
@@ -26,16 +27,17 @@ struct ContentView: View {
         Button("Vel") {
           velocity = CGVector(dx: Double.random(in: -1.0 ... 1.0), dy: Double.random(in: -1.0 ... 1.0))
         }
+        Button("Acc") {
+          
+        }
       }
       ParticleSystem(data: systemData) {
         Emitter {
           Particle(color: .red)
             .start(\.hueRotation, at: .degrees(180.0))
-            .start(\.velocity, at: velocity)
+            .start(\.velocity) { .random(magnitudeIn: 1.0 ... 3.0) }
         }
-        .start(\.canFire) { emitter in
-          emitter.emittedCount < 5
-        }
+        .start(\.position, at: UnitPoint.center)
       }
     }
     .padding()

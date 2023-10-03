@@ -40,6 +40,8 @@ open class Entity: Identifiable {
   
   // MARK: - Methods
   
+  // Modifiers
+  
   /// Modifies the behavior of the entity upon birth.
   ///
   /// If the entity came from an emitter, this method is called when the particle is emitted.
@@ -71,19 +73,72 @@ open class Entity: Identifiable {
     return self
   }
   
+  /// Starts a particular value of the entity upon birth.
+  /// - Parameters:
+  ///   - path: A key path pointing to the proxy value to update.
+  ///   - value: The initial value of the property.
+  ///   - kind: The root type of the key path, some subclass of ``Entity.Proxy``.
+  /// - Returns: The updated entity declaration. This is an entity modifier.
   public func start<T, V>(_ path: ReferenceWritableKeyPath<T, V>, at value: V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
     self.onBirth { proxy, _ in
-      guard let cast = proxy as? T else { fatalError("oops") }
+      guard let cast = proxy as? T else { fatalError("Something went wrong. Please submit a Github issue if you encounter this issue.") }
       cast[keyPath: path] = value
     }
   }
   
+  /// Starts a particular value of the entity upon birth.
+  /// - Parameters:
+  ///   - path: A key path pointing to the proxy value to update.
+  ///   - systemValue: The initial value of the property.
+  ///   - kind: The root type of the key path, some subclass of ``Entity.Proxy``.
+  /// - Returns: The updated entity declaration. This is an entity modifier.
+  public func start<T, V, U>(_ path: ReferenceWritableKeyPath<T, V>, at systemValue: U, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy, U: SystemValue, U.Value == V {
+    self.onBirth { proxy, _ in
+      guard let cast = proxy as? T else { fatalError("Something went wrong. Please submit a Github issue if you encounter this issue.") }
+      cast[keyPath: path] = systemValue.getValue(from: proxy)
+    }
+  }
+  
+  /// Starts a particular value of the entity upon birth.
+  /// - Parameters:
+  ///   - path: A key path pointing to the proxy value to update.
+  ///   - value: A closure returning the desired initial value of the property.
+  ///   - kind: The root type of the key path, some subclass of ``Entity.Proxy``.
+  /// - Returns: The updated entity declaration. This is an entity modifier.
   public func start<T, V>(_ path: ReferenceWritableKeyPath<T, V>, with value: @escaping () -> V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
     self.onBirth { proxy, _ in
-      guard let cast = proxy as? T else { fatalError("oops") }
+      guard let cast = proxy as? T else { fatalError("Something went wrong. Please submit a Github issue if you encounter this issue.") }
       cast[keyPath: path] = value()
     }
   }
+  
+  /// Fixes a particular value of the entity upon update.
+  /// - Parameters:
+  ///   - path: A key path pointing to the proxy value to update.
+  ///   - value: The fixed value of the property.
+  ///   - kind: The root type of the key path, some subclass of ``Entity.Proxy``.
+  /// - Returns: The updated entity declaration. This is an entity modifier.
+  public func fix<T, V>(_ path: ReferenceWritableKeyPath<T, V>, at value: V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
+    self.onUpdate { proxy in
+      guard let cast = proxy as? T else { fatalError("Something went wrong. Please submit a Github issue if you encounter this issue.") }
+      cast[keyPath: path] = value
+    }
+  }
+  
+  /// Fixes a particular value of the entity upon update.
+  /// - Parameters:
+  ///   - path: A key path pointing to the proxy value to update.
+  ///   - value: A closure returning the desired fixed value of the property.
+  ///   - kind: The root type of the key path, some subclass of ``Entity.Proxy``.
+  /// - Returns: The updated entity declaration. This is an entity modifier.
+  public func fix<T, V>(_ path: ReferenceWritableKeyPath<T, V>, with value: @escaping () -> V, in kind: T.Type = Proxy.self) -> Self where T: Entity.Proxy {
+    self.onUpdate { proxy in
+      guard let cast = proxy as? T else { fatalError("Something went wrong. Please submit a Github issue if you encounter this issue.") }
+      cast[keyPath: path] = value()
+    }
+  }
+  
+  // Implementation
   
   func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
     let proxy = Proxy(systemData: data, entityData: self)
@@ -160,3 +215,14 @@ open class Entity: Identifiable {
     }
   }
 }
+
+//public extension Entity {
+//  
+//  /// Sets the start position 
+//  func startPosition(at point: UnitPoint) -> Self {
+//    self.onBirth { proxy, emitter in
+//      let size: CGSize = proxy.systemData!.systemSize
+//      proxy.position = CGPoint(x: size.width * point.x, y: size.height * point.y)
+//    }
+//  }
+//}
