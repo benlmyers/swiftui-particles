@@ -29,8 +29,9 @@ struct ContentView: View {
       }
       ParticleSystem(data: systemData) {
         Emitter {
-          Particle(color: .purple)
+          AdvancedParticle(color: .purple)
             .start(\.velocity, with: { .random(magnitudeIn: 1.0 ... 3.0) })
+            .start(\.blur, at: 3.0)
             .fix(\.acceleration, at: acceleration)
             .fix(\.scaleEffect, updatingFrom: { v in v * 0.98 })
             .onBirth { particle, _ in

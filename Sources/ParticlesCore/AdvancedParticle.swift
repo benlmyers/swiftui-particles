@@ -45,6 +45,10 @@ open class AdvancedParticle: Particle {
     super.fix(path, updatingFrom: value, in: kind)
   }
   
+  override func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Entity.Proxy {
+    return Proxy(from: super.makeProxy(source: source, data: data) as! Particle.Proxy, entityData: self)
+  }
+  
   // MARK: - Subtypes
   
   /// A particle proxy.
@@ -63,6 +67,12 @@ open class AdvancedParticle: Particle {
     public var rotation3D: Rotation3D = .zero
     /// The three-dimensional torque of the particle.
     public var torque3D: Rotation3D = .zero
+    
+    // MARK: - Initalizers
+    
+    public init(from particle: Particle.Proxy, entityData: AdvancedParticle) {
+      super.init(onDraw: particle.onDraw, systemData: particle.systemData!, entityData: entityData)
+    }
     
     // MARK: - Overrides
     
