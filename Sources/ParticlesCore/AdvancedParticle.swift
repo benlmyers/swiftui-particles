@@ -78,22 +78,24 @@ open class AdvancedParticle: Particle {
     
     override func onUpdate(_ context: inout GraphicsContext) {
       super.onUpdate(&context)
+      
+      // TODO: Incorporate 3D rotation using affineTransform
+      context.transform = .identity // rotation3D.affineTransform
+      
       context.drawLayer { context in
-        // TODO: Incorporate 3D rotation using affineTransform
-//        context.transform = rotation3D.affineTransform
         context.rotate(by: rotation)
         context.opacity = opacity
         context.blendMode = blendMode
-        if scaleEffect != 1.0 {
-          context.scaleBy(x: scaleEffect, y: scaleEffect)
+        if !hueRotation.degrees.isZero {
+          context.addFilter(.hueRotation(hueRotation))
         }
         if !blur.isZero {
           context.addFilter(.blur(radius: blur))
         }
-        if !hueRotation.degrees.isZero {
-          context.addFilter(.hueRotation(hueRotation))
-        }
         context.translateBy(x: position.x, y: position.y)
+        if scaleEffect != 1.0 {
+          context.scaleBy(x: scaleEffect, y: scaleEffect)
+        }
         self.onDraw(&context)
       }
     }

@@ -146,11 +146,11 @@ public class Emitter: Entity {
       }
       let prototype: Entity = prototypes[decider(self) % prototypes.count]
       let newProxy = prototype.makeProxy(source: self, data: systemData)
-      systemData.addProxy(newProxy)
       lastEmitted = Date()
       emittedCount += 1
       DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.05) {
         newProxy.onBirth(self)
+        systemData.addProxy(newProxy)
       }
     }
   }

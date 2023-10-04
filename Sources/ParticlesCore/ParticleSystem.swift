@@ -71,18 +71,20 @@ public struct ParticleSystem: View {
   func renderer(context: inout GraphicsContext, size: CGSize) {
 //    self.data.systemSize = size
     for proxy in data.proxies {
-      proxy.onUpdate(&context)
+      proxy?.onUpdate(&context)
     }
   }
   
   func destroyExpired() {
-    data.proxies.removeAll { proxy in
+    for i in 0 ..< data.proxies.count {
+      guard let proxy = data.proxies[i] else { continue }
       let kill = Date() >= proxy.expiration
       if kill {
         proxy.onDeath()
+        data.proxies[i] = nil
       }
-      return kill
     }
+    data.proxies.removeAll { $0 == nil }
   }
   
   // MARK: - Subtypes
@@ -93,7 +95,7 @@ public struct ParticleSystem: View {
     
     var prepared: Bool = false
     var views: Set<AnyTaggedView> = .init()
-    var proxies: [Entity.Proxy] = []
+    var proxies: [Entity.Proxy?] = []
     var debug: Bool = false
     
     private var rootEntities: [Entity] = []
@@ -130,7 +132,7 @@ public struct ParticleSystem: View {
         self.rootEntities = entities
         self.prepared = true
         for proxy in self.proxies {
-          proxy.onBirth(nil)
+          proxy?.onBirth(nil)
         }
       }
     }
