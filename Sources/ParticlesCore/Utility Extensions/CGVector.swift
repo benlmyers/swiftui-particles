@@ -25,4 +25,14 @@ public extension CGVector {
     let magnitude: CGFloat = .random(in: range)
     return CGVector(dx: magnitude * CGFloat(cos(angle.radians)), dy: magnitude * CGFloat(sin(angle.radians)))
   }
+  
+  /// Generates a random CGVector with the specified magnitude and angle range.
+  /// - Parameters:
+  ///   - magnitude: The magnitude of the CGVector.
+  ///   - range: The range of angles in degrees.
+  /// - Returns: A CGVector with the specified magnitude and a randomly generated angle within the specified range.
+  static func random(magnitude: CGFloat, degreesIn range: ClosedRange<Double>) -> CGVector {
+    let angle: Angle = .degrees(.random(in: range))
+    return CGVector(dx: magnitude * CGFloat(cos(angle.radians)), dy: magnitude * CGFloat(sin(angle.radians)))
+  }
 }

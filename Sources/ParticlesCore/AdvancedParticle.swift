@@ -83,7 +83,6 @@ open class AdvancedParticle: Particle {
       context.transform = .identity // rotation3D.affineTransform
       
       context.drawLayer { context in
-        context.rotate(by: rotation)
         context.opacity = opacity
         context.blendMode = blendMode
         if !hueRotation.degrees.isZero {
@@ -93,6 +92,7 @@ open class AdvancedParticle: Particle {
           context.addFilter(.blur(radius: blur))
         }
         context.translateBy(x: position.x, y: position.y)
+        context.rotate(by: rotation)
         if scaleEffect != 1.0 {
           context.scaleBy(x: scaleEffect, y: scaleEffect)
         }

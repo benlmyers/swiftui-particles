@@ -136,13 +136,20 @@ open class Particle: Entity {
     
     override func onUpdate(_ context: inout GraphicsContext) {
       super.onUpdate(&context)
+      guard type(of: self) == Particle.Proxy.self else { return }
+      guard
+        position.x > 0,
+        position.x < systemData!.systemSize.width,
+        position.y > 0,
+        position.y < systemData!.systemSize.height
+      else { return }
       context.drawLayer { context in
-        context.rotate(by: rotation)
         context.opacity = opacity
         if !hueRotation.degrees.isZero {
           context.addFilter(.hueRotation(hueRotation))
         }
         context.translateBy(x: position.x, y: position.y)
+        context.rotate(by: rotation)
         if scaleEffect != 1.0 {
           context.scaleBy(x: scaleEffect, y: scaleEffect)
         }

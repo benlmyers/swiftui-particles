@@ -51,7 +51,7 @@ public extension Entity {
   /// - Parameter factor: The factor by which gravity is applied. Default value is 1.0.
   /// - Returns: The modified object.
   final func useGravity(_ factor: Double = 1.0) -> Self {
-    self.acceleration(x: 0.0, y: factor * 0.98)
+    self.acceleration(x: 0.0, y: factor * 0.05)
   }
 
   /// Sets the lifetime of the object.

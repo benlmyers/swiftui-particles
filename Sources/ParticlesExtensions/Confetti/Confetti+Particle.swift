@@ -20,7 +20,7 @@ public extension Confetti {
         case .circle:
           context.fill(.circle(radius: size.value), with: .color(color))
         case .rectangle:
-          context.fill(.rectangle(width: 1.5 * size.value, height: 0.75 * size.value), with: .color(color))
+          context.fill(.rectangle(width: 2 * 1.5 * size.value, height: 2 * size.value), with: .color(color))
         }
       }
     }
@@ -40,11 +40,11 @@ public extension Confetti {
       var value: CGFloat {
         switch self {
         case .small:
-          return 8.0
+          return 4.0
         case .medium:
-          return 12.0
+          return 6.0
         case .large:
-          return 16.0
+          return 8.0
         case .custom(let cgFloat):
           return cgFloat
         }
