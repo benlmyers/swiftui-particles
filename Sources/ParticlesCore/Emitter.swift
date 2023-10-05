@@ -66,7 +66,7 @@ public class Emitter: Entity {
     super.fix(path, updatingFrom: value, in: kind)
   }
   
-  final override func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
+  override open func _makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
     return Proxy(prototypes: prototypes, systemData: data, entityData: self)
   }
   
@@ -145,7 +145,7 @@ public class Emitter: Entity {
         return
       }
       let prototype: Entity = prototypes[decider(self) % prototypes.count]
-      let newProxy = prototype.makeProxy(source: self, data: systemData)
+      let newProxy = prototype._makeProxy(source: self, data: systemData)
       lastEmitted = Date()
       emittedCount += 1
       DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.05) {

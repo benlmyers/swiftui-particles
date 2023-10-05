@@ -14,9 +14,7 @@ public struct Confetti: Extension {
   public var description: String = "An extension used to create fun confetti particle effects."
   public var author: String = "Particles"
   
-  public var examples: [ParticleSystem] {[
-    ParticleSystem {
-      
-    }
-  ]}
+  public var example: some View {
+    Confetti.System()
+  }
 }

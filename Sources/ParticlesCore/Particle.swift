@@ -95,7 +95,7 @@ open class Particle: Entity {
     super.fix(path, updatingFrom: value, in: kind)
   }
   
-  override func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Entity.Proxy {
+  override open func _makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Entity.Proxy {
     if let taggedView {
       data.views.insert(taggedView)
     }

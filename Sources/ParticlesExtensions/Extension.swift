@@ -5,11 +5,14 @@
 //  Created by Ben Myers on 10/3/23.
 //
 
+import SwiftUI
 import Particles
 import Foundation
 
 /// A protocol defining a pack extension.
 public protocol Extension {
+  
+  associatedtype Body
   
   /// The name of the extension.
   var name: String { get }
@@ -19,5 +22,5 @@ public protocol Extension {
   var author: String { get }
   
   /// Examples of the extension in use via particle systems.
-  var examples: [ParticleSystem] { get }
+  @ViewBuilder var example: Body { get }
 }

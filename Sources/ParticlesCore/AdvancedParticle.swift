@@ -45,8 +45,8 @@ open class AdvancedParticle: Particle {
     super.fix(path, updatingFrom: value, in: kind)
   }
   
-  override func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Entity.Proxy {
-    return Proxy(from: super.makeProxy(source: source, data: data) as! Particle.Proxy, entityData: self)
+  override open func _makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Entity.Proxy {
+    return Proxy(from: super._makeProxy(source: source, data: data) as! Particle.Proxy, entityData: self)
   }
   
   // MARK: - Subtypes

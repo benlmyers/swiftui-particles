@@ -7,6 +7,8 @@
 
 import SwiftUI
 import Particles
+import ParticlesCore
+import ParticlesExtensions
 
 struct ContentView: View {
   
@@ -31,7 +33,7 @@ struct ContentView: View {
         Emitter {
           AdvancedParticle(color: .purple)
             .start(\.velocity, with: { .random(magnitudeIn: 1.0 ... 3.0) })
-//            .start(\.blur, at: 3.0)
+            .start(\.blur, at: 3.0)
             .fix(\.acceleration, at: acceleration)
             .fix(\.scaleEffect, updatingFrom: { v in v * 0.98 })
             .onBirth { particle, _ in

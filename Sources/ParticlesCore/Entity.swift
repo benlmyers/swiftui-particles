@@ -95,7 +95,7 @@ open class Entity: Identifiable {
   public final func emit(onDeath: @escaping () -> Entity) -> Self {
     // FIXME: This function doesn't work.
     self.onDeath { proxy in
-      let newProxy = proxy.entityData.makeProxy(source: nil, data: proxy.systemData!)
+      let newProxy = proxy.entityData._makeProxy(source: nil, data: proxy.systemData!)
       DispatchQueue.global(qos: .userInitiated).async {
         proxy.systemData!.addProxy(newProxy)
       }
@@ -169,7 +169,7 @@ open class Entity: Identifiable {
   
   // Implementation
   
-  func makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
+  open func _makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
     let proxy = Proxy(systemData: data, entityData: self)
     return proxy
   }
