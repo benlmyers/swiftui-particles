@@ -28,6 +28,7 @@ public extension Confetti {
             .modifier()
         }
         .startPosition(source)
+        .fireRate(30.0)
       }
     }
     
@@ -44,7 +45,7 @@ fileprivate extension Confetti.Particle {
   func modifier() -> Self {
     return self
       .useGravity()
-      .start(\.velocity, with: { .random(magnitude: 4.0) })
-      .rotationSpeed(speed: 1.0)
+      .start(\.velocity, with: { .random(magnitude: 4.0, degreesIn: 180.0 ... 360.0) })
+      .start(\.torque, with: { .random(degreesIn: -4.0 ... 4.0) })
   }
 }
