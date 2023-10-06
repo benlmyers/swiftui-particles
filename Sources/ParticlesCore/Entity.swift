@@ -39,12 +39,6 @@ open class Entity: Identifiable {
     },
     { proxy in
       proxy.rotation = Angle(degrees: proxy.rotation.degrees + proxy.torque.degrees)
-    },
-    { proxy in
-      guard let particle = proxy as? AdvancedParticle.Proxy else { return }
-      let r = particle.rotation3D
-      let t = particle.torque3D
-      particle.rotation3D = Rotation3D(theta: r.theta + t.theta, phi: r.phi + t.theta)
     }
   ]
   

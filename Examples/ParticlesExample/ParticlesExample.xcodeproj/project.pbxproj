@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EE1442E62ACE745D003FDD81 /* ParticlesExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = EE1442E52ACE745D003FDD81 /* ParticlesExtensions */; };
+		EE4EDA112ACFC63C00E1B65C /* ParticlesPresets in Frameworks */ = {isa = PBXBuildFile; productRef = EE4EDA102ACFC63C00E1B65C /* ParticlesPresets */; };
 		EE695F0C2ACB767E002D8F5B /* Particles in Frameworks */ = {isa = PBXBuildFile; productRef = EE695F0B2ACB767E002D8F5B /* Particles */; };
 		EE857F022ACBFF870007A254 /* ParticlesCore in Frameworks */ = {isa = PBXBuildFile; productRef = EE857F012ACBFF870007A254 /* ParticlesCore */; };
 		EED626832A4990B300A3C3F4 /* ParticlesExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED626822A4990B300A3C3F4 /* ParticlesExampleApp.swift */; };
@@ -33,7 +33,7 @@
 			files = (
 				EE695F0C2ACB767E002D8F5B /* Particles in Frameworks */,
 				EE857F022ACBFF870007A254 /* ParticlesCore in Frameworks */,
-				EE1442E62ACE745D003FDD81 /* ParticlesExtensions in Frameworks */,
+				EE4EDA112ACFC63C00E1B65C /* ParticlesPresets in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,7 +112,7 @@
 			packageProductDependencies = (
 				EE695F0B2ACB767E002D8F5B /* Particles */,
 				EE857F012ACBFF870007A254 /* ParticlesCore */,
-				EE1442E52ACE745D003FDD81 /* ParticlesExtensions */,
+				EE4EDA102ACFC63C00E1B65C /* ParticlesPresets */,
 			);
 			productName = ParticlesExample;
 			productReference = EED6267F2A4990B300A3C3F4 /* ParticlesExample.app */;
@@ -387,9 +387,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		EE1442E52ACE745D003FDD81 /* ParticlesExtensions */ = {
+		EE4EDA102ACFC63C00E1B65C /* ParticlesPresets */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = ParticlesExtensions;
+			productName = ParticlesPresets;
 		};
 		EE695F0B2ACB767E002D8F5B /* Particles */ = {
 			isa = XCSwiftPackageProductDependency;

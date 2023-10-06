@@ -45,7 +45,8 @@ fileprivate extension Confetti.Particle {
   func modifier() -> Self {
     return self
       .useGravity()
-      .start(\.velocity, with: { .random(magnitude: 4.0, degreesIn: 180.0 ... 360.0) })
+      .start(\.velocity, with: { .random(magnitude: 5.0, degreesIn: 180.0 ... 360.0) })
       .start(\.torque, with: { .random(degreesIn: -4.0 ... 4.0) })
+      .dampenVelocity()
   }
 }

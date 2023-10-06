@@ -63,10 +63,10 @@ open class AdvancedParticle: Particle {
     public var blur: CGFloat = .zero
     /// The blend mode of the particle.
     public var blendMode: GraphicsContext.BlendMode = .normal
-    /// The three-dimensional rotation of the particle.
-    public var rotation3D: Rotation3D = .zero
-    /// The three-dimensional torque of the particle.
-    public var torque3D: Rotation3D = .zero
+    /// The three-dimensional rotational axis of the particle. Used with ``Entity/Proxy/rotation``.
+    public var axis3D: (Double, Double, Double) = (.zero, .zero, 1.0)
+    /// Graphical filters to apply to this view.
+    public var filters: [GraphicsContext.Filter] = []
     
     // MARK: - Initalizers
     
@@ -78,10 +78,6 @@ open class AdvancedParticle: Particle {
     
     override func onUpdate(_ context: inout GraphicsContext) {
       super.onUpdate(&context)
-      
-      // TODO: Incorporate 3D rotation using affineTransform
-      context.transform = .identity // rotation3D.affineTransform
-      
       context.drawLayer { context in
         context.opacity = opacity
         context.blendMode = blendMode
@@ -92,12 +88,23 @@ open class AdvancedParticle: Particle {
           context.addFilter(.blur(radius: blur))
         }
         context.translateBy(x: position.x, y: position.y)
-        context.rotate(by: rotation)
+        context.addFilter(.projectionTransform(getRotationProjection()))
+        for filter in filters {
+          context.addFilter(filter)
+        }
         if scaleEffect != 1.0 {
           context.scaleBy(x: scaleEffect, y: scaleEffect)
         }
         self.onDraw(&context)
       }
+    }
+    
+    // MARK: - Methods
+    
+    private func getRotationProjection() -> ProjectionTransform {
+      var t = CATransform3DIdentity
+      t = CATransform3DRotate(t, rotation.radians, axis3D.0, axis3D.1, axis3D.2)
+      return ProjectionTransform(t)
     }
   }
 }

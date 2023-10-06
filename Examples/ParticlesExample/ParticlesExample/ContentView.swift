@@ -8,7 +8,7 @@
 import SwiftUI
 import Particles
 import ParticlesCore
-import ParticlesExtensions
+import ParticlesPresets
 
 struct ContentView: View {
   
@@ -30,20 +30,6 @@ struct ContentView: View {
         }
       }
       Confetti.System()
-//      ParticleSystem(data: systemData) {
-//        Emitter {
-//          AdvancedParticle(color: .purple)
-//            .start(\.velocity, with: { .random(magnitudeIn: 1.0 ... 3.0) })
-//            .start(\.blur, at: 3.0)
-//            .fix(\.acceleration, at: acceleration)
-//            .fix(\.scaleEffect, updatingFrom: { v in v * 0.98 })
-//            .onBirth { particle, _ in
-//              particle.hueRotation = .random()
-//            }
-//        }
-//        .fix(\.fireRate, at: 500.0)
-//        .startPosition(.center)
-//      }
     }
     .padding()
   }

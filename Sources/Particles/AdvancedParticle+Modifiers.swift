@@ -10,6 +10,8 @@ import ParticlesCore
 
 public extension AdvancedParticle {
   
+  typealias Vector3D = (Double, Double, Double)
+  
   /// Applies a blur effect to the particle.
   /// - Parameter radius: The radius of the blur effect. Default value is 5.0.
   /// - Returns: The modified particle.
@@ -24,12 +26,34 @@ public extension AdvancedParticle {
     self.fix(\.blendMode, at: mode)
   }
   
-  /// Rotates the particle in 3D.
+  /// <#Description#>
+  /// - Parameter amount: <#amount description#>
+  /// - Returns: <#description#>
+  final func brightness(_ amount: Double) -> Self {
+    self.onUpdate { proxy in
+      proxy.filters.append(.brightness(amount))
+    }
+  }
+  
+  /// <#Description#>
   /// - Parameters:
-  ///   - x: The angle, in degrees, around the x-axis to rotate.
-  ///   - y: The angle, in degrees, around the y-axis to rotate.
-  /// - Returns: The modified particle.
-  final func rotate3D(x: Double, y: Double) -> Self {
-    self.fix(\.rotation3D, at: Rotation3D(theta: .degrees(x), phi: .degrees(y)))
+  ///   - color: <#color description#>
+  ///   - radius: <#radius description#>
+  /// - Returns: <#description#>
+  final func glow(_ color: Color, radius: CGFloat = 5.0) -> Self {
+    self.onUpdate { proxy in
+      proxy.filters.append(.shadow(color: color, radius: radius))
+    }
+  }
+  
+  /// <#Description#>
+  /// - Parameters:
+  ///   - angle: <#angle description#>
+  ///   - axis: <#axis description#>
+  /// - Returns: <#description#>
+  final func rotation3D(angle: Angle, about axis: Vector3D) -> Self {
+    self
+      .fix(\.rotation, at: angle)
+      .fix(\.axis3D, at: axis)
   }
 }

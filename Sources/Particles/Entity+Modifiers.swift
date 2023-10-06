@@ -47,6 +47,16 @@ public extension Entity {
     self.fix(\.acceleration, at: CGVector(dx: x, dy: y))
   }
   
+  /// <#Description#>
+  /// - Parameter factor: <#factor description#>
+  /// - Returns: <#description#>
+  final func dampenVelocity(_ factor: Double = 0.98) -> Self {
+    self.onUpdate { proxy in
+      proxy.velocity.dx = factor * proxy.velocity.dx
+      proxy.velocity.dy = factor * proxy.velocity.dy
+    }
+  }
+  
   /// Applies gravity to the object.
   /// - Parameter factor: The factor by which gravity is applied. Default value is 1.0.
   /// - Returns: The modified object.

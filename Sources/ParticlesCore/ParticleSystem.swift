@@ -45,9 +45,6 @@ public struct ParticleSystem: View {
           }
         }
         .border(Color.red.opacity(data.debug ? 1.0 : 0.1))
-        .onChange(of: t.date) { _ in
-          destroyExpired()
-        }
       }
       .task {
         data.systemSize = proxy.size
@@ -70,6 +67,7 @@ public struct ParticleSystem: View {
   
   func renderer(context: inout GraphicsContext, size: CGSize) {
 //    self.data.systemSize = size
+    destroyExpired()
     for proxy in data.proxies {
       proxy?.onUpdate(&context)
     }
@@ -78,6 +76,8 @@ public struct ParticleSystem: View {
   func destroyExpired() {
     for i in 0 ..< data.proxies.count {
       guard let proxy = data.proxies[i] else { continue }
+      guard proxy.systemData != nil else { return }
+      guard proxy.lifetime > 0 else { return }
       let kill = Date() >= proxy.expiration
       if kill {
         proxy.onDeath()

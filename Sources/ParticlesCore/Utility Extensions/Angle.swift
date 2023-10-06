@@ -18,6 +18,10 @@ public extension Angle {
   /// Rightwards.
   static let right: Angle = Angle.zero
   
+  var isZero: Bool {
+    return degrees == 0.0
+  }
+  
   /// Returns a random angle.
   /// - Returns: A randomly generated angle.
   static func random() -> Angle {
