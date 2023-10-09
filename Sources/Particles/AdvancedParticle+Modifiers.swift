@@ -26,34 +26,34 @@ public extension AdvancedParticle {
     self.fix(\.blendMode, at: mode)
   }
   
-  /// <#Description#>
-  /// - Parameter amount: <#amount description#>
-  /// - Returns: <#description#>
+  /// Applies a brightness effect to the particle.
+  /// - Parameter amount: The amount of brightness to apply.
+  /// - Returns: The modified particle.
   final func brightness(_ amount: Double) -> Self {
     self.onUpdate { proxy in
       proxy.filters.append(.brightness(amount))
     }
   }
   
-  /// <#Description#>
+  /// Applies a glow effect to the particle.
   /// - Parameters:
-  ///   - color: <#color description#>
-  ///   - radius: <#radius description#>
-  /// - Returns: <#description#>
+  ///   - color: The color of the glow effect.
+  ///   - radius: The radius of the glow effect. Default value is 5.0.
+  /// - Returns: The modified particle.
   final func glow(_ color: Color, radius: CGFloat = 5.0) -> Self {
     self.onUpdate { proxy in
       proxy.filters.append(.shadow(color: color, radius: radius))
     }
   }
   
-  /// <#Description#>
+  /// Applies a 3D rotation to the particle.
   /// - Parameters:
-  ///   - angle: <#angle description#>
-  ///   - axis: <#axis description#>
-  /// - Returns: <#description#>
+  ///   - angle: The angle of rotation.
+  ///   - axis: The axis of rotation in 3D space.
+  /// - Returns: The modified particle.
   final func rotation3D(angle: Angle, about axis: Vector3D) -> Self {
     self
-      .fix(\.rotation, at: angle)
+      .fix(\.rotation3D, at: angle)
       .fix(\.axis3D, at: axis)
   }
 }

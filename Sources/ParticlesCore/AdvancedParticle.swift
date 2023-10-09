@@ -65,8 +65,14 @@ open class AdvancedParticle: Particle {
     public var blendMode: GraphicsContext.BlendMode = .normal
     /// The three-dimensional rotational axis of the particle. Used with ``Entity/Proxy/rotation``.
     public var axis3D: (Double, Double, Double) = (.zero, .zero, 1.0)
+    /// The three-dimensional rotation of the particle along its ``axis3D``.
+    public var rotation3D: Angle = .zero
+    /// The three-dimensional torque of the particle along its ``axis3D``.
+    public var torque3D: Angle = .zero
     /// Graphical filters to apply to this view.
     public var filters: [GraphicsContext.Filter] = []
+    /// A configuration for how to draw the particle's trail.
+    public var trail: (GraphicsContext.Shading, StrokeStyle)?
     
     // MARK: - Initalizers
     
@@ -79,6 +85,12 @@ open class AdvancedParticle: Particle {
     override func onUpdate(_ context: inout GraphicsContext) {
       super.onUpdate(&context)
       context.drawLayer { context in
+        if let trail {
+          var path = Path()
+          path.move(to: position)
+          path.addLine(to: CGPoint(x: position.x - 10 * velocity.dx, y: position.y - 10 * velocity.dy))
+          context.stroke(path, with: trail.0, style: trail.1)
+        }
         context.opacity = opacity
         context.blendMode = blendMode
         if !hueRotation.degrees.isZero {
@@ -89,6 +101,7 @@ open class AdvancedParticle: Particle {
         }
         context.translateBy(x: position.x, y: position.y)
         context.addFilter(.projectionTransform(getRotationProjection()))
+        context.rotate(by: rotation)
         for filter in filters {
           context.addFilter(filter)
         }
@@ -103,7 +116,8 @@ open class AdvancedParticle: Particle {
     
     private func getRotationProjection() -> ProjectionTransform {
       var t = CATransform3DIdentity
-      t = CATransform3DRotate(t, rotation.radians, axis3D.0, axis3D.1, axis3D.2)
+//      t = CATransform3DRotate(t, rotation.radians, 0, 0, 1)
+      t = CATransform3DRotate(t, rotation3D.radians, axis3D.0, axis3D.1, axis3D.2)
       return ProjectionTransform(t)
     }
   }

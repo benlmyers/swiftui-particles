@@ -17,7 +17,7 @@ import Foundation
 ///   Emitter(
 /// }
 /// ```
-public class Emitter: Entity {
+public final class Emitter: Entity {
   
   // MARK: - Properties
   
@@ -66,7 +66,7 @@ public class Emitter: Entity {
     super.fix(path, updatingFrom: value, in: kind)
   }
   
-  override open func _makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
+  override public func _makeProxy(source: Emitter.Proxy?, data: ParticleSystem.Data) -> Proxy {
     return Proxy(prototypes: prototypes, systemData: data, entityData: self)
   }
   

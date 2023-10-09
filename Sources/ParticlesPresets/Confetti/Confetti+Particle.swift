@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Particles
 import ParticlesCore
 
 public extension Confetti {
@@ -13,16 +14,30 @@ public extension Confetti {
   class Particle: ParticlesCore.AdvancedParticle {
     
     public init(color: Color, shape: Shape, size: Size) {
-      super.init { context in
+      super.init(from: ParticlesCore.AdvancedParticle(onDraw: { context in
         switch shape {
         case .square:
+          context.translateBy(x: -size.value, y: -size.value)
           context.fill(.square(radius: size.value), with: .color(color))
         case .circle:
+          context.translateBy(x: -size.value, y: -size.value)
           context.fill(.circle(radius: size.value), with: .color(color))
         case .rectangle:
+          context.translateBy(x: -2 * size.value, y: -size.value)
           context.fill(.rectangle(width: 2 * 1.5 * size.value, height: 2 * size.value), with: .color(color))
         }
-      }
+      })
+        .useGravity()
+        .start(\.velocity, with: { .random(magnitude: 5.0, degreesIn: 180.0 ... 360.0) })
+        .start(\.torque, with: { .random(degreesIn: -8.0 ... 8.0) })
+        .onUpdate(perform: { proxy in
+          let t = proxy.timeAlive * 4.0
+          proxy.rotation3D = .radians(t)
+          proxy.axis3D = (1, cos(t), 0)
+          proxy.velocity.dx += 0.1 * cos(t)
+        })
+        .dampenVelocity()
+      )
     }
     
     public enum Shape {
@@ -50,9 +65,5 @@ public extension Confetti {
         }
       }
     }
-    
-//    public class Proxy: AdvancedParticle.Proxy {
-//
-//    }
   }
 }

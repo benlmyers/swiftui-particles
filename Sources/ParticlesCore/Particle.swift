@@ -37,16 +37,17 @@ open class Particle: Entity {
   ///   - radius: The radius of the particle's circular shape.
   public init(color: Color, radius: CGFloat = 4.0) {
     self.onDraw = { context in
+      context.translateBy(x: -radius, y: -radius)
       context.fill(Path(ellipseIn: .init(origin: .zero, size: .init(width: radius * 2.0, height: radius * 2.0))), with: .color(color))
     }
   }
-  
+
   /// Creates a particle with a custom drawing closure.
   /// - Parameter onDraw: An action to perform when the particle is to be rendered. The `GraphicsContext` is translated to the particle's position.
   public init(onDraw: @escaping (inout GraphicsContext) -> Void) {
     self.onDraw = onDraw
   }
-  
+
   /// Creates a particle rendered from a view.
   /// - Parameter view: The view to render as this particle's appearance.
   public init(@ViewBuilder view: () -> some View) {
@@ -60,6 +61,18 @@ open class Particle: Entity {
       context.draw(resolved, at: .zero)
     }
   }
+
+  /// Creates a particle from another particle.
+  /// - Parameter other: The particle to create from.
+  public init(from other: Particle) {
+    self.onDraw = other.onDraw
+    self.taggedView = other.taggedView
+    super.init()
+    self.birthActions = other.birthActions
+    self.updateActions = other.updateActions
+    self.deathActions = other.deathActions
+  }
+
   
   // MARK: - Overrides
   

@@ -16,7 +16,7 @@ open class Entity: Identifiable {
   
   public private(set) var id: UUID = UUID()
   
-  private final var birthActions: [(Entity.Proxy, Emitter.Proxy?) -> Void] = [
+  final var birthActions: [(Entity.Proxy, Emitter.Proxy?) -> Void] = [
     { entityProxy, emitterProxy in
       if let emitterProxy {
         entityProxy.position = emitterProxy.position
@@ -24,9 +24,9 @@ open class Entity: Identifiable {
     }
   ]
   
-  private final var deathActions: [(Entity.Proxy) -> Void] = []
+  final var deathActions: [(Entity.Proxy) -> Void] = []
   
-  var updateActions: [(Entity.Proxy) -> Void] = [
+  final var updateActions: [(Entity.Proxy) -> Void] = [
     { proxy in
       let v: CGVector = proxy.velocity
       let a: CGVector = proxy.acceleration
@@ -39,6 +39,9 @@ open class Entity: Identifiable {
     },
     { proxy in
       proxy.rotation = Angle(degrees: proxy.rotation.degrees + proxy.torque.degrees)
+      if let a = proxy as? AdvancedParticle.Proxy {
+        a.rotation3D = Angle(degrees: a.rotation3D.degrees + a.torque3D.degrees)
+      }
     }
   ]
   

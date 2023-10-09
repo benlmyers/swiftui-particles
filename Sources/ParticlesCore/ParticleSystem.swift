@@ -66,7 +66,6 @@ public struct ParticleSystem: View {
   // MARK: - Methods
   
   func renderer(context: inout GraphicsContext, size: CGSize) {
-//    self.data.systemSize = size
     destroyExpired()
     for proxy in data.proxies {
       proxy?.onUpdate(&context)

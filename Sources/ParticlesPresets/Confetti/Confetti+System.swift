@@ -21,11 +21,8 @@ public extension Confetti {
       ParticleSystem {
         Emitter {
           Confetti.Particle(color: colors.randomElement()!, shape: .circle, size: .medium)
-            .modifier()
           Confetti.Particle(color: colors.randomElement()!, shape: .square, size: .medium)
-            .modifier()
           Confetti.Particle(color: colors.randomElement()!, shape: .rectangle, size: .medium)
-            .modifier()
         }
         .startPosition(source)
         .fireRate(30.0)
@@ -37,16 +34,5 @@ public extension Confetti {
       self.colors = colors
       self.sizes = sizes
     }
-  }
-}
-
-fileprivate extension Confetti.Particle {
-  
-  func modifier() -> Self {
-    return self
-      .useGravity()
-      .start(\.velocity, with: { .random(magnitude: 5.0, degreesIn: 180.0 ... 360.0) })
-      .start(\.torque, with: { .random(degreesIn: -4.0 ... 4.0) })
-      .dampenVelocity()
   }
 }
