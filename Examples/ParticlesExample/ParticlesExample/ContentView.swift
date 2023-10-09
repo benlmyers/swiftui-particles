@@ -29,7 +29,7 @@ struct ContentView: View {
           acceleration = .random(magnitude: 0.05)
         }
       }
-      Confetti.System()
+      Confetti.System().rainFromTop()
     }
     .padding()
   }

@@ -56,4 +56,14 @@ public extension AdvancedParticle {
       .fix(\.rotation3D, at: angle)
       .fix(\.axis3D, at: axis)
   }
+  
+  /// Sets the trail color and width for the particle.
+  /// - Parameters:
+  ///   - color: The color of the trail.
+  ///   - width: The width of the trail line. Default value is 2.0.
+  /// - Returns: The modified particle.
+  final func trail(color: Color, lineWidth width: CGFloat = 2.0) -> Self {
+    self
+      .fix(\.trail, at: (.color(color), .init(lineWidth: width)))
+  }
 }

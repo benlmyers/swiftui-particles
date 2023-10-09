@@ -28,7 +28,6 @@ public extension Confetti {
         }
       })
         .useGravity()
-        .start(\.velocity, with: { .random(magnitude: 5.0, degreesIn: 180.0 ... 360.0) })
         .start(\.torque, with: { .random(degreesIn: -8.0 ... 8.0) })
         .onUpdate(perform: { proxy in
           let t = proxy.timeAlive * 4.0

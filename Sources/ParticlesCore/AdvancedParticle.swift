@@ -73,6 +73,8 @@ open class AdvancedParticle: Particle {
     public var filters: [GraphicsContext.Filter] = []
     /// A configuration for how to draw the particle's trail.
     public var trail: (GraphicsContext.Shading, StrokeStyle)?
+//    /// The color overlay of the particle. If `.clear`, the color overlay will not be applied.
+//    public var colorOverlay: Color = .clear
     
     // MARK: - Initalizers
     
@@ -101,6 +103,7 @@ open class AdvancedParticle: Particle {
         }
         context.translateBy(x: position.x, y: position.y)
         context.addFilter(.projectionTransform(getRotationProjection()))
+//        context.addFilter(.layerShader(., maxSampleOffset: <#T##CGSize#>)
         context.rotate(by: rotation)
         for filter in filters {
           context.addFilter(filter)
@@ -116,7 +119,6 @@ open class AdvancedParticle: Particle {
     
     private func getRotationProjection() -> ProjectionTransform {
       var t = CATransform3DIdentity
-//      t = CATransform3DRotate(t, rotation.radians, 0, 0, 1)
       t = CATransform3DRotate(t, rotation3D.radians, axis3D.0, axis3D.1, axis3D.2)
       return ProjectionTransform(t)
     }
