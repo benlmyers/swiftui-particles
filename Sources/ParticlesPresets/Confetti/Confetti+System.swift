@@ -14,7 +14,7 @@ public extension Confetti {
   struct System: View {
     
     private var source: UnitPoint
-    private var color: Color
+    private var colors: [Color]
     private var size: Confetti.Particle.Size
     
     private var fireVelocity: () -> CGVector = { .random(magnitude: 5.0, degreesIn: 180.0 ... 360.0) }
@@ -23,23 +23,26 @@ public extension Confetti {
     public var body: some View {
       ParticleSystem {
         Emitter {
-          Confetti.Particle(color: color, shape: .circle, size: size)
+          Confetti.Particle(shape: .circle, size: size)
             .onBirth { proxy, _ in
               if rain {
-                proxy.position.x = proxy.systemData!.systemSize.width * CGFloat.random(in: -1.0 ... 1.0)
+                proxy.position.x = proxy.systemData!.systemSize.width * CGFloat.random(in: 0.0 ... 1.0)
               }
+              proxy.colorOverlay = colors.randomElement()!
             }
-          Confetti.Particle(color: color, shape: .square, size: size)
+          Confetti.Particle(shape: .square, size: size)
             .onBirth { proxy, _ in
               if rain {
-                proxy.position.x = proxy.systemData!.systemSize.width * CGFloat.random(in: -1.0 ... 1.0)
+                proxy.position.x = proxy.systemData!.systemSize.width * CGFloat.random(in: 0.0 ... 1.0)
               }
+              proxy.colorOverlay = colors.randomElement()!
             }
-          Confetti.Particle(color: color, shape: .rectangle, size: size)
+          Confetti.Particle(shape: .rectangle, size: size)
             .onBirth { proxy, _ in
               if rain {
-                proxy.position.x = proxy.systemData!.systemSize.width * CGFloat.random(in: -1.0 ... 1.0)
+                proxy.position.x = proxy.systemData!.systemSize.width * CGFloat.random(in: 0.0 ... 1.0)
               }
+              proxy.colorOverlay = colors.randomElement()!
             }
         }
         .startPosition(source)
@@ -47,15 +50,15 @@ public extension Confetti {
       }
     }
     
-    public init(source: UnitPoint = .center, color: Color = .red, size: Confetti.Particle.Size = .medium) {
+    public init(source: UnitPoint = .center, colors: [Color] = [.red, .orange, .yellow, .green, .blue, .purple], size: Confetti.Particle.Size = .medium) {
       self.source = source
-      self.color = color
+      self.colors = colors
       self.size = size
     }
     
     public func rainFromTop() -> Self {
       var copy = self
-      copy.source = .top
+      copy.source = UnitPoint(x: 0.5, y: -0.05)
       copy.fireVelocity = { .zero }
       copy.rain = true
       return copy

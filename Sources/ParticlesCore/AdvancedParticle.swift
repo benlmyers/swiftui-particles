@@ -61,20 +61,20 @@ open class AdvancedParticle: Particle {
     
     /// The blur of the particle. Default `0.0`.
     public var blur: CGFloat = .zero
-    /// The blend mode of the particle.
+    /// The blend mode of the particle. Default `.normal`.
     public var blendMode: GraphicsContext.BlendMode = .normal
-    /// The three-dimensional rotational axis of the particle. Used with ``Entity/Proxy/rotation``.
+    /// The three-dimensional rotational axis of the particle. Used with ``Entity/Proxy/rotation``. Default `(.zero, .zero, 1.0)`.
     public var axis3D: (Double, Double, Double) = (.zero, .zero, 1.0)
-    /// The three-dimensional rotation of the particle along its ``axis3D``.
+    /// The three-dimensional rotation of the particle along its ``axis3D``. Default `.zero`.
     public var rotation3D: Angle = .zero
-    /// The three-dimensional torque of the particle along its ``axis3D``.
+    /// The three-dimensional torque of the particle along its ``axis3D``. Default `.zero`.
     public var torque3D: Angle = .zero
-    /// Graphical filters to apply to this view.
+    /// Graphical filters to apply to this view. Default empty.
     public var filters: [GraphicsContext.Filter] = []
-    /// A configuration for how to draw the particle's trail.
+    /// A configuration for how to draw the particle's trail. If `nil`, no trail is applied. Default `nil`.
     public var trail: (GraphicsContext.Shading, StrokeStyle)?
-//    /// The color overlay of the particle. If `.clear`, the color overlay will not be applied.
-//    public var colorOverlay: Color = .clear
+    /// The color overlay of the particle. If `nil`, no color overlay is applied. Default `nil`.
+    public var colorOverlay: Color?
     
     // MARK: - Initalizers
     
@@ -103,7 +103,16 @@ open class AdvancedParticle: Particle {
         }
         context.translateBy(x: position.x, y: position.y)
         context.addFilter(.projectionTransform(getRotationProjection()))
-//        context.addFilter(.layerShader(., maxSampleOffset: <#T##CGSize#>)
+        if #available(macOS 14.0, *), let colorOverlay: Color {
+          var m = ColorMatrix()
+          m.r1 = 0; m.r2 = 0; m.r3 = 0; m.r4 = 0
+          m.r5 = Float(colorOverlay.toRGBA().0)
+          m.g1 = 0; m.g2 = 0; m.g3 = 0; m.g4 = 0
+          m.g5 = Float(colorOverlay.toRGBA().1)
+          m.b1 = 0; m.b2 = 0; m.b3 = 0; m.b4 = 0
+          m.b5 = Float(colorOverlay.toRGBA().2)
+          context.addFilter(.colorMatrix(m))
+        }
         context.rotate(by: rotation)
         for filter in filters {
           context.addFilter(filter)

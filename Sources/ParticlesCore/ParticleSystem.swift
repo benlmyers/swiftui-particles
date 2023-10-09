@@ -68,6 +68,7 @@ public struct ParticleSystem: View {
   func renderer(context: inout GraphicsContext, size: CGSize) {
     destroyExpired()
     for proxy in data.proxies {
+      guard proxy?.entityData != nil else { continue }
       proxy?.onUpdate(&context)
     }
   }
@@ -112,9 +113,7 @@ public struct ParticleSystem: View {
     // MARK: - Methods
     
     func addProxy(_ proxy: Entity.Proxy) {
-      Task {
-        self.proxies.append(proxy)
-      }
+      self.proxies.append(proxy)
     }
     
     func refresh(_ entities: [Entity]) {

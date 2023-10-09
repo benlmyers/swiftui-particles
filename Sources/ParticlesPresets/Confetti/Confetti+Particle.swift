@@ -13,18 +13,18 @@ public extension Confetti {
   
   class Particle: ParticlesCore.AdvancedParticle {
     
-    public init(color: Color, shape: Shape, size: Size) {
+    public init(shape: Shape, size: Size) {
       super.init(from: ParticlesCore.AdvancedParticle(onDraw: { context in
         switch shape {
         case .square:
           context.translateBy(x: -size.value, y: -size.value)
-          context.fill(.square(radius: size.value), with: .color(color))
+          context.fill(.square(radius: size.value), with: .color(.white))
         case .circle:
           context.translateBy(x: -size.value, y: -size.value)
-          context.fill(.circle(radius: size.value), with: .color(color))
+          context.fill(.circle(radius: size.value), with: .color(.white))
         case .rectangle:
           context.translateBy(x: -2 * size.value, y: -size.value)
-          context.fill(.rectangle(width: 2 * 1.5 * size.value, height: 2 * size.value), with: .color(color))
+          context.fill(.rectangle(width: 2 * 1.5 * size.value, height: 2 * size.value), with: .color(.white))
         }
       })
         .useGravity()
@@ -33,7 +33,7 @@ public extension Confetti {
           let t = proxy.timeAlive * 4.0
           proxy.rotation3D = .radians(t)
           proxy.axis3D = (1, cos(t), 0)
-          proxy.velocity.dx += 0.1 * cos(t)
+          proxy.velocity.dx += 0.1 * cos(t + 0.001 * Double(proxy.id.hashValue))
         })
         .dampenVelocity()
       )

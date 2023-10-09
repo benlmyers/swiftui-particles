@@ -191,7 +191,7 @@ open class Entity: Identifiable {
     public internal(set) final weak var systemData: ParticleSystem.Data?
     final var entityData: Entity
     
-    private final let id: UUID = UUID()
+    public final let id: UUID = UUID()
     
     private var inception: Date = Date()
     

@@ -17,7 +17,11 @@ let package = Package(
   targets: [
     .target(
       name: "ParticlesCore",
-      dependencies: []),
+      dependencies: [],
+      resources: [
+        .process("Resources")
+      ]
+    ),
     .target(
       name: "Particles",
       dependencies: ["ParticlesCore"]),
