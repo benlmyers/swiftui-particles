@@ -25,7 +25,8 @@ struct ContentView: View {
       HStack {
         Toggle("Fire", isOn: $canFire)
       }
-      Confetti.System(data: systemData).rainFromTop().canFire($canFire)
+//      Confetti.System(data: systemData).rainFromTop().canFire($canFire)
+      Fireworks.System()
     }
     .padding()
   }

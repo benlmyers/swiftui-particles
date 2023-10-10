@@ -67,14 +67,16 @@ public struct ParticleSystem: View {
   
   func renderer(context: inout GraphicsContext, size: CGSize) {
     destroyExpired()
-    for proxy in data.proxies {
-      guard proxy?.entityData != nil else { continue }
-      proxy?.onUpdate(&context)
+    for i in 0 ..< data.proxies.count {
+      guard i < data.proxies.count else { continue }
+      guard let proxy = data.proxies[i] else { continue }
+      proxy.onUpdate(&context)
     }
   }
   
   func destroyExpired() {
     for i in 0 ..< data.proxies.count {
+      guard i < data.proxies.count else { continue }
       guard let proxy = data.proxies[i] else { continue }
       guard proxy.systemData != nil else { return }
       guard proxy.lifetime > 0 else { return }

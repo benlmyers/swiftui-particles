@@ -17,10 +17,7 @@ let package = Package(
   targets: [
     .target(
       name: "ParticlesCore",
-      dependencies: [],
-      resources: [
-        .process("Resources")
-      ]
+      dependencies: []
     ),
     .target(
       name: "Particles",

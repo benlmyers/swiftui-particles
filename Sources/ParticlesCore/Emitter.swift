@@ -18,7 +18,7 @@ import Foundation
 ///   Emitter(
 /// }
 /// ```
-public final class Emitter: Entity {
+open class Emitter: Entity {
   
   // MARK: - Properties
   
@@ -31,6 +31,12 @@ public final class Emitter: Entity {
   /// the entity to spawn.
   public init(@Builder<Entity> entities: @escaping () -> [Entity]) {
     self.prototypes = entities()
+  }
+  
+  /// Creates a particle from another particle.
+  /// - Parameter other: The particle to create from.
+  public init(from other: Emitter) {
+    self.prototypes = other.prototypes
   }
   
   // MARK: - Overrides
@@ -131,12 +137,10 @@ public final class Emitter: Entity {
       guard canFire else {
         return
       }
-      var n = 1
       if let lastEmitted {
         guard Date().timeIntervalSince(lastEmitted) >= 1.0 / fireRate else {
           return
         }
-        n = Int(floor(fireRate * Date().timeIntervalSince(lastEmitted)))
       }
       guard !prototypes.isEmpty else {
         // TODO: Warn
