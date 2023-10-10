@@ -70,6 +70,7 @@ public struct ParticleSystem: View {
     for i in 0 ..< data.proxies.count {
       guard i < data.proxies.count else { continue }
       guard let proxy = data.proxies[i] else { continue }
+      guard proxy.id != nil else { continue }
       proxy.onUpdate(&context)
     }
   }
@@ -115,7 +116,7 @@ public struct ParticleSystem: View {
     // MARK: - Methods
     
     func addProxy(_ proxy: Entity.Proxy) {
-      self.proxies.append(proxy)
+      self.proxies.insert(proxy, at: 0)
     }
     
     func refresh(_ entities: [Entity]) {

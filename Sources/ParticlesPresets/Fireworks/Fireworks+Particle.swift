@@ -18,14 +18,14 @@ public extension Fireworks {
         context.translateBy(x: -1.0, y: 1.0)
         context.fill(.square(radius: 2.0), with: .color(.yellow.opacity(0.7)))
       })
+        .rotation(degrees: 45.0)
+        .lifetime(2.0)
         .onUpdate(perform: { proxy in
           proxy.blendMode = .lighten
           proxy.blur = proxy.timeAlive * 3.0
           proxy.scaleEffect *= 1.01
           proxy.opacity *= 0.96
         })
-          .rotation(degrees: 45.0)
-          .lifetime(2.0)
       )
     }
   }
@@ -35,7 +35,11 @@ public extension Fireworks {
     public init() {
       super.init(from: ParticlesCore.Emitter(entities: {
         TrailParticle()
-      }))
+      })
+        .onUpdate(perform: { proxy in
+          proxy.canFire = proxy.velocity.dy >= -2.0
+        })
+      )
     }
   }
   

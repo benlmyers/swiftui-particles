@@ -93,7 +93,7 @@ open class Emitter: Entity {
     /// The rate, in entities per second, upon which to fire new entities.
     public var fireRate: Double = 1.0
     
-    /// A decider closure that chooses a declared ``Entity`` to spawn via index.
+    /// A decider closure that chooses a declared ``Entity`` to spawn via index. If `nil`, spawns all entities at once.
     ///
     /// By default, emitters choose a random declared entity to spawn.
     /// If `decider` returns an integer value greater than the number of declared entities, its index will wrap to the first entity's.
@@ -117,7 +117,7 @@ open class Emitter: Entity {
     ///   }
     /// }
     /// ```
-    public var decider: (Proxy) -> Int = { _ in Int.random(in: 0 ... .max) }
+    public var decider: ((Proxy) -> Int)? = { _ in Int.random(in: 0 ... .max) }
     
     /// Whether the emitter can fire entities.
     public var canFire: Bool = true
@@ -150,13 +150,23 @@ open class Emitter: Entity {
         // TODO: Warn
         return
       }
-      let prototype: Entity = prototypes[decider(self) % prototypes.count]
-      let newProxy = prototype._makeProxy(source: self, data: systemData)
+      if let decider {
+        let prototype: Entity = prototypes[decider(self) % prototypes.count]
+        create(prototype: prototype)
+      } else {
+        for prototype in prototypes {
+          create(prototype: prototype)
+        }
+      }
+    }
+    
+    private func create(prototype: Entity) {
+      let newProxy = prototype._makeProxy(source: self, data: systemData!)
       lastEmitted = Date()
       emittedCount += 1
       DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.05) {
         newProxy.onBirth(self)
-        systemData.addProxy(newProxy)
+        self.systemData!.addProxy(newProxy)
       }
     }
   }
