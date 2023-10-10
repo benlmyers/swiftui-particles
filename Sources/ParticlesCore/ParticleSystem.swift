@@ -127,7 +127,7 @@ public struct ParticleSystem: View {
     }
     
     private func prepare(_ entities: [Entity]) {
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [self] in
+      Task { @MainActor in  
         self.proxies = entities.map({ $0._makeProxy(source: nil, data: self) })
         self.rootEntities = entities
         self.prepared = true
