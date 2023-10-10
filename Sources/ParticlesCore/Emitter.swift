@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Dispatch
 import Foundation
 
 /// An emitter declaration.
@@ -127,14 +128,15 @@ public final class Emitter: Entity {
     
     override func onUpdate(_ context: inout GraphicsContext) {
       super.onUpdate(&context)
-//      context.stroke(.init(ellipseIn: .init(x: position.x, y: position.y, width: 2.0, height: 2.0)), with: .color(.white))
       guard canFire else {
         return
       }
+      var n = 1
       if let lastEmitted {
         guard Date().timeIntervalSince(lastEmitted) >= 1.0 / fireRate else {
           return
         }
+        n = Int(floor(fireRate * Date().timeIntervalSince(lastEmitted)))
       }
       guard !prototypes.isEmpty else {
         // TODO: Warn

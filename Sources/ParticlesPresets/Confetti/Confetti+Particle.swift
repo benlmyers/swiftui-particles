@@ -36,6 +36,7 @@ public extension Confetti {
           proxy.velocity.dx += 0.1 * cos(t + 0.001 * Double(proxy.id.hashValue))
         })
         .dampenVelocity()
+        .trail(color: .red, lineWidth: 3.0)
       )
     }
     

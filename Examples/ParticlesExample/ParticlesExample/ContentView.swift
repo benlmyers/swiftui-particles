@@ -12,9 +12,7 @@ import ParticlesPresets
 
 struct ContentView: View {
   
-  @State var velocity: CGVector = .init(dx: 1, dy: 1)
-  @State var acceleration: CGVector = .zero
-  @State var opacity: CGFloat = 1.0
+  @State var canFire: Bool = true
   
   private let systemData = ParticleSystem.Data()
   
@@ -25,11 +23,9 @@ struct ContentView: View {
         .foregroundColor(.accentColor)
       Text("Hello, world!")
       HStack {
-        Button("Acc") {
-          acceleration = .random(magnitude: 0.05)
-        }
+        Toggle("Fire", isOn: $canFire)
       }
-      Confetti.System().rainFromTop()
+      Confetti.System(data: systemData).rainFromTop().canFire($canFire)
     }
     .padding()
   }

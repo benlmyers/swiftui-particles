@@ -64,6 +64,6 @@ public extension AdvancedParticle {
   /// - Returns: The modified particle.
   final func trail(color: Color, lineWidth width: CGFloat = 2.0) -> Self {
     self
-      .fix(\.trail, at: (.color(color), .init(lineWidth: width)))
+      .fix(\.trail, at: (.color(color), .init(lineWidth: width, lineCap: .round, lineJoin: .round)))
   }
 }
