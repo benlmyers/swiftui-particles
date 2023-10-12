@@ -164,7 +164,7 @@ open class Emitter: Entity {
       let newProxy = prototype._makeProxy(source: self, data: systemData!)
       lastEmitted = Date()
       emittedCount += 1
-      DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.05) {
+      Task { @MainActor in
         newProxy.onBirth(self)
         self.systemData!.addProxy(newProxy)
       }

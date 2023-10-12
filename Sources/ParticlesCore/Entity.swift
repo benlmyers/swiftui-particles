@@ -93,7 +93,7 @@ open class Entity: Identifiable {
     // FIXME: This function doesn't work.
     self.onDeath { proxy in
       let newProxy = proxy.entityData._makeProxy(source: nil, data: proxy.systemData!)
-      DispatchQueue.global(qos: .userInitiated).async {
+      Task { @MainActor in 
         proxy.systemData!.addProxy(newProxy)
       }
     }
