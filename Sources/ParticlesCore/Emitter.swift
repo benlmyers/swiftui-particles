@@ -121,6 +121,8 @@ open class Emitter: Entity {
     
     /// Whether the emitter can fire entities.
     public var canFire: Bool = true
+    /// The delay to fire entities from inception. Default zero.
+    public var delay: TimeInterval = .zero
     
     // MARK: - Initalizers
     
@@ -137,16 +139,15 @@ open class Emitter: Entity {
       guard canFire else {
         return
       }
+      guard Date() > inception + delay else {
+        return
+      }
       if let lastEmitted {
         guard Date().timeIntervalSince(lastEmitted) >= 1.0 / fireRate else {
           return
         }
       }
       guard !prototypes.isEmpty else {
-        // TODO: Warn
-        return
-      }
-      guard let systemData else {
         // TODO: Warn
         return
       }

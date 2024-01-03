@@ -70,7 +70,6 @@ public struct ParticleSystem: View {
     for i in 0 ..< data.proxies.count {
       guard i < data.proxies.count else { continue }
       guard let proxy = data.proxies[i] else { continue }
-      guard proxy.id != nil else { continue }
       proxy.onUpdate(&context)
     }
   }

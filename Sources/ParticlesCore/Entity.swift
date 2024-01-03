@@ -193,7 +193,7 @@ open class Entity: Identifiable {
     
     public final let id: UUID = UUID()
     
-    private var inception: Date = Date()
+    var inception: Date = Date()
     
     public var lifetime: TimeInterval = 5.0
     public var position: CGPoint = .zero
