@@ -8,7 +8,6 @@
 import SwiftUI
 import Particles
 import ParticlesCore
-import ParticlesPresets
 
 struct ContentView: View {
   
@@ -18,15 +17,7 @@ struct ContentView: View {
   
   var body: some View {
     VStack {
-      Image(systemName: "globe")
-        .imageScale(.large)
-        .foregroundColor(.accentColor)
-      Text("Hello, world!")
-      HStack {
-        Toggle("Fire", isOn: $canFire)
-      }
-//      Confetti.System(data: systemData).rainFromTop().canFire($canFire)
-      Fireworks.System()
+      TestView()
     }
     .padding()
   }
