@@ -132,7 +132,7 @@ public struct ParticleSystem {
     private func register(entity: any Entity) {
       self.entities[nextEntityRegistry] = entity
       self.physicsProxies[nextProxyRegistry] = PhysicsProxy()
-      if let view: AnyView = entity.view {
+      if let view: AnyView = entity.viewToRegister() {
         self.renderProxies[nextProxyRegistry] = RenderProxy()
         self.views[nextEntityRegistry] = view
       }
@@ -154,11 +154,11 @@ public protocol Entity {
 }
 
 extension Entity {
-  var view: AnyView? {
+  func viewToRegister() -> AnyView? {
     if let particle = self as? Particle {
       return particle.view
     } else {
-      return body.view
+      return body.viewToRegister()
     }
   }
   func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy { return context.physics }
@@ -191,7 +191,7 @@ public struct TupleEntity<T>: Entity {
 public struct Particle: Entity {
   public typealias Body = Never
   public var body: Never { .transferRepresentation }
-  private var view: AnyView
+  internal var view: AnyView
   public init<V>(@ViewBuilder view: () -> V) where V: View {
     self.view = .init(view())
   }
