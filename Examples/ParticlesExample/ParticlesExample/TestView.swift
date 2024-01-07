@@ -15,27 +15,27 @@ struct TestView: View {
   }
 }
 
-struct AnyTaggedView: Hashable, Identifiable {
-  
-  // MARK: - Properties
-  
-  var view: AnyView
-  var tag: UInt8
-  
-  var id: UInt8 { tag }
-  
-  // MARK: - Static Methods
-  
-  static func == (lhs: AnyTaggedView, rhs: AnyTaggedView) -> Bool {
-    return lhs.tag == rhs.tag
-  }
-  
-  // MARK: - Methods
-  
-  func hash(into hasher: inout Hasher) {
-    return tag.hash(into: &hasher)
-  }
-}
+//struct AnyTaggedView: Hashable, Identifiable {
+//  
+//  // MARK: - Properties
+//  
+//  var view: AnyView
+//  var tag: UInt8
+//  
+//  var id: UInt8 { tag }
+//  
+//  // MARK: - Static Methods
+//  
+//  static func == (lhs: AnyTaggedView, rhs: AnyTaggedView) -> Bool {
+//    return lhs.tag == rhs.tag
+//  }
+//  
+//  // MARK: - Methods
+//  
+//  func hash(into hasher: inout Hasher) {
+//    return tag.hash(into: &hasher)
+//  }
+//}
 
 
 @resultBuilder public struct EntityBuilder {
@@ -68,6 +68,8 @@ struct AnyTaggedView: Hashable, Identifiable {
 }
 
 public struct ParticleSystem {
+  internal typealias EntityID = UInt8
+  internal typealias ProxyID = UInt16
   var data: Self.Data
   public var body: some View {
     GeometryReader { proxy in
@@ -76,12 +78,13 @@ public struct ParticleSystem {
           
         }) {
           Text("❌").tag("NOT_FOUND")
-          ForEach(Array(data.views), id: \.tag) { taggedView in
-            taggedView.view.tag(taggedView.tag)
+          ForEach(Array(data.viewPairs()), id: \.1) { (pair: (AnyView, EntityID)) in
+            pair.0.tag(pair.1)
           }
         }
       }
-      .task {
+      .onAppear {
+        // TODO: Verify this works (before it was Task and threw warning)
         data.systemSize = proxy.size
       }
     }
@@ -90,38 +93,55 @@ public struct ParticleSystem {
     let e: E = entity()
     self.data = .init()
     if let tuple = e as? TupleEntity<(any Entity)> {
-      self.data.register(tuple.value)
+      self.data.create(entity: tuple.value)
     } else if let tuple = e as? TupleEntity<(any Entity, any Entity)> {
-      self.data.register(tuple.value.0)
-      self.data.register(tuple.value.1)
+      self.data.create(entity: tuple.value.0)
+      self.data.create(entity: tuple.value.1)
     } else if let tuple = e as? TupleEntity<(any Entity, any Entity, any Entity)> {
-      self.data.register(tuple.value.0)
-      self.data.register(tuple.value.1)
-      self.data.register(tuple.value.2)
+      self.data.create(entity: tuple.value.0)
+      self.data.create(entity: tuple.value.1)
+      self.data.create(entity: tuple.value.2)
     } else if let tuple = e as? TupleEntity<(any Entity, any Entity, any Entity, any Entity)> {
-      self.data.register(tuple.value.0)
-      self.data.register(tuple.value.1)
-      self.data.register(tuple.value.2)
-      self.data.register(tuple.value.3)
+      self.data.create(entity: tuple.value.0)
+      self.data.create(entity: tuple.value.1)
+      self.data.create(entity: tuple.value.2)
+      self.data.create(entity: tuple.value.3)
     }
   }
   class Data {
-    internal var views: Set<AnyTaggedView>
     internal var systemSize: CGSize = .zero
-    internal var currentFrame: UInt16 = .zero
-    private var entities: [UInt8: any Entity] = [:]
-    private var nextEntityRegistry: UInt8 = .zero
-    private var currentIndex: UInt8
-    init() {
-      views = .init()
-      currentIndex = .zero
+    internal private(set) var currentFrame: UInt16 = .zero
+    private var entities: [EntityID: any Entity] = [:]
+    private var views: [EntityID: AnyView] = .init()
+    private var physicsProxies: [ProxyID: PhysicsProxy] = [:]
+    private var renderProxies: [ProxyID: RenderProxy] = [:]
+    private var proxyEntities: [ProxyID: EntityID] = [:]
+    private var nextEntityRegistry: EntityID = .zero
+    private var nextProxyRegistry: ProxyID = .zero
+    init() {}
+    internal func create(entity: any Entity) {
+      self.register(entity: entity)
     }
-    func register(_ entity: any Entity) {
+    internal func viewPairs() -> [(AnyView, EntityID)] {
+      var result: [(AnyView, EntityID)] = []
+      for (id, view) in views {
+        result.append((view, id))
+      }
+      return result
+    }
+    private func register(entity: any Entity) {
       self.entities[nextEntityRegistry] = entity
+      self.physicsProxies[nextProxyRegistry] = PhysicsProxy()
+      if let view: AnyView = entity.view {
+        self.renderProxies[nextProxyRegistry] = RenderProxy()
+        self.views[nextEntityRegistry] = view
+      }
+      self.proxyEntities[nextProxyRegistry] = nextEntityRegistry
       guard nextEntityRegistry < .max else {
         fatalError("For performance purposes, you may not have more than 256 entity variants.")
       }
       nextEntityRegistry += 1
+      nextProxyRegistry += 1
     }
   }
 }
@@ -134,6 +154,13 @@ public protocol Entity {
 }
 
 extension Entity {
+  var view: AnyView? {
+    if let particle = self as? Particle {
+      return particle.view
+    } else {
+      return body.view
+    }
+  }
   func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy { return context.physics }
   func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy { return context.physics }
   func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy { return context.render }
@@ -142,6 +169,14 @@ extension Entity {
 public struct EmptyEntity: Entity {
   public var body: Never
   public typealias Body = Never
+}
+
+public struct AnyEntity {
+  public var body: Any
+  public typealias Body = Any
+  init<T>(body: T) where T: Entity {
+    self.body = body
+  }
 }
 
 public struct TupleEntity<T>: Entity {
@@ -153,12 +188,12 @@ public struct TupleEntity<T>: Entity {
   }
 }
 
-public struct Particle<V>: Entity where V: View {
+public struct Particle: Entity {
   public typealias Body = Never
   public var body: Never { .transferRepresentation }
-  private var view: V
-  public init(@ViewBuilder view: () -> V) {
-    self.view = view()
+  private var view: AnyView
+  public init<V>(@ViewBuilder view: () -> V) where V: View {
+    self.view = .init(view())
   }
 }
 
@@ -215,14 +250,12 @@ struct PhysicsProxy: Proxy {
 
 struct RenderProxy: Proxy {
   typealias C = Context
-  var viewID: AnyTaggedView.ID
   var opacity: UInt8
   var hueRotation: UInt8
   var blur: UInt8
   var scaleX: Float16
   var scaleY: Float16
-  init(viewID: AnyTaggedView.ID) {
-    self.viewID = viewID
+  init() {
     self.opacity = .max
     self.hueRotation = .zero
     self.blur = .zero
