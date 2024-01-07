@@ -15,7 +15,7 @@ struct TestView: View {
       Particle {
         Text("Hi")
       }
-      .initialPosition(x: 25.0, y: 25.0)
+      .constantPosition(x: 25.0, y: 25.0)
     }
   }
 }
@@ -73,78 +73,154 @@ public struct ParticleSystem: View {
   var data: Self.Data
   public var body: some View {
     GeometryReader { proxy in
-      TimelineView(.animation(paused: false)) { [self] t in
-        Canvas(opaque: true, colorMode: .linear, rendersAsynchronously: true, renderer: { context, size in
-          
-        }) {
+      TimelineView(.animation(minimumInterval: 1.0 / 60.0, paused: false)) { [self] t in
+        Canvas(opaque: true, colorMode: .linear, rendersAsynchronously: true, renderer: renderer) {
           Text("❌").tag("NOT_FOUND")
           ForEach(Array(data.viewPairs()), id: \.1) { (pair: (AnyView, EntityID)) in
             pair.0.tag(pair.1)
           }
         }
-      }
-      .onAppear {
-        // TODO: Verify this works (before it was Task and threw warning)
-        data.systemSize = proxy.size
+        .border(data.debug ? Color.red.opacity(0.5) : Color.clear)
+        .overlay {
+          HStack {
+            VStack {
+              debugView
+              Spacer()
+            }
+            Spacer()
+          }
+        }
       }
     }
+  }
+  private var debugView: some View {
+    VStack(alignment: .leading, spacing: 2.0) {
+      Text("Frame \(data.currentFrame)")
+      Text("\(1.0 / Date().timeIntervalSince(data.lastFrameUpdate), specifier: "%.1f") FPS")
+      Text("\(data.stats.renderUpdatesLastFrame) render updates")
+      Text("\(data.stats.physicsUpdatesLastFrame) physics updates")
+      Text("\(data.nextProxyRegistry) proxies registered")
+      Text("\(data.nextEntityRegistry) entities registered")
+    }
+    .font(.caption)
+    .opacity(0.5)
   }
   init<E>(@EntityBuilder entity: () -> E) where E: Entity {
     let e: E = entity()
     self.data = .init()
     if let tuple = e as? TupleEntity<(any Entity)> {
-      self.data.create(entity: tuple.value)
+      self.data.createSingle(entity: tuple.value)
     } else if let tuple = e as? TupleEntity<(any Entity, any Entity)> {
-      self.data.create(entity: tuple.value.0)
-      self.data.create(entity: tuple.value.1)
+      self.data.createSingle(entity: tuple.value.0)
+      self.data.createSingle(entity: tuple.value.1)
     } else if let tuple = e as? TupleEntity<(any Entity, any Entity, any Entity)> {
-      self.data.create(entity: tuple.value.0)
-      self.data.create(entity: tuple.value.1)
-      self.data.create(entity: tuple.value.2)
+      self.data.createSingle(entity: tuple.value.0)
+      self.data.createSingle(entity: tuple.value.1)
+      self.data.createSingle(entity: tuple.value.2)
     } else if let tuple = e as? TupleEntity<(any Entity, any Entity, any Entity, any Entity)> {
-      self.data.create(entity: tuple.value.0)
-      self.data.create(entity: tuple.value.1)
-      self.data.create(entity: tuple.value.2)
-      self.data.create(entity: tuple.value.3)
+      self.data.createSingle(entity: tuple.value.0)
+      self.data.createSingle(entity: tuple.value.1)
+      self.data.createSingle(entity: tuple.value.2)
+      self.data.createSingle(entity: tuple.value.3)
+    } else {
+      self.data.createSingle(entity: e)
     }
   }
-  private func renderProxy(_ proxyID: ProxyID) {
-//    guard
-//      position.x > 0,
-//      position.x < systemData!.systemSize.width,
-//      position.y > 0,
-//      position.y < systemData!.systemSize.height
-//    else { return }
-//    context.drawLayer { context in
-//      context.opacity = opacity
-//      if !hueRotation.degrees.isZero {
-//        context.addFilter(.hueRotation(hueRotation))
-//      }
-//      context.translateBy(x: position.x, y: position.y)
-//      context.rotate(by: rotation)
-//      if scaleEffect != 1.0 {
-//        context.scaleBy(x: scaleEffect, y: scaleEffect)
-//      }
-//      guard let resolved = context.resolveSymbol(id: taggedView.tag) else {
-//        // TODO: WARN
-//        return
-//      }
-//      context.draw(resolved, at: .zero)
-//    }
+  func renderer(_ context: inout GraphicsContext, size: CGSize) {
+    self.data.systemSize = size
+    data.updatePhysics()
+    data.updateRenders()
+    data.advanceFrame()
+    data.performRenders(&context)
+  }
+  class Stats {
+    internal var renderUpdatesLastFrame: UInt16 = .zero
+    internal var physicsUpdatesLastFrame: UInt16 = .zero
+    init() {}
   }
   class Data {
-    internal var systemSize: CGSize = .zero
+    public internal(set) var systemSize: CGSize = .zero
     internal private(set) var currentFrame: UInt16 = .zero
+    internal private(set) var lastFrameUpdate: Date = .distantPast
+    internal var debug: Bool = true
+    internal var stats: Stats = .init()
     private var entities: [EntityID: any Entity] = [:]
     private var views: [EntityID: AnyView] = .init()
     private var physicsProxies: [ProxyID: PhysicsProxy] = [:]
     private var renderProxies: [ProxyID: RenderProxy] = [:]
     private var proxyEntities: [ProxyID: EntityID] = [:]
-    private var nextEntityRegistry: EntityID = .zero
-    private var nextProxyRegistry: ProxyID = .zero
+    internal private(set) var nextEntityRegistry: EntityID = .zero
+    internal private(set) var nextProxyRegistry: ProxyID = .zero
     init() {}
-    internal func create(entity: any Entity) {
-      self.register(entity: entity)
+    internal func updatePhysics() {
+      let proxyIDs = physicsProxies.keys
+      for proxyID in proxyIDs {
+        guard let proxy: PhysicsProxy = physicsProxies[proxyID] else { continue }
+        guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
+        guard let entity: any Entity = entities[entityID] else { continue }
+        let context = PhysicsProxy.Context(physics: proxy, data: self)
+        let newPhysics = entity.onPhysicsUpdate(context)
+        physicsProxies[proxyID] = newPhysics
+        stats.physicsUpdatesLastFrame += 1
+      }
+    }
+    internal func updateRenders() {
+      let proxyIDs = physicsProxies.keys
+      for proxyID in proxyIDs {
+        guard let renderProxy: RenderProxy = renderProxies[proxyID] else { continue }
+        guard let physicsProxy: PhysicsProxy = physicsProxies[proxyID] else { continue }
+        guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
+        guard let entity: any Entity = entities[entityID] else { continue }
+        let context = RenderProxy.Context(physics: physicsProxy, render: renderProxy, data: self)
+        let newPhysics = entity.onRenderUpdate(context)
+        renderProxies[proxyID] = newPhysics
+        stats.renderUpdatesLastFrame += 1
+      }
+    }
+    internal func performRenders(_ context: inout GraphicsContext) {
+      for proxyID in physicsProxies.keys {
+        guard let render: RenderProxy = renderProxies[proxyID] else { continue }
+        guard let physics: PhysicsProxy = physicsProxies[proxyID] else { continue }
+        guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
+        if views[entityID] == nil {
+          guard let entity: any Entity = entities[entityID] else { continue }
+          guard let view: AnyView = entity.viewToRegister() else { continue }
+          views[entityID] = view
+        }
+        guard
+          physics.position.x > -10.0,
+          physics.position.x < systemSize.width + 10.0,
+          physics.position.y > -10.0,
+          physics.position.y < systemSize.height + 10.0
+        else { return }
+        context.drawLayer { context in
+          context.opacity = render.opacity
+          if !render.hueRotation.degrees.isZero {
+            context.addFilter(.hueRotation(render.hueRotation))
+          }
+          context.translateBy(x: physics.position.x, y: physics.position.y)
+          context.rotate(by: physics.rotation)
+          if render.scale.width != 1.0 || render.scale.height != 1.0 {
+            context.scaleBy(x: render.scale.width, y: render.scale.height)
+          }
+          guard let resolved = context.resolveSymbol(id: entityID) else {
+            return
+          }
+          context.draw(resolved, at: .zero)
+        }
+      }
+    }
+    internal func advanceFrame() {
+      if self.currentFrame < .max {
+        self.currentFrame += 1
+      } else {
+        self.currentFrame = 0
+      }
+      self.lastFrameUpdate = Date()
+    }
+    internal func createSingle(entity: any Entity) {
+      let entityID: EntityID = self.register(entity: entity)
+      self.create(entityID)
     }
     internal func viewPairs() -> [(AnyView, EntityID)] {
       var result: [(AnyView, EntityID)] = []
@@ -153,19 +229,23 @@ public struct ParticleSystem: View {
       }
       return result
     }
-    private func register(entity: any Entity) {
-      self.entities[nextEntityRegistry] = entity
+    private func create(_ id: EntityID) {
+      guard let entity = self.entities[id] else { return }
       self.physicsProxies[nextProxyRegistry] = PhysicsProxy()
       if let view: AnyView = entity.viewToRegister() {
         self.renderProxies[nextProxyRegistry] = RenderProxy()
-        self.views[nextEntityRegistry] = view
       }
-      self.proxyEntities[nextProxyRegistry] = nextEntityRegistry
+      self.proxyEntities[nextProxyRegistry] = id
+      nextProxyRegistry += 1
+    }
+    private func register(entity: any Entity) -> EntityID {
+      self.entities[nextEntityRegistry] = entity
       guard nextEntityRegistry < .max else {
         fatalError("For performance purposes, you may not have more than 256 entity variants.")
       }
+      let id = nextEntityRegistry
       nextEntityRegistry += 1
-      nextProxyRegistry += 1
+      return id
     }
   }
 }
@@ -175,6 +255,9 @@ extension Never: Entity {}
 public protocol Entity {
   var body: Self.Body { get }
   associatedtype Body: Entity
+  func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy
+  func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy
+  func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy
 }
 
 extension Entity {
@@ -185,9 +268,9 @@ extension Entity {
       return body.viewToRegister()
     }
   }
-  func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy { return context.physics }
-  func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy { return context.physics }
-  func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy { return context.render }
+  public func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy { return context.physics }
+  public func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy { return context.physics }
+  public func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy { return context.render }
 }
 
 public struct EmptyEntity: Entity {
@@ -229,30 +312,16 @@ public struct Emitter<E> where E: Entity {
   }
 }
 
-protocol SystemContext {
-  var data: ParticleSystem.Data? { get }
-}
-protocol Proxy {
-  associatedtype C: SystemContext
-}
-
-public struct PhysicsProxy: Proxy {
+public struct PhysicsProxy {
   typealias C = Context
-  // x = 10 => 1 pixel x-positioning
   private var _x: UInt16
-  // y = 10 => 1 pixel y-positioning
   private var _y: UInt16
-  // velX = 1 => 1 pixel per frame x-velocity
   private var _velX: Float16
-  // velY = 1 => 1 pixel per frame y-velocity
   private var _velY: Float16
-  // accX = 1 => 1 pixel per frame x-acceleration
   private var _accX: Float16
-  // accY = 1 => 1 pixel per frame y-acceleration
   private var _accY: Float16
-  // rotation = 1 => 1.411° rotation
   private var _rotation: UInt8
-  // torque = 1 => 1.411° per frame rotation
+  private var _torque: Int8
   init() {
     _x = .zero
     _y = .zero
@@ -261,8 +330,9 @@ public struct PhysicsProxy: Proxy {
     _accX = .zero
     _accY = .zero
     _rotation = .zero
+    _torque = .zero
   }
-  struct Context: SystemContext {
+  public struct Context {
     var physics: PhysicsProxy
     weak var data: ParticleSystem.Data?
     init(physics: PhysicsProxy, data: ParticleSystem.Data) {
@@ -279,23 +349,45 @@ public extension PhysicsProxy {
     _x = UInt16(newValue.x / 10.0)
     _y = UInt16(newValue.y / 10.0)
   }}
+  var velocity: CGVector { get {
+    CGVector(dx: CGFloat(_velX), dy: CGFloat(_velY))
+  } set {
+    _velX = Float16(newValue.dx)
+    _velY = Float16(newValue.dy)
+  }}
+  var acceleration: CGVector { get {
+    CGVector(dx: CGFloat(_accX), dy: CGFloat(_accY))
+  } set {
+    _accX = Float16(newValue.dx)
+    _accY = Float16(newValue.dy)
+  }}
+  var rotation: Angle { get {
+    Angle(degrees: Double(_rotation) * 1.41176)
+  } set {
+    _rotation = UInt8(floor((newValue.degrees.truncatingRemainder(dividingBy: 360.0) * 0.7083)))
+  }}
+  var torque: Angle { get {
+    Angle(degrees: Double(_torque) * 1.41176)
+  } set {
+    _torque = Int8(floor((newValue.degrees.truncatingRemainder(dividingBy: 360.0) * 0.7083)))
+  }}
 }
 
-struct RenderProxy: Proxy {
+public struct RenderProxy {
   typealias C = Context
-  var opacity: UInt8
-  var hueRotation: UInt8
-  var blur: UInt8
-  var scaleX: Float16
-  var scaleY: Float16
+  private var _opacity: UInt8
+  private var _hueRotation: UInt8
+  private var _blur: UInt8
+  private var _scaleX: Float16
+  private var _scaleY: Float16
   init() {
-    self.opacity = .max
-    self.hueRotation = .zero
-    self.blur = .zero
-    self.scaleX = 1
-    self.scaleY = 1
+    self._opacity = .max
+    self._hueRotation = .zero
+    self._blur = .zero
+    self._scaleX = 1
+    self._scaleY = 1
   }
-  struct Context: SystemContext {
+  public struct Context {
     var physics: PhysicsProxy
     var render: RenderProxy
     weak var data: ParticleSystem.Data?
@@ -305,6 +397,30 @@ struct RenderProxy: Proxy {
       self.data = data
     }
   }
+}
+
+public extension RenderProxy {
+  var opacity: Double { get {
+    Double(_opacity) / Double(UInt8.max)
+  } set {
+    _opacity = UInt8(clamping: Int(newValue * Double(UInt8.max)))
+  }}
+  var hueRotation: Angle { get {
+    Angle(degrees: Double(_hueRotation) * 1.41176)
+  } set {
+    _hueRotation = UInt8(floor((newValue.degrees.truncatingRemainder(dividingBy: 360.0) * 0.7083)))
+  }}
+  var blur: CGFloat { get {
+    CGFloat(_blur) * 3.0
+  } set {
+    _blur = UInt8(clamping: Int(newValue / 3))
+  }}
+  var scale: CGSize { get {
+    CGSize(width: CGFloat(_scaleX), height: CGFloat(_scaleY))
+  } set {
+    _scaleX = Float16(newValue.width)
+    _scaleY = Float16(newValue.height)
+  }}
 }
 
 internal struct PhysicsModifiedEntity<E>: Entity where E: Entity {
@@ -351,6 +467,18 @@ internal struct RenderModifiedEntity<E>: Entity where E: Entity {
 
 public extension Entity {
   func initialPosition(x: CGFloat?, y: CGFloat?) -> some Entity {
+    PhysicsModifiedEntity(entity: self, onBirth: { context in
+      var p = context.physics
+      if let x {
+        p.position.x = x
+      }
+      if let y {
+        p.position.y = y
+      }
+      return p
+    })
+  }
+  func constantPosition(x: CGFloat?, y: CGFloat?) -> some Entity {
     PhysicsModifiedEntity(entity: self, onUpdate: { context in
       var p = context.physics
       if let x {
