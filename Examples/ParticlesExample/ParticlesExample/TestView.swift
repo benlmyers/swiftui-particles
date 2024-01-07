@@ -15,7 +15,7 @@ struct TestView: View {
       Particle {
         Text("Hi")
       }
-      .constantPosition(x: 25.0, y: 25.0)
+      .constantPosition(x: 225.0, y: 25.0)
     }
   }
 }
@@ -156,6 +156,12 @@ public struct ParticleSystem: View {
       let proxyIDs = physicsProxies.keys
       for proxyID in proxyIDs {
         guard let proxy: PhysicsProxy = physicsProxies[proxyID] else { continue }
+        let deathFrame: Int = Int(Double(proxy.inception) + proxy.lifetime * 60.0)
+        print("\(currentFrame)/\(deathFrame)")
+        if Int(currentFrame) >= deathFrame {
+          physicsProxies[proxyID] = nil
+          renderProxies[proxyID] = nil
+        }
         guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
         guard let entity: any Entity = entities[entityID] else { continue }
         let context = PhysicsProxy.Context(physics: proxy, data: self)
@@ -231,7 +237,7 @@ public struct ParticleSystem: View {
     }
     private func create(_ id: EntityID) {
       guard let entity = self.entities[id] else { return }
-      self.physicsProxies[nextProxyRegistry] = PhysicsProxy()
+      self.physicsProxies[nextProxyRegistry] = PhysicsProxy(currentFrame: currentFrame)
       if let view: AnyView = entity.viewToRegister() {
         self.renderProxies[nextProxyRegistry] = RenderProxy()
       }
@@ -322,7 +328,9 @@ public struct PhysicsProxy {
   private var _accY: Float16
   private var _rotation: UInt8
   private var _torque: Int8
-  init() {
+  private var _inception: UInt16
+  private var _lifetime: Float16
+  init(currentFrame: UInt16) {
     _x = .zero
     _y = .zero
     _velX = .zero
@@ -331,6 +339,8 @@ public struct PhysicsProxy {
     _accY = .zero
     _rotation = .zero
     _torque = .zero
+    _inception = currentFrame
+    _lifetime = 5.0
   }
   public struct Context {
     var physics: PhysicsProxy
@@ -370,6 +380,14 @@ public extension PhysicsProxy {
     Angle(degrees: Double(_torque) * 1.41176)
   } set {
     _torque = Int8(floor((newValue.degrees.truncatingRemainder(dividingBy: 360.0) * 0.7083)))
+  }}
+  var inception: Int {
+    Int(_inception)
+  }
+  var lifetime: Double { get {
+    Double(_lifetime)
+  } set {
+    _lifetime = Float16(newValue)
   }}
 }
 
