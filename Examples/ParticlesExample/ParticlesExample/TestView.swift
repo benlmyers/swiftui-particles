@@ -15,32 +15,12 @@ struct TestView: View {
       Particle {
         Text("Hi")
       }
-      .constantPosition(x: 225.0, y: 25.0)
+      .initialPosition(x: 225.0, y: 25.0)
+      .scale(2.0)
+      .constantAcceleration(x: 0.0, y: 0.01)
     }
   }
 }
-
-//struct AnyTaggedView: Hashable, Identifiable {
-//  
-//  // MARK: - Properties
-//  
-//  var view: AnyView
-//  var tag: UInt8
-//  
-//  var id: UInt8 { tag }
-//  
-//  // MARK: - Static Methods
-//  
-//  static func == (lhs: AnyTaggedView, rhs: AnyTaggedView) -> Bool {
-//    return lhs.tag == rhs.tag
-//  }
-//  
-//  // MARK: - Methods
-//  
-//  func hash(into hasher: inout Hasher) {
-//    return tag.hash(into: &hasher)
-//  }
-//}
 
 @resultBuilder public struct EntityBuilder {
   
@@ -157,7 +137,6 @@ public struct ParticleSystem: View {
       for proxyID in proxyIDs {
         guard let proxy: PhysicsProxy = physicsProxies[proxyID] else { continue }
         let deathFrame: Int = Int(Double(proxy.inception) + proxy.lifetime * 60.0)
-        print("\(currentFrame)/\(deathFrame)")
         if Int(currentFrame) >= deathFrame {
           physicsProxies[proxyID] = nil
           renderProxies[proxyID] = nil
@@ -204,11 +183,11 @@ public struct ParticleSystem: View {
           if !render.hueRotation.degrees.isZero {
             context.addFilter(.hueRotation(render.hueRotation))
           }
-          context.translateBy(x: physics.position.x, y: physics.position.y)
-          context.rotate(by: physics.rotation)
           if render.scale.width != 1.0 || render.scale.height != 1.0 {
             context.scaleBy(x: render.scale.width, y: render.scale.height)
           }
+          context.translateBy(x: physics.position.x, y: physics.position.y)
+          context.rotate(by: physics.rotation)
           guard let resolved = context.resolveSymbol(id: entityID) else {
             return
           }
@@ -237,7 +216,10 @@ public struct ParticleSystem: View {
     }
     private func create(_ id: EntityID) {
       guard let entity = self.entities[id] else { return }
-      self.physicsProxies[nextProxyRegistry] = PhysicsProxy(currentFrame: currentFrame)
+      let physics = PhysicsProxy(currentFrame: currentFrame)
+      let context = PhysicsProxy.Context(physics: physics, data: self)
+      let newPhysics = entity.onPhysicsBirth(context)
+      self.physicsProxies[nextProxyRegistry] = newPhysics
       if let view: AnyView = entity.viewToRegister() {
         self.renderProxies[nextProxyRegistry] = RenderProxy()
       }
@@ -274,13 +256,38 @@ extension Entity {
       return body.viewToRegister()
     }
   }
-  public func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy { return context.physics }
-  public func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy { return context.physics }
-  public func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy { return context.render }
+  public func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
+    if body is EmptyEntity {
+      return context.physics
+    } else {
+      return body.onPhysicsBirth(context)
+    }
+  }
+  public func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy {
+    var result: PhysicsProxy
+    if body is EmptyEntity {
+      result = context.physics
+    } else {
+      result = body.onPhysicsUpdate(context)
+    }
+    result.velocity.dx += result.acceleration.dx
+    result.velocity.dy += result.acceleration.dy
+    result.position.x += result.velocity.dx
+    result.position.y += result.velocity.dy
+    result.rotation.degrees += result.torque.degrees
+    return result
+  }
+  public func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy {
+    if body is EmptyEntity {
+      return context.render
+    } else {
+      return body.onRenderUpdate(context)
+    }
+  }
 }
 
 public struct EmptyEntity: Entity {
-  public var body: Never
+  public var body: Never { .transferRepresentation }
   public typealias Body = Never
 }
 
@@ -302,8 +309,7 @@ public struct TupleEntity<T>: Entity {
 }
 
 public struct Particle: Entity {
-  public typealias Body = Never
-  public var body: Never { .transferRepresentation }
+  public var body = EmptyEntity()
   internal var view: AnyView
   public init<V>(@ViewBuilder view: () -> V) where V: View {
     self.view = .init(view())
@@ -354,10 +360,10 @@ public struct PhysicsProxy {
 
 public extension PhysicsProxy {
   var position: CGPoint { get {
-    CGPoint(x: CGFloat(_x * 10), y: CGFloat(_y * 10))
+    CGPoint(x: CGFloat(_x) / 10.0, y: CGFloat(_y) / 10.0)
   } set {
-    _x = UInt16(newValue.x / 10.0)
-    _y = UInt16(newValue.y / 10.0)
+    _x = UInt16(clamping: Int(newValue.x * 10.0))
+    _y = UInt16(clamping: Int(newValue.y * 10.0))
   }}
   var velocity: CGVector { get {
     CGVector(dx: CGFloat(_velX), dy: CGFloat(_velY))
@@ -507,5 +513,124 @@ public extension Entity {
       }
       return p
     })
+  }
+  func initialVelocity(x: CGFloat?, y: CGFloat?) -> some Entity {
+    PhysicsModifiedEntity(entity: self, onBirth: { context in
+      var p = context.physics
+      if let x {
+        p.velocity.dx = x
+      }
+      if let y {
+        p.velocity.dy = y
+      }
+      return p
+    })
+  }
+  func constantVelocity(x: CGFloat?, y: CGFloat?) -> some Entity {
+    PhysicsModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.physics
+      if let x {
+        p.velocity.dx = x
+      }
+      if let y {
+        p.velocity.dy = y
+      }
+      return p
+    })
+  }
+  func initialAcceleration(x: CGFloat?, y: CGFloat?) -> some Entity {
+    PhysicsModifiedEntity(entity: self, onBirth: { context in
+      var p = context.physics
+      if let x {
+        p.acceleration.dx = x
+      }
+      if let y {
+        p.acceleration.dy = y
+      }
+      return p
+    })
+  }
+  func constantAcceleration(x: CGFloat?, y: CGFloat?) -> some Entity {
+    PhysicsModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.physics
+      if let x {
+        p.acceleration.dx = x
+      }
+      if let y {
+        p.acceleration.dy = y
+      }
+      return p
+    })
+  }
+  func initialRotation(_ angle: Angle) -> some Entity {
+    PhysicsModifiedEntity(entity: self, onBirth: { context in
+      var p = context.physics
+      p.rotation = angle
+      return p
+    })
+  }
+  func constantRotation(_ angle: Angle) -> some Entity {
+    PhysicsModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.physics
+      p.rotation = angle
+      return p
+    })
+  }
+  func initialTorque(_ angle: Angle) -> some Entity {
+    PhysicsModifiedEntity(entity: self, onBirth: { context in
+      var p = context.physics
+      p.torque = angle
+      return p
+    })
+  }
+  func constantTorque(_ angle: Angle) -> some Entity {
+    PhysicsModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.physics
+      p.torque = angle
+      return p
+    })
+  }
+  func lifetime(_ value: Double) -> some Entity {
+    PhysicsModifiedEntity(entity: self, onBirth: { context in
+      var p = context.physics
+      p.lifetime = value
+      return p
+    })
+  }
+  func opacity(_ value: Double) -> some Entity {
+    RenderModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.render
+      p.opacity = value
+      return p
+    })
+  }
+  func hueRotation(_ angle: Angle) -> some Entity {
+    RenderModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.render
+      p.hueRotation = angle
+      return p
+    })
+  }
+  func blur(_ size: CGFloat) -> some Entity {
+    RenderModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.render
+      p.blur = size
+      return p
+    })
+  }
+  func scale(x: CGFloat?, y: CGFloat?) -> some Entity {
+    RenderModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.render
+      if let x {
+        p.scale.width = x
+      }
+      if let y {
+        p.scale.height = y
+      }
+      return p
+    })
+  }
+  func scale(_ size: CGFloat) -> some Entity {
+    self.scale(x: size, y: size)
   }
 }
