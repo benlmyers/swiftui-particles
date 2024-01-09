@@ -12,27 +12,27 @@ struct TestView: View {
   
   var body: some View {
     ParticleSystem {
-      Emitter(interval: 0.1) {
+      Emitter(interval: 0.01) {
         Particle {
           Circle().frame(width: 10.0, height: 10.0).foregroundColor([Color.red, .yellow, .green].randomElement()!)
         }
         .initialPosition(x: 500, y: 200)
         .constantAcceleration(x: nil, y: 0.05)
-        .onPhysicsBirth { physics in
+        .onAppear { physics in
           physics.velocity = .init(dx: .random(in: -5.0 ... 5.0), dy: .random(in: -5.0 ... 5.0))
         }
       }
-//      MyCustomParticle(text: "A")
-//        .lifetime(1.0)
-//        .initialPosition(x: 200.0, y: 200.0)
-//      MyCustomParticle(text: "B")
-//        .lifetime(2.0)
-//        .initialPosition(x: 300.0, y: 200.0)
-//      Emitter(interval: 1.0) {
-//        MyCustomParticle(text: "C")
-//          .lifetime(3.0)
-//      }
-//      .initialPosition(x: 400.0, y: 200.0)
+      MyCustomParticle(text: "A")
+        .lifetime(1.0)
+        .initialPosition(x: 200.0, y: 200.0)
+      MyCustomParticle(text: "B")
+        .lifetime(2.0)
+        .initialPosition(x: 300.0, y: 200.0)
+      Emitter(interval: 1.0) {
+        MyCustomParticle(text: "C")
+          .lifetime(3.0)
+      }
+      .initialPosition(x: 400.0, y: 200.0)
     }
   }
 }
@@ -449,10 +449,10 @@ public struct PhysicsProxy {
 
 public extension PhysicsProxy {
   var position: CGPoint { get {
-    CGPoint(x: CGFloat(_x) / 10.0, y: CGFloat(_y) / 10.0)
+    CGPoint(x: (CGFloat(_x) - 250.0) / 10.0, y: (CGFloat(_y) - 250.0) / 10.0)
   } set {
-    _x = UInt16(clamping: Int(newValue.x * 10.0))
-    _y = UInt16(clamping: Int(newValue.y * 10.0))
+    _x = UInt16(clamping: Int(newValue.x * 10.0) + 250)
+    _y = UInt16(clamping: Int(newValue.y * 10.0) + 250)
   }}
   var velocity: CGVector { get {
     CGVector(dx: CGFloat(_velX), dy: CGFloat(_velY))
@@ -536,51 +536,48 @@ public extension RenderProxy {
   }}
 }
 
-internal struct PhysicsModifiedEntity<E>: Entity where E: Entity {
-  private var birth: (PhysicsProxy.Context) -> PhysicsProxy
-  private var update: (PhysicsProxy.Context) -> PhysicsProxy
+internal struct ModifiedEntity<E>: Entity where E: Entity {
+  private var birthPhysics: ((PhysicsProxy.Context) -> PhysicsProxy)?
+  private var updatePhysics: ((PhysicsProxy.Context) -> PhysicsProxy)?
+  private var updateRender: ((RenderProxy.Context) -> RenderProxy)?
   var body: E
   init(
     entity: E,
-    onBirth: @escaping (PhysicsProxy.Context) -> PhysicsProxy = { p in return p.physics },
-    onUpdate: @escaping (PhysicsProxy.Context) -> PhysicsProxy = { p in return p.physics }
+    onBirthPhysics: ((PhysicsProxy.Context) -> PhysicsProxy)? = nil,
+    onUpdatePhysics: ((PhysicsProxy.Context) -> PhysicsProxy)? = nil,
+    onUpdateRender: ((RenderProxy.Context) -> RenderProxy)? = nil
   ) {
     self.body = entity
-    self.birth = onBirth
-    self.update = onUpdate
+    self.birthPhysics = onBirthPhysics
+    self.updatePhysics = onUpdatePhysics
+    self.updateRender = onUpdateRender
   }
   func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
     let proxy = body.onPhysicsBirth(context)
+    guard let birthPhysics else { return proxy }
     guard let data = context.data else { return proxy }
     let newContext: PhysicsProxy.Context = .init(physics: proxy, data: data)
-    return birth(newContext)
+    return birthPhysics(newContext)
   }
   func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy {
     let proxy = body.onPhysicsUpdate(context)
+    guard let updatePhysics else { return proxy }
     guard let data = context.data else { return proxy }
     let newContext: PhysicsProxy.Context = .init(physics: proxy, data: data)
-    return update(newContext)
-  }
-}
-
-internal struct RenderModifiedEntity<E>: Entity where E: Entity {
-  private var update: (RenderProxy.Context) -> RenderProxy
-  internal var body: E
-  init(entity: E, onUpdate: @escaping (RenderProxy.Context) -> RenderProxy) {
-    self.body = entity
-    self.update = onUpdate
+    return updatePhysics(newContext)
   }
   func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy {
     let proxy = body.onRenderUpdate(context)
+    guard let updateRender else { return proxy}
     guard let data = context.data else { return proxy }
     let newContext: RenderProxy.Context = .init(physics: context.physics, render: proxy, data: data)
-    return update(newContext)
+    return updateRender(newContext)
   }
 }
 
 public extension Entity {
   func initialPosition(x: CGFloat?, y: CGFloat?) -> some Entity {
-    PhysicsModifiedEntity(entity: self, onBirth: { context in
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
       if let x {
         p.position.x = x
@@ -592,7 +589,7 @@ public extension Entity {
     })
   }
   func constantPosition(x: CGFloat?, y: CGFloat?) -> some Entity {
-    PhysicsModifiedEntity(entity: self, onUpdate: { context in
+    ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
       if let x {
         p.position.x = x
@@ -604,7 +601,7 @@ public extension Entity {
     })
   }
   func initialVelocity(x: CGFloat?, y: CGFloat?) -> some Entity {
-    PhysicsModifiedEntity(entity: self, onBirth: { context in
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
       if let x {
         p.velocity.dx = x
@@ -616,7 +613,7 @@ public extension Entity {
     })
   }
   func constantVelocity(x: CGFloat?, y: CGFloat?) -> some Entity {
-    PhysicsModifiedEntity(entity: self, onUpdate: { context in
+    ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
       if let x {
         p.velocity.dx = x
@@ -628,7 +625,7 @@ public extension Entity {
     })
   }
   func initialAcceleration(x: CGFloat?, y: CGFloat?) -> some Entity {
-    PhysicsModifiedEntity(entity: self, onBirth: { context in
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
       if let x {
         p.acceleration.dx = x
@@ -640,7 +637,7 @@ public extension Entity {
     })
   }
   func constantAcceleration(x: CGFloat?, y: CGFloat?) -> some Entity {
-    PhysicsModifiedEntity(entity: self, onUpdate: { context in
+    ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
       if let x {
         p.acceleration.dx = x
@@ -652,63 +649,63 @@ public extension Entity {
     })
   }
   func initialRotation(_ angle: Angle) -> some Entity {
-    PhysicsModifiedEntity(entity: self, onBirth: { context in
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
       p.rotation = angle
       return p
     })
   }
   func constantRotation(_ angle: Angle) -> some Entity {
-    PhysicsModifiedEntity(entity: self, onUpdate: { context in
+    ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
       p.rotation = angle
       return p
     })
   }
   func initialTorque(_ angle: Angle) -> some Entity {
-    PhysicsModifiedEntity(entity: self, onBirth: { context in
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
       p.torque = angle
       return p
     })
   }
   func constantTorque(_ angle: Angle) -> some Entity {
-    PhysicsModifiedEntity(entity: self, onUpdate: { context in
+    ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
       p.torque = angle
       return p
     })
   }
   func lifetime(_ value: Double) -> some Entity {
-    PhysicsModifiedEntity(entity: self, onBirth: { context in
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
       p.lifetime = value
       return p
     })
   }
   func opacity(_ value: Double) -> some Entity {
-    RenderModifiedEntity(entity: self, onUpdate: { context in
+    ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
       p.opacity = value
       return p
     })
   }
   func hueRotation(_ angle: Angle) -> some Entity {
-    RenderModifiedEntity(entity: self, onUpdate: { context in
+    ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
       p.hueRotation = angle
       return p
     })
   }
   func blur(_ size: CGFloat) -> some Entity {
-    RenderModifiedEntity(entity: self, onUpdate: { context in
+    ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
       p.blur = size
       return p
     })
   }
   func scale(x: CGFloat?, y: CGFloat?) -> some Entity {
-    RenderModifiedEntity(entity: self, onUpdate: { context in
+    ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
       if let x {
         p.scale.width = x
@@ -722,28 +719,26 @@ public extension Entity {
   func scale(_ size: CGFloat) -> some Entity {
     self.scale(x: size, y: size)
   }
-  func onPhysicsBirth(_ closure: @escaping (inout PhysicsProxy) -> Void) -> some Entity {
-    let newClosure: (PhysicsProxy.Context) -> PhysicsProxy = { context in
+  func onAppear(_ closure: @escaping (inout PhysicsProxy) -> Void) -> some Entity {
+    let newPhysicsClosure: (PhysicsProxy.Context) -> PhysicsProxy = { context in
       var newContext = context
       closure(&newContext.physics)
       return newContext.physics
     }
-    return PhysicsModifiedEntity(entity: self, onBirth: newClosure)
+    return ModifiedEntity(entity: self, onBirthPhysics: newPhysicsClosure)
   }
-  func onPhysicsUpdate(_ closure: @escaping (inout PhysicsProxy) -> Void) -> some Entity {
-    let newClosure: (PhysicsProxy.Context) -> PhysicsProxy = { context in
+  func onUpdate(_ closure: @escaping (inout PhysicsProxy, inout RenderProxy) -> Void) -> some Entity {
+    let newPhysicsClosure: (PhysicsProxy.Context) -> PhysicsProxy = { context in
       var newContext = context
-      closure(&newContext.physics)
+      var p = RenderProxy()
+      closure(&newContext.physics, &p)
       return newContext.physics
     }
-    return PhysicsModifiedEntity(entity: self, onUpdate: newClosure)
-  }
-  func onRenderUpdate(_ closure: @escaping (inout RenderProxy) -> Void) -> some Entity {
-    let newClosure: (RenderProxy.Context) -> RenderProxy = { context in
+    let newRenderClosure: (RenderProxy.Context) -> RenderProxy = { context in
       var newContext = context
-      closure(&newContext.render)
+      closure(&newContext.physics, &newContext.render)
       return newContext.render
     }
-    return RenderModifiedEntity(entity: self, onUpdate: newClosure)
+    return ModifiedEntity(entity: self, onUpdatePhysics: newPhysicsClosure, onUpdateRender: newRenderClosure)
   }
 }
