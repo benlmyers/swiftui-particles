@@ -16,34 +16,25 @@ struct TestView: View {
     VStack {
       Button("\(x)", action: { x += 1 })
       ParticleSystem {
-        MyCustomParticle(text: "A")
-          .lifetime(1.0)
-          .initialPosition(x: 200.0, y: 200.0)
-        MyCustomParticle(text: "B")
-          .lifetime(2.0)
-          .initialPosition(x: 300.0, y: 200.0)
-          .scale(3.0)
-          .scale(3.0)
-//        Emitter(interval: 0.01) {
-//          burstParticle
-//          burstParticle
-//          burstParticle.hueRotation(.degrees(140.0))
-//        }
-//        EntityGroup {
-//          MyCustomParticle(text: "A")
-//            .lifetime(1.0)
-//            .initialPosition(x: 200.0, y: 200.0)
-//          MyCustomParticle(text: "B")
-//            .lifetime(2.0)
+        EntityGroup {
+          MyCustomParticle(text: "A")
+            .lifetime(1.0)
+            .initialPosition(x: 200.0, y: 200.0)
+          MyCustomParticle(text: "B")
+            .lifetime(2.0)
 //            .initialPosition(x: 300.0, y: 200.0)
-//            .scale(2.0)
-//        }
-//        .scale(3.0)
-//        Emitter(interval: 1.0) {
-//          MyCustomParticle(text: "C")
-//            .lifetime(3.0)
-//        }
-//        .initialPosition(x: 400.0, y: 200.0)
+            .scale(3.0)
+            .scale(2.0)
+        }
+        .initialPosition(x: 100.0, y: 100.0)
+        .scale(2.0)
+//        .lifetime(6.0)
+        Emitter(interval: 1.0) {
+          MyCustomParticle(text: "Cool")
+            .lifetime(3.0)
+        }
+        .initialPosition(x: 400.0, y: 200.0)
+        .lifetime(99)
       }
       .debug()
     }
@@ -53,7 +44,7 @@ struct TestView: View {
     Particle {
       Circle().frame(width: 10.0, height: 10.0).foregroundColor([Color.red, .yellow, .green].randomElement()!)
     }
-    .initialPosition(x: 500, y: 200)
+//    .initialPosition(x: 500, y: 200)
     .constantAcceleration(x: nil, y: 0.05)
     .onAppear { physics, _ in
       physics.velocity = .init(dx: .random(in: -5.0 ... 5.0), dy: .random(in: -5.0 ... 5.0))
@@ -273,7 +264,7 @@ public struct ParticleSystem: View {
       }
       self.lastFrameUpdate = Date()
     }
-    private func applyGroup<E>(to entity: E, group: EntityGroup) -> some Entity where E: Entity {
+    private func applyGroup<E>(to entity: E, group: any Entity) -> some Entity where E: Entity {
       let m = ModifiedEntity(entity: entity, onBirthPhysics: { c in
         group.onPhysicsBirth(c)
       }, onUpdatePhysics: { c in
@@ -291,7 +282,7 @@ public struct ParticleSystem: View {
       if let group = entity.underlyingGroup() {
         for v in group.values {
           guard let e = v.body as? any Entity else { continue }
-          let modified = applyGroup(to: e, group: group)
+          let modified = applyGroup(to: e, group: entity)
           result.append(contentsOf: self.createSingle(entity: modified))
         }
       } else {
@@ -617,31 +608,27 @@ internal struct ModifiedEntity<E>: Entity where E: Entity {
     self.updateRender = onUpdateRender
   }
   func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
-    let proxy = body.onPhysicsBirth(context)
-    guard let birthPhysics else { return proxy }
-    guard let data = context.data else { return proxy }
-    let newContext: PhysicsProxy.Context = .init(physics: proxy, data: data)
-    return birthPhysics(newContext)
+    guard let data = context.data else { return body.onPhysicsBirth(context) }
+    guard let birthPhysics else { return body.onPhysicsBirth(context) }
+    let newContext: PhysicsProxy.Context = .init(physics: birthPhysics(context), data: data)
+    return body.onPhysicsBirth(newContext)
   }
   func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy {
-    let proxy = body.onPhysicsUpdate(context)
-    guard let updatePhysics else { return proxy }
-    guard let data = context.data else { return proxy }
-    let newContext: PhysicsProxy.Context = .init(physics: proxy, data: data)
-    return updatePhysics(newContext)
+    guard let data = context.data else { return body.onPhysicsUpdate(context) }
+    guard let updatePhysics else { return body.onPhysicsUpdate(context) }
+    let newContext: PhysicsProxy.Context = .init(physics: updatePhysics(context), data: data)
+    return body.onPhysicsUpdate(newContext)
   }
   func onRenderBirth(_ context: RenderProxy.Context) -> RenderProxy {
-    let proxy = body.onRenderBirth(context)
-    guard let birthRender else { return proxy }
-    guard let data = context.data else { return proxy }
-    let newContext: RenderProxy.Context = .init(physics: context.physics, render: proxy, data: data)
+    guard let data = context.data else { return body.onRenderBirth(context) }
+    guard let birthRender else { return body.onRenderBirth(context) }
+    let newContext: RenderProxy.Context = .init(physics: context.physics, render: birthRender(context), data: data)
     return birthRender(newContext)
   }
   func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy {
-    let proxy = body.onRenderUpdate(context)
-    guard let updateRender else { return proxy}
-    guard let data = context.data else { return proxy }
-    let newContext: RenderProxy.Context = .init(physics: context.physics, render: proxy, data: data)
+    guard let data = context.data else { return body.onRenderUpdate(context) }
+    guard let updateRender else { return body.onRenderUpdate(context) }
+    let newContext: RenderProxy.Context = .init(physics: context.physics, render: updateRender(context), data: data)
     return updateRender(newContext)
   }
 }
