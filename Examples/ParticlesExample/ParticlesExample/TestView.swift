@@ -15,20 +15,28 @@ struct TestView: View {
   
   var body: some View {
     ParticleSystem {
-//      Emitter {
-        ForEach(in: [Color.red, .orange, .yellow, .green, .blue, .purple]) { color in
-          Particle {
-            Circle().foregroundColor(color).frame(width: 20.0, height: 20.0)
-          }
-        }
-        .initialPosition(.center)
-        .initialVelocity { context in
-            .init(dx: .random(in: -1.0 ... 1.0), dy: .random(in: -1.0 ... 1.0))
-        }
-        .setAcceleration(y: 0.01)
-//      }
-//      .emitSingle()
+      CrazyEmitter()
     }
     .debug()
+  }
+}
+
+struct CrazyEmitter: Entity {
+  
+  let colors = [Color.red, .orange, .yellow, .green, .blue, .purple, .pink, .white]
+  
+  var body: some Entity {
+    Emitter(interval: 0.02) {
+      ForEach(colors) { color in
+        Particle {
+          Circle().foregroundColor(color).frame(width: 10.0, height: 10.0)
+        }
+        .initialVelocity { c in
+          return .init(angle: .degrees(Double(c.system.proxiesSpawned) * 8.0), magnitude: 2.0)
+        }
+      }
+    }
+    .emitSingle()
+    .setPosition(.center)
   }
 }

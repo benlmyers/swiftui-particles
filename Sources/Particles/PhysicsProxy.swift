@@ -48,7 +48,7 @@ public struct PhysicsProxy {
     
     var physics: PhysicsProxy
     
-    public private(set) weak var system: ParticleSystem.Data?
+    public private(set) weak var system: ParticleSystem.Data!
     
     // MARK: - Initalizers
     

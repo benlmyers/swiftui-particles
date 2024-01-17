@@ -17,7 +17,7 @@ public struct ForEach<T>: Entity {
   
   // MARK: - Initalizers
   
-  public init<E>(in data: [T], @EntityBuilder mapping: @escaping (T) -> E) where E: Entity {
+  public init<E>(_ data: [T], @EntityBuilder mapping: @escaping (T) -> E) where E: Entity {
     self.data = data
     self.mapping = mapping
   }

@@ -26,7 +26,7 @@ public protocol Entity {
   associatedtype Body: Entity
   
   /// The inner content of the entity.
-  /// Inner content often holds additional modifiers to apply to ``PhysicsProxy`` or ``RenderProxy`` instances.
+  /// Inner content often holds additional modifiers to apply to ``PhysicsProxy`` or ``RenderProxy`` instances upon spawn.
   var body: Self.Body { get }
   
   /// A method transforms a ``PhysicsProxy`` via ``PhysicsProxy/Context`` to an updated model upon the entity's **birth**.

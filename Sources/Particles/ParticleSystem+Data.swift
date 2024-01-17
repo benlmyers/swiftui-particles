@@ -86,7 +86,7 @@ public extension ParticleSystem {
           finalEntities = [protoEntities[chooser(context) % protoEntities.count]]
         }
         for protoEntity in finalEntities {
-          guard let _: ProxyID = self.create(protoEntity, inherit: entityID) else { continue }
+          guard let _: ProxyID = self.create(protoEntity, inherit: proxy) else { continue }
           self.lastEmitted[proxyID] = currentFrame
         }
       }
@@ -147,6 +147,9 @@ public extension ParticleSystem {
             context.opacity = render.opacity
             if !render.hueRotation.degrees.isZero {
               context.addFilter(.hueRotation(render.hueRotation))
+            }
+            if !render.blur.isZero {
+              context.addFilter(.blur(radius: render.blur))
             }
           }
           context.translateBy(x: physics.position.x, y: physics.position.y)
@@ -223,15 +226,14 @@ public extension ParticleSystem {
     }
     
     @discardableResult
-    private func create(_ id: EntityID, inherit: EntityID? = nil) -> ProxyID? {
+    private func create(_ id: EntityID, inherit: PhysicsProxy? = nil) -> ProxyID? {
       guard let entity = self.entities[id] else { return nil }
       var physics = PhysicsProxy(currentFrame: currentFrame)
+      if let inherit {
+        physics = inherit
+      }
       if entity is Emitter {
         physics.lifetime = .infinity
-      }
-      if let inherit, let parent: any Entity = entities[inherit] {
-        let context = PhysicsProxy.Context(physics: physics, system: self)
-        physics = parent.onPhysicsBirth(context)
       }
       let context = PhysicsProxy.Context(physics: physics, system: self)
       let newPhysics = entity.onPhysicsBirth(context)
