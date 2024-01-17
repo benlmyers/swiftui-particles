@@ -17,18 +17,17 @@ struct TestView: View {
       Button("\(x)", action: { x += 1 })
       ParticleSystem {
         EntityGroup {
-          MyCustomParticle(text: "A")
-            .lifetime(1.0)
-            .initialPosition(x: 200.0, y: 200.0)
           MyCustomParticle(text: "B")
-            .lifetime(2.0)
-//            .initialPosition(x: 300.0, y: 200.0)
+            .lifetime(1.0)
+            .scale(2.0)
+          MyCustomParticle(text: "C")
+            .initialPosition(x: 300.0, y: 200.0)
             .scale(3.0)
             .scale(2.0)
         }
         .initialPosition(x: 100.0, y: 100.0)
         .scale(2.0)
-//        .lifetime(6.0)
+        .lifetime(6.0)
         Emitter(interval: 1.0) {
           MyCustomParticle(text: "Cool")
             .lifetime(3.0)
@@ -59,7 +58,6 @@ struct MyCustomParticle: Entity {
       Text(text)
     }
     .constantVelocity(x: nil, y: 0.2)
-    .constantTorque(.degrees(2.0))
   }
 }
 
@@ -623,13 +621,13 @@ internal struct ModifiedEntity<E>: Entity where E: Entity {
     guard let data = context.data else { return body.onRenderBirth(context) }
     guard let birthRender else { return body.onRenderBirth(context) }
     let newContext: RenderProxy.Context = .init(physics: context.physics, render: birthRender(context), data: data)
-    return birthRender(newContext)
+    return body.onRenderBirth(newContext)
   }
   func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy {
     guard let data = context.data else { return body.onRenderUpdate(context) }
     guard let updateRender else { return body.onRenderUpdate(context) }
     let newContext: RenderProxy.Context = .init(physics: context.physics, render: updateRender(context), data: data)
-    return updateRender(newContext)
+    return body.onRenderUpdate(newContext)
   }
 }
 
