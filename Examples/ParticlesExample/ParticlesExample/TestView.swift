@@ -16,48 +16,13 @@ struct TestView: View {
     VStack {
       Button("\(x)", action: { x += 1 })
       ParticleSystem {
-        EntityGroup {
-          MyCustomParticle(text: "B")
-            .lifetime(1.0)
-            .scale(2.0)
-          MyCustomParticle(text: "C")
-            .initialPosition(x: 300.0, y: 200.0)
-            .scale(3.0)
-            .scale(2.0)
+        Particle {
+          Text("Test")
         }
         .initialPosition(x: 100.0, y: 100.0)
-        .scale(2.0)
-        .lifetime(6.0)
-        Emitter(interval: 1.0) {
-          MyCustomParticle(text: "Cool")
-            .lifetime(3.0)
-        }
-        .initialPosition(x: 400.0, y: 200.0)
-        .lifetime(99)
       }
       .debug()
     }
-  }
-  
-  var burstParticle: some Entity {
-    Particle {
-      Circle().frame(width: 10.0, height: 10.0).foregroundColor([Color.red, .yellow, .green].randomElement()!)
-    }
-//    .initialPosition(x: 500, y: 200)
-    .constantAcceleration(x: nil, y: 0.05)
-    .onAppear { physics, _ in
-      physics.velocity = .init(dx: .random(in: -5.0 ... 5.0), dy: .random(in: -5.0 ... 5.0))
-    }
-  }
-}
-
-struct MyCustomParticle: Entity {
-  var text: String
-  var body: some Entity {
-    Particle {
-      Text(text)
-    }
-    .constantVelocity(x: nil, y: 0.2)
   }
 }
 
@@ -145,6 +110,10 @@ public struct ParticleSystem: View {
     internal private(set) var currentFrame: UInt16 = .zero
     internal private(set) var lastFrameUpdate: Date = .distantPast
     internal var debug: Bool = false
+    internal var systemTime: TimeInterval {
+      return Date().timeIntervalSince(inception)
+    }
+    private var inception: Date = Date()
     private var entities: [EntityID: any Entity] = [:]
     // ID of entity -> View to render
     private var views: [EntityID: AnyView] = .init()
@@ -176,14 +145,8 @@ public struct ParticleSystem: View {
           guard currentFrame >= emitAt else { continue }
         }
         for protoEntity in protoEntities {
-          // Spawn the child proxy
-          guard let childProxyID: ProxyID = self.create(protoEntity) else { continue }
+          guard let _: ProxyID = self.create(protoEntity, inherit: entityID) else { continue }
           self.lastEmitted[proxyID] = currentFrame
-          // Endow the child proxy with parent physics
-          guard var childPhyics: PhysicsProxy = self.physicsProxies[childProxyID] else { continue }
-          childPhyics.lifetime = 5.0
-          let context = PhysicsProxy.Context(physics: childPhyics, data: self)
-          self.physicsProxies[childProxyID] = entity.onPhysicsBirth(context)
         }
       }
     }
@@ -262,18 +225,6 @@ public struct ParticleSystem: View {
       }
       self.lastFrameUpdate = Date()
     }
-    private func applyGroup<E>(to entity: E, group: any Entity) -> some Entity where E: Entity {
-      let m = ModifiedEntity(entity: entity, onBirthPhysics: { c in
-        group.onPhysicsBirth(c)
-      }, onUpdatePhysics: { c in
-        group.onPhysicsUpdate(c)
-      }, onBirthRender: { c in
-        group.onRenderBirth(c)
-      }, onUpdateRender: { c in
-        group.onRenderUpdate(c)
-      })
-      return m
-    }
     @discardableResult
     internal func createSingle<E>(entity: E) -> [EntityID] where E: Entity {
       var result: [EntityID] = []
@@ -307,12 +258,28 @@ public struct ParticleSystem: View {
       arr.append("\(physicsProxies.count) physics, \(renderProxies.count) renders")
       return arr.joined(separator: "\n")
     }
+    private func applyGroup<E>(to entity: E, group: any Entity) -> some Entity where E: Entity {
+      let m = ModifiedEntity(entity: entity, onBirthPhysics: { c in
+        group.onPhysicsBirth(c)
+      }, onUpdatePhysics: { c in
+        group.onPhysicsUpdate(c)
+      }, onBirthRender: { c in
+        group.onRenderBirth(c)
+      }, onUpdateRender: { c in
+        group.onRenderUpdate(c)
+      })
+      return m
+    }
     @discardableResult
-    private func create(_ id: EntityID) -> ProxyID? {
+    private func create(_ id: EntityID, inherit: EntityID? = nil) -> ProxyID? {
       guard let entity = self.entities[id] else { return nil }
       var physics = PhysicsProxy(currentFrame: currentFrame)
       if entity is Emitter {
         physics.lifetime = .infinity
+      }
+      if let inherit, let parent: any Entity = entities[inherit] {
+        let context = PhysicsProxy.Context(physics: physics, data: self)
+        physics = parent.onPhysicsBirth(context)
       }
       let context = PhysicsProxy.Context(physics: physics, data: self)
       let newPhysics = entity.onPhysicsBirth(context)
@@ -519,7 +486,7 @@ public extension PhysicsProxy {
   var rotation: Angle { get {
     Angle(degrees: Double(_rotation) * 1.41176)
   } set {
-    _rotation = UInt8(floor((newValue.degrees.truncatingRemainder(dividingBy: 360.0) * 0.7083)))
+    _rotation = UInt8(ceil((newValue.degrees.truncatingRemainder(dividingBy: 360.0) * 0.7083)))
   }}
   var torque: Angle { get {
     Angle(degrees: Double(_torque) * 1.41176)
@@ -644,6 +611,42 @@ public extension Entity {
       return p
     })
   }
+  func initialPosition(x: @escaping (PhysicsProxy.Context) -> CGFloat?, y: @escaping (PhysicsProxy.Context) -> CGFloat?) -> some Entity {
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
+      var p = context.physics
+      if let x = x(context) {
+        p.position.x = x
+      }
+      if let y = y(context) {
+        p.position.y = y
+      }
+      return p
+    })
+  }
+  func initialOffset(x: CGFloat?, y: CGFloat?) -> some Entity {
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
+      var p = context.physics
+      if let x {
+        p.position.x += x
+      }
+      if let y {
+        p.position.y += y
+      }
+      return p
+    })
+  }
+  func initialOffset(x: @escaping (PhysicsProxy.Context) -> CGFloat?, y: @escaping (PhysicsProxy.Context) -> CGFloat?) -> some Entity {
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
+      var p = context.physics
+      if let x = x(context) {
+        p.position.x += x
+      }
+      if let y = y(context) {
+        p.position.y += y
+      }
+      return p
+    })
+  }
   func constantPosition(x: CGFloat?, y: CGFloat?) -> some Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
@@ -651,6 +654,18 @@ public extension Entity {
         p.position.x = x
       }
       if let y {
+        p.position.y = y
+      }
+      return p
+    })
+  }
+  func constantPosition(x: @escaping (PhysicsProxy.Context) -> CGFloat?, y: @escaping (PhysicsProxy.Context) -> CGFloat?) -> some Entity {
+    ModifiedEntity(entity: self, onUpdatePhysics: { context in
+      var p = context.physics
+      if let x = x(context) {
+        p.position.x = x
+      }
+      if let y = y(context) {
         p.position.y = y
       }
       return p
@@ -668,6 +683,18 @@ public extension Entity {
       return p
     })
   }
+  func initialVelocity(x: @escaping (PhysicsProxy.Context) -> CGFloat?, y: @escaping (PhysicsProxy.Context) -> CGFloat?) -> some Entity {
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
+      var p = context.physics
+      if let x = x(context) {
+        p.velocity.dx = x
+      }
+      if let y = y(context) {
+        p.velocity.dy = y
+      }
+      return p
+    })
+  }
   func constantVelocity(x: CGFloat?, y: CGFloat?) -> some Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
@@ -675,6 +702,18 @@ public extension Entity {
         p.velocity.dx = x
       }
       if let y {
+        p.velocity.dy = y
+      }
+      return p
+    })
+  }
+  func constantVelocity(x: @escaping (PhysicsProxy.Context) -> CGFloat?, y: @escaping (PhysicsProxy.Context) -> CGFloat?) -> some Entity {
+    ModifiedEntity(entity: self, onUpdatePhysics: { context in
+      var p = context.physics
+      if let x = x(context) {
+        p.velocity.dx = x
+      }
+      if let y = y(context) {
         p.velocity.dy = y
       }
       return p
@@ -692,6 +731,18 @@ public extension Entity {
       return p
     })
   }
+  func initialAcceleration(x: @escaping (PhysicsProxy.Context) -> CGFloat?, y: @escaping (PhysicsProxy.Context) -> CGFloat?) -> some Entity {
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
+      var p = context.physics
+      if let x = x(context) {
+        p.acceleration.dx = x
+      }
+      if let y = y(context) {
+        p.acceleration.dy = y
+      }
+      return p
+    })
+  }
   func constantAcceleration(x: CGFloat?, y: CGFloat?) -> some Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
@@ -704,10 +755,29 @@ public extension Entity {
       return p
     })
   }
+  func constantAcceleration(x: @escaping (PhysicsProxy.Context) -> CGFloat?, y: @escaping (PhysicsProxy.Context) -> CGFloat?) -> some Entity {
+    ModifiedEntity(entity: self, onUpdatePhysics: { context in
+      var p = context.physics
+      if let x = x(context) {
+        p.acceleration.dx = x
+      }
+      if let y = y(context) {
+        p.acceleration.dy = y
+      }
+      return p
+    })
+  }
   func initialRotation(_ angle: Angle) -> some Entity {
     ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
       p.rotation = angle
+      return p
+    })
+  }
+  func initialRotation(_ angle: @escaping (PhysicsProxy.Context) -> Angle) -> some Entity {
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
+      var p = context.physics
+      p.rotation = angle(context)
       return p
     })
   }
@@ -718,6 +788,13 @@ public extension Entity {
       return p
     })
   }
+  func constantRotation(_ angle: @escaping (PhysicsProxy.Context) -> Angle) -> some Entity {
+    ModifiedEntity(entity: self, onUpdatePhysics: { context in
+      var p = context.physics
+      p.rotation = angle(context)
+      return p
+    })
+  }
   func initialTorque(_ angle: Angle) -> some Entity {
     ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
@@ -725,10 +802,17 @@ public extension Entity {
       return p
     })
   }
-  func constantTorque(_ angle: Angle) -> some Entity {
+  func initialTorque(_ angle: @escaping (PhysicsProxy.Context) -> Angle) -> some Entity {
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
+      var p = context.physics
+      p.torque = angle(context)
+      return p
+    })
+  }
+  func constantTorque(_ angle: @escaping (PhysicsProxy.Context) -> Angle) -> some Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
-      p.torque = angle
+      p.torque = angle(context)
       return p
     })
   }
@@ -739,10 +823,24 @@ public extension Entity {
       return p
     })
   }
+  func lifetime(_ value: @escaping (PhysicsProxy.Context) -> Double) -> some Entity {
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
+      var p = context.physics
+      p.lifetime = value(context)
+      return p
+    })
+  }
   func opacity(_ value: Double) -> some Entity {
     ModifiedEntity(entity: self, onBirthRender: { context in
       var p = context.render
       p.opacity *= value
+      return p
+    })
+  }
+  func opacity(_ value: @escaping (RenderProxy.Context) -> Double) -> some Entity {
+    ModifiedEntity(entity: self, onBirthRender: { context in
+      var p = context.render
+      p.opacity *= value(context)
       return p
     })
   }
@@ -753,10 +851,24 @@ public extension Entity {
       return p
     })
   }
+  func hueRotation(_ angle: @escaping (RenderProxy.Context) -> Angle) -> some Entity {
+    ModifiedEntity(entity: self, onUpdateRender: { context in
+      var p = context.render
+      p.hueRotation = angle(context)
+      return p
+    })
+  }
   func blur(_ size: CGFloat) -> some Entity {
     ModifiedEntity(entity: self, onBirthRender: { context in
       var p = context.render
       p.blur = size
+      return p
+    })
+  }
+  func blur(_ size: @escaping (RenderProxy.Context) -> CGFloat) -> some Entity {
+    ModifiedEntity(entity: self, onBirthRender: { context in
+      var p = context.render
+      p.blur = size(context)
       return p
     })
   }
@@ -772,38 +884,28 @@ public extension Entity {
       return p
     })
   }
+  func scale(x: @escaping (RenderProxy.Context) -> CGFloat?, y: @escaping (RenderProxy.Context) -> CGFloat?) -> some Entity {
+    ModifiedEntity(entity: self, onBirthRender: { context in
+      var p = context.render
+      if let x = x(context) {
+        p.scale.width *= x
+      }
+      if let y = y(context) {
+        p.scale.height *= y
+      }
+      return p
+    })
+  }
   func scale(_ size: CGFloat) -> some Entity {
     self.scale(x: size, y: size)
   }
-  func onAppear(perform closure: @escaping (inout PhysicsProxy) -> Void) -> some Entity {
-    onAppear { p, _ in closure(&p) }
-  }
-  func onAppear(perform closure: @escaping (inout PhysicsProxy, inout RenderProxy) -> Void) -> some Entity {
-    let newPhysicsClosure: (PhysicsProxy.Context) -> PhysicsProxy = { context in
-      var newContext = context
-      var p = RenderProxy()
-      closure(&newContext.physics, &p)
-      return newContext.physics
-    }
-    let newRenderClosure: (RenderProxy.Context) -> RenderProxy = { context in
-      var newContext = context
-      closure(&newContext.physics, &newContext.render)
-      return newContext.render
-    }
-    return ModifiedEntity(entity: self, onBirthPhysics: newPhysicsClosure, onBirthRender: newRenderClosure)
-  }
-  func onUpdate(perform closure: @escaping (inout PhysicsProxy, inout RenderProxy) -> Void) -> some Entity {
-    let newPhysicsClosure: (PhysicsProxy.Context) -> PhysicsProxy = { context in
-      var newContext = context
-      var p = RenderProxy()
-      closure(&newContext.physics, &p)
-      return newContext.physics
-    }
-    let newRenderClosure: (RenderProxy.Context) -> RenderProxy = { context in
-      var newContext = context
-      closure(&newContext.physics, &newContext.render)
-      return newContext.render
-    }
-    return ModifiedEntity(entity: self, onUpdatePhysics: newPhysicsClosure, onUpdateRender: newRenderClosure)
+  func scale(_ size: @escaping (RenderProxy.Context) -> CGFloat) -> some Entity {
+    ModifiedEntity(entity: self, onBirthRender: { context in
+      var p = context.render
+      let s = size(context)
+      p.scale.width *= s
+      p.scale.height *= s
+      return p
+    })
   }
 }
