@@ -8,20 +8,21 @@ let package = Package(
   platforms: [.iOS(.v15), .macOS(.v12), .watchOS(.v8)],
   products: [
 //    .library(name: "ParticlesPresets", targets: ["ParticlesPresets"]),
-    .library(name: "ParticlesCore", targets: ["ParticlesCore"]),
+//    .library(name: "ParticlesCore", targets: ["ParticlesCore"]),
     .library(name: "Particles", targets: ["Particles"])
   ],
   dependencies: [
     // .package(url: /* package url */, from: "1.0.0"),
   ],
   targets: [
+//    .target(
+//      name: "ParticlesCore",
+//      dependencies: []
+//    ),
     .target(
-      name: "ParticlesCore",
-      dependencies: []
-    ),
-    .target(
-      name: "Particles",
-      dependencies: ["ParticlesCore"])
+      name: "Particles"
+    )
+//      dependencies: ["ParticlesCore"])
 //    .target(
 //      name: "ParticlesPresets",
 //      dependencies: ["ParticlesCore", "Particles"]),

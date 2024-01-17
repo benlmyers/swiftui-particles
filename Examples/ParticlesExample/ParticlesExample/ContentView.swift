@@ -11,13 +11,9 @@ import ParticlesCore
 
 struct ContentView: View {
   
-  @State var canFire: Bool = true
-  
-  private let systemData = ParticleSystem.Data()
-  
   var body: some View {
     VStack {
-      TestView()
+      EmptyView()
     }
     .padding()
   }

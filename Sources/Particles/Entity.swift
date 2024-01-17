@@ -1,0 +1,89 @@
+//
+//  Entity.swift
+//
+//
+//  Created by Ben Myers on 1/17/24.
+//
+
+import SwiftUI
+import Foundation
+
+public protocol Entity {
+  var body: Self.Body { get }
+  associatedtype Body: Entity
+  func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy
+  func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy
+  func onRenderBirth(_ context: RenderProxy.Context) -> RenderProxy
+  func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy
+}
+
+extension Never: Entity {}
+
+extension Entity {
+  
+  internal func viewToRegister() -> AnyView? {
+    if let particle = self as? Particle {
+      return particle.view
+    } else if self is EmptyEntity {
+      return nil
+    } else {
+      return body.viewToRegister()
+    }
+  }
+  
+  internal func underlyingGroup() -> EntityGroup? {
+    if let group = self as? EntityGroup {
+      return group
+    } else if self is EmptyEntity {
+      return nil
+    } else {
+      return body.underlyingGroup()
+    }
+  }
+  
+  internal func underlyingEmitter() -> Emitter? {
+    if let emitter = self as? Emitter {
+      return emitter
+    } else if self is EmptyEntity {
+      return nil
+    } else {
+      return body.underlyingEmitter()
+    }
+  }
+  
+  public func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
+    if self is EmptyEntity {
+      return context.physics
+    } else {
+      return body.onPhysicsBirth(context)
+    }
+  }
+  public func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy {
+    var result: PhysicsProxy
+    if self is EmptyEntity {
+      result = context.physics
+    } else {
+      result = body.onPhysicsUpdate(context)
+    }
+    result.velocity.dx += result.acceleration.dx
+    result.velocity.dy += result.acceleration.dy
+    result.position.x += result.velocity.dx
+    result.position.y += result.velocity.dy
+    result.rotation.degrees += result.torque.degrees
+    return result
+  }
+  public func onRenderBirth(_ context: RenderProxy.Context) -> RenderProxy {
+    if self is EmptyEntity {
+      return context.render
+    } else {
+      return body.onRenderBirth(context)
+    }
+  }
+  public func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy {
+    if self is EmptyEntity {
+      return context.render
+    } else {
+      return body.onRenderUpdate(context)
+    }
+  }
+}
