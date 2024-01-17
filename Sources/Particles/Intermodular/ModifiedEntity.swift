@@ -27,25 +27,25 @@ internal struct ModifiedEntity<E>: Entity where E: Entity {
     self.updateRender = onUpdateRender
   }
   func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
-    guard let data = context.data else { return body.onPhysicsBirth(context) }
+    guard let data = context.system else { return body.onPhysicsBirth(context) }
     guard let birthPhysics else { return body.onPhysicsBirth(context) }
     let newContext: PhysicsProxy.Context = .init(physics: birthPhysics(context), data: data)
     return body.onPhysicsBirth(newContext)
   }
   func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy {
-    guard let data = context.data else { return body.onPhysicsUpdate(context) }
+    guard let data = context.system else { return body.onPhysicsUpdate(context) }
     guard let updatePhysics else { return body.onPhysicsUpdate(context) }
     let newContext: PhysicsProxy.Context = .init(physics: updatePhysics(context), data: data)
     return body.onPhysicsUpdate(newContext)
   }
   func onRenderBirth(_ context: RenderProxy.Context) -> RenderProxy {
-    guard let data = context.data else { return body.onRenderBirth(context) }
+    guard let data = context.system else { return body.onRenderBirth(context) }
     guard let birthRender else { return body.onRenderBirth(context) }
     let newContext: RenderProxy.Context = .init(physics: context.physics, render: birthRender(context), data: data)
     return body.onRenderBirth(newContext)
   }
   func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy {
-    guard let data = context.data else { return body.onRenderUpdate(context) }
+    guard let data = context.system else { return body.onRenderUpdate(context) }
     guard let updateRender else { return body.onRenderUpdate(context) }
     let newContext: RenderProxy.Context = .init(physics: context.physics, render: updateRender(context), data: data)
     return body.onRenderUpdate(newContext)

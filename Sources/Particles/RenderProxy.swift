@@ -9,12 +9,19 @@ import SwiftUI
 import Foundation
 
 public struct RenderProxy: Equatable {
+  
   typealias C = Context
+  
+  // MARK: - Properties
+  
   private var _opacity: UInt8
   private var _hueRotation: UInt8
   private var _blur: UInt8
   private var _scaleX: Float16
   private var _scaleY: Float16
+  
+  // MARK: - Initializers
+  
   init() {
     self._opacity = .max
     self._hueRotation = .zero
@@ -22,14 +29,25 @@ public struct RenderProxy: Equatable {
     self._scaleX = 1
     self._scaleY = 1
   }
+  
+  // MARK: - Subtypes
+  
+  /// Context used to assist in updating the **rendering properties** of a spawned entity.
+  /// Every ``Context`` model carries properties that may be helpful in the creation of unique particle systems.
   public struct Context {
+    
+    // MARK: - Properties
+    
     var physics: PhysicsProxy
     var render: RenderProxy
-    weak var data: ParticleSystem.Data?
-    init(physics: PhysicsProxy, render: RenderProxy, data: ParticleSystem.Data) {
+    weak var system: ParticleSystem.Data?
+    
+    // MARK: - Initalizers
+    
+    init(physics: PhysicsProxy, render: RenderProxy, system: ParticleSystem.Data) {
       self.physics = physics
       self.render = render
-      self.data = data
+      self.system = system
     }
   }
 }

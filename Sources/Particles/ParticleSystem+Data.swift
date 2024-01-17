@@ -9,15 +9,24 @@ import SwiftUI
 import Foundation
 import CoreGraphics
 
-extension ParticleSystem {
-  internal class Data {
+public extension ParticleSystem {
+  
+  class Data {
+    
+    // MARK: - Stored Properties
+    
+    /// Whether this ``ParticleSystem`` is in debug mode.
+    public internal(set) var debug: Bool = false
+    /// The size of the ``ParticleSystem``, in pixels.
     public internal(set) var systemSize: CGSize = .zero
-    internal private(set) var currentFrame: UInt16 = .zero
-    internal private(set) var lastFrameUpdate: Date = .distantPast
-    internal var debug: Bool = false
-    internal var systemTime: TimeInterval {
-      return Date().timeIntervalSince(inception)
-    }
+    /// The current frame of the ``ParticleSystem``.
+    public private(set) var currentFrame: UInt16 = .zero
+    /// The date of the last frame update in the ``ParticleSystem``.
+    public private(set) var lastFrameUpdate: Date = .distantPast
+    
+    internal private(set) var nextEntityRegistry: EntityID = .zero
+    internal private(set) var nextProxyRegistry: ProxyID = .zero
+    
     private var inception: Date = Date()
     private var entities: [EntityID: any Entity] = [:]
     // ID of entity -> View to render
@@ -34,9 +43,20 @@ extension ParticleSystem {
     private var emitEntities: [EntityID: [EntityID]] = [:]
     // ID of entity contained in EntityGroup -> Group entity top-level ID
     private var entityGroups: [EntityID: EntityID] = [:]
-    internal private(set) var nextEntityRegistry: EntityID = .zero
-    internal private(set) var nextProxyRegistry: ProxyID = .zero
+    
+    // MARK: - Computed Properties
+    
+    /// The amount of time, in seconds, that has elapsed since the ``ParticleSystem`` was created.
+    public var systemTime: TimeInterval {
+      return Date().timeIntervalSince(inception)
+    }
+    
+    // MARK: - Initalizers
+    
     init() {}
+    
+    // MARK: - Methods
+    
     internal func emitChildren() {
       let proxyIDs = physicsProxies.keys
       for proxyID in proxyIDs {
@@ -55,6 +75,7 @@ extension ParticleSystem {
         }
       }
     }
+    
     internal func updatePhysics() {
       let proxyIDs = physicsProxies.keys
       for proxyID in proxyIDs {
@@ -75,6 +96,7 @@ extension ParticleSystem {
         physicsProxies[proxyID] = newPhysics
       }
     }
+    
     internal func updateRenders() {
       let proxyIDs = physicsProxies.keys
       for proxyID in proxyIDs {
@@ -87,6 +109,7 @@ extension ParticleSystem {
         renderProxies[proxyID] = newPhysics
       }
     }
+    
     internal func performRenders(_ context: inout GraphicsContext) {
       for proxyID in physicsProxies.keys {
         let render: RenderProxy? = renderProxies[proxyID]
@@ -122,6 +145,7 @@ extension ParticleSystem {
         }
       }
     }
+    
     internal func advanceFrame() {
       if self.currentFrame < .max {
         self.currentFrame += 1
@@ -130,6 +154,7 @@ extension ParticleSystem {
       }
       self.lastFrameUpdate = Date()
     }
+    
     @discardableResult
     internal func createSingle<E>(entity: E) -> [EntityID] where E: Entity {
       var result: [EntityID] = []
@@ -149,6 +174,7 @@ extension ParticleSystem {
       }
       return result
     }
+    
     internal func viewPairs() -> [(AnyView, EntityID)] {
       var result: [(AnyView, EntityID)] = []
       for (id, view) in views {
@@ -156,6 +182,7 @@ extension ParticleSystem {
       }
       return result
     }
+    
     internal func memorySummary() -> String {
       var arr: [String] = []
       arr.append("\(systemSize.width)x\(systemSize.height) | \(currentFrame)")
@@ -163,6 +190,7 @@ extension ParticleSystem {
       arr.append("\(physicsProxies.count) physics, \(renderProxies.count) renders")
       return arr.joined(separator: "\n")
     }
+    
     private func applyGroup<E>(to entity: E, group: any Entity) -> some Entity where E: Entity {
       let m = ModifiedEntity(entity: entity, onBirthPhysics: { c in
         group.onPhysicsBirth(c)
@@ -175,6 +203,7 @@ extension ParticleSystem {
       })
       return m
     }
+    
     @discardableResult
     private func create(_ id: EntityID, inherit: EntityID? = nil) -> ProxyID? {
       guard let entity = self.entities[id] else { return nil }
@@ -201,6 +230,7 @@ extension ParticleSystem {
       nextProxyRegistry += 1
       return proxyID
     }
+    
     private func register(entity: any Entity) -> EntityID {
       self.entities[nextEntityRegistry] = entity
       guard nextEntityRegistry < .max else {

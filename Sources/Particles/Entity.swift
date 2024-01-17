@@ -22,11 +22,31 @@ import Foundation
 /// }
 /// ```
 public protocol Entity {
+  
   associatedtype Body: Entity
+  
+  /// The inner content of the entity.
+  /// Inner content often holds additional modifiers to apply to ``PhysicsProxy`` or ``RenderProxy`` instances.
   var body: Self.Body { get }
+  
+  /// A method transforms a ``PhysicsProxy`` via ``PhysicsProxy/Context`` to an updated model upon the entity's **birth**.
+  /// - Parameter context: The context of the proxy, including the proxy data and surrounding ``ParticleSystem`` data.
+  /// - Returns: The updated ``PhysicsProxy`` after modifiers have been applied on birth.
   func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy
+  
+  /// A method transforms a ``PhysicsProxy`` via ``PhysicsProxy/Context`` to an updated model upon the entity's **update**.
+  /// - Parameter context: The context of the proxy, including the proxy data and surrounding ``ParticleSystem`` data.
+  /// - Returns: The updated ``PhysicsProxy`` after modifiers have been applied on update.
   func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy
+  
+  /// A method transforms a ``RenderProxy`` via ``RenderProxy/Context`` to an updated model upon the entity's **birth**.
+  /// - Parameter context: The context of the proxy, including the proxy data and surrounding ``ParticleSystem`` data.
+  /// - Returns: The updated ``RenderProxy`` after modifiers have been applied on birth.
   func onRenderBirth(_ context: RenderProxy.Context) -> RenderProxy
+  
+  /// A method transforms a ``RenderProxy`` via ``RenderProxy/Context`` to an updated model upon the entity's **update**.
+  /// - Parameter context: The context of the proxy, including the proxy data and surrounding ``ParticleSystem`` data.
+  /// - Returns: The updated ``RenderProxy`` after modifiers have been applied on update.
   func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy
 }
 

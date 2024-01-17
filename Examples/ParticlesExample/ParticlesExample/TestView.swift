@@ -11,19 +11,17 @@ import Particles
 
 struct TestView: View {
   
-  @State var x: Int = 0
+  @State var x: Int = 1
   
   var body: some View {
-    VStack {
-      Text("Test")
-      Button("\(x)", action: { x += 1 })
-      ParticleSystem {
+    ParticleSystem {
+      Emitter {
         Particle {
-          Text("Test")
+          Circle().foregroundColor(.red).frame(width: 20.0, height: 20.0)
         }
-        .initialPosition(x: 100.0, y: 100.0)
+        .initialPosition(x: 100, y: 100)
+        .initialVelocity(y: 0.5)
       }
-      .debug()
     }
   }
 }

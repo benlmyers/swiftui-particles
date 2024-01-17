@@ -9,6 +9,20 @@ import SwiftUI
 import Foundation
 
 /// A view used to display particles.
+/// A ``ParticleSystem`` can be created within views. The behavior of ``Entity`` objects, or "particles", is controlled by what is passed declaratively, like in SwiftUI:
+/// ```
+/// var body: some View {
+///   ParticleSystem {
+///     Emitter {
+///       Particle {
+///         Circle().foregroundColor(.red).frame(width: 20.0, height: 20.0)
+///       }
+///     }
+///     .initialPosition(.center)
+///     .initialVelocity(y: 0.5)
+///   }
+/// }
+/// ```
 public struct ParticleSystem: View {
   
   internal typealias EntityID = UInt8
