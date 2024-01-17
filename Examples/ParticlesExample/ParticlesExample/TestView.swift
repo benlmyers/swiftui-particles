@@ -19,9 +19,9 @@ struct TestView: View {
         Particle {
           Circle().foregroundColor(.red).frame(width: 20.0, height: 20.0)
         }
-        .initialPosition(x: 100, y: 100)
-        .initialVelocity(y: 0.5)
+        .setPosition(.center)
       }
     }
+    .debug()
   }
 }

@@ -30,20 +30,31 @@ public extension Entity {
   
   /// Sets the initial position of the entity.
   /// - Parameters:
-  ///   - x: A closure returning the x-position, in pixels, to set the entity upon creation.
+  ///   - point: A closure returning the 2D point, in pixels, to set the entity upon creation.
   ///   - y: A closure returning the y-position, in pixels, to set the entity upon creation.
   /// - Returns: The modified entity.
-  func initialPosition(
-    x: @escaping (PhysicsProxy.Context) -> CGFloat? = { _ in nil },
-    y: @escaping (PhysicsProxy.Context) -> CGFloat? = { _ in nil }
-  ) -> some Entity {
+  func initialPosition(_ point: @escaping (PhysicsProxy.Context) -> CGPoint) -> some Entity {
     ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
-      if let x = x(context) {
-        p.position.x = x
+      let point = point(context)
+      p.position.x = point.x
+      p.position.y = point.y
+      return p
+    })
+  }
+  
+  /// Sets the initial position of the entity relative to the size of its parent ``ParticleSystem``.
+  /// - Parameters:
+  ///   - point: The relative location to position the entity at birth.
+  /// - Returns: The modified entity.
+  func initialPosition(_ point: UnitPoint) -> some Entity {
+    ModifiedEntity(entity: self, onBirthPhysics: { context in
+      var p = context.physics
+      if let w = context.system?.systemSize.width {
+        p.position.x = w * point.x
       }
-      if let y = y(context) {
-        p.position.y = y
+      if let h = context.system?.systemSize.height {
+        p.position.y = h * point.y
       }
       return p
     })
@@ -106,31 +117,59 @@ public extension Entity {
     })
   }
   
-  /// Sets the constant position of the entity using the values returned by the provided closures.
+  /// Sets the position of the entity relative to the size of its parent ``ParticleSystem``.
   /// - Parameters:
-  ///   - x: A closure returning the x-position, in pixels, to set the entity's position to.
-  ///   - y: A closure returning the y-position, in pixels, to set the entity's position to.
+  ///   - point: The relative location to position the entity on update.
   /// - Returns: The modified entity.
-  func setPosition(
-    x: @escaping (PhysicsProxy.Context) -> CGFloat? = { _ in nil },
-    y: @escaping (PhysicsProxy.Context) -> CGFloat? = { _ in nil }
-  ) -> some Entity {
+  func setPosition(_ point: UnitPoint) -> some Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
-      if let x = x(context) {
-        p.position.x = x
+      guard let size = context.system?.systemSize else {
+        return p
       }
-      if let y = y(context) {
-        p.position.y = y
+      p.position.x = size.width * point.x
+      p.position.y = size.height * point.y
+      return p
+    })
+  }
+  
+  /// Sets the constant position of the entity using the values returned by the provided closures.
+  /// ⚠️ **Warning:** Be sure to specify a return type of `CGPoint` or `UnitPoint` explicitly.
+  /// - Parameters:
+  ///   - point: A closure returning the 2D point, in pixels, to set the entity's position to.
+  /// - Returns: The modified entity.
+  func setPosition(_ point: @escaping (PhysicsProxy.Context) -> CGPoint) -> some Entity {
+    ModifiedEntity(entity: self, onUpdatePhysics: { context in
+      var p = context.physics
+      let point = point(context)
+      p.position.x = point.x
+      p.position.y = point.y
+      return p
+    })
+  }
+  
+  /// Sets the position of the entity relative to the size of its parent ``ParticleSystem`` using the provided closure.
+  /// ⚠️ **Warning:** Be sure to specify a return type of `CGPoint` or `UnitPoint` explicitly.
+  /// - Parameters:
+  ///   - point: The relative location to position the entity on update.
+  /// - Returns: The modified entity.
+  func setPosition(_ point: @escaping (PhysicsProxy.Context) -> UnitPoint) -> some Entity {
+    ModifiedEntity(entity: self, onUpdatePhysics: { context in
+      var p = context.physics
+      let point = point(context)
+      guard let size = context.system?.systemSize else {
+        return p
       }
+      p.position.x = size.width * point.x
+      p.position.y = size.height * point.y
       return p
     })
   }
   
   /// Sets the initial velocity of the entity.
   /// - Parameters:
-  ///   - x: The x-velocity, in pixels per second, to set the entity upon creation. Set to `nil` for no behavior.
-  ///   - y: The y-velocity, in pixels per second, to set the entity upon creation. Set to `nil` for no behavior.
+  ///   - x: The x-velocity, in pixels per frame, to set the entity upon creation. Set to `nil` for no behavior.
+  ///   - y: The y-velocity, in pixels per frame, to set the entity upon creation. Set to `nil` for no behavior.
   /// - Returns: The modified entity.
   func initialVelocity(x: CGFloat? = nil, y: CGFloat? = nil) -> some Entity {
     ModifiedEntity(entity: self, onBirthPhysics: { context in
@@ -147,29 +186,22 @@ public extension Entity {
   
   /// Sets the initial velocity of the entity using the values returned by the provided closures.
   /// - Parameters:
-  ///   - x: A closure returning the x-velocity, in pixels per second, to set the entity upon creation.
-  ///   - y: A closure returning the y-velocity, in pixels per second, to set the entity upon creation.
+  ///   - velocity: A closure returning the 2D velocity, in pixels per frame, to set the entity upon creation.
   /// - Returns: The modified entity.
-  func initialVelocity(
-    x: @escaping (PhysicsProxy.Context) -> CGFloat? = { _ in nil },
-    y: @escaping (PhysicsProxy.Context) -> CGFloat? = { _ in nil }
-  ) -> some Entity {
+  func initialVelocity(_ velocity: @escaping (PhysicsProxy.Context) -> CGVector) -> some Entity {
     ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
-      if let x = x(context) {
-        p.velocity.dx = x
-      }
-      if let y = y(context) {
-        p.velocity.dy = y
-      }
+      let v = velocity(context)
+      p.velocity.dx = v.dx
+      p.velocity.dy = v.dy
       return p
     })
   }
   
   /// Sets the constant velocity of the entity.
   /// - Parameters:
-  ///   - x: The x-velocity, in pixels per second, to set the entity's velocity to. Set to `nil` for no behavior.
-  ///   - y: The y-velocity, in pixels per second, to set the entity's velocity to. Set to `nil` for no behavior.
+  ///   - x: The x-velocity, in pixels per frame, to set the entity's velocity to. Set to `nil` for no behavior.
+  ///   - y: The y-velocity, in pixels per frame, to set the entity's velocity to. Set to `nil` for no behavior.
   /// - Returns: The modified entity.
   func setVelocity(x: CGFloat? = nil, y: CGFloat? = nil) -> some Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
@@ -186,21 +218,14 @@ public extension Entity {
   
   /// Sets the constant velocity of the entity using the values returned by the provided closures.
   /// - Parameters:
-  ///   - x: A closure returning the x-velocity, in pixels per second, to set the entity's velocity to.
-  ///   - y: A closure returning the y-velocity, in pixels per second, to set the entity's velocity to.
+  ///   - velocity: A closure returning the 2D- velocity, in pixels per frame, to set the entity's velocity to.
   /// - Returns: The modified entity.
-  func setVelocity(
-    x: @escaping (PhysicsProxy.Context) -> CGFloat? = { _ in nil },
-    y: @escaping (PhysicsProxy.Context) -> CGFloat? = { _ in nil }
-  ) -> some Entity {
+  func setVelocity(_ velocity: @escaping (PhysicsProxy.Context) -> CGVector) -> some Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
-      if let x = x(context) {
-        p.velocity.dx = x
-      }
-      if let y = y(context) {
-        p.velocity.dy = y
-      }
+      let v = velocity(context)
+      p.velocity.dx = v.dx
+      p.velocity.dy = v.dy
       return p
     })
   }

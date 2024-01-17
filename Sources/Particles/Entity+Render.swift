@@ -69,7 +69,7 @@ public extension Entity {
   /// - Parameter size: A closure returning the size of the blur radius in pixels.
   /// - Returns: The modified entity.
   func blur(_ size: @escaping (RenderProxy.Context) -> CGFloat) -> some Entity {
-    ModifiedEntity(entity: self, onBirthRender: { context in
+    ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
       p.blur = size(context)
       return p
@@ -87,7 +87,7 @@ public extension Entity {
   /// - Parameter size: A closure returning the scaling factor to apply to both the x and y dimensions.
   /// - Returns: The modified entity.
   func scale(_ size: @escaping (RenderProxy.Context) -> CGFloat) -> some Entity {
-    ModifiedEntity(entity: self, onBirthRender: { context in
+    ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
       let s = size(context)
       p.scale.width *= s
@@ -116,21 +116,14 @@ public extension Entity {
   
   /// Scales the entity in the x and y directions by the sizes returned by the provided closures.
   /// - Parameters:
-  ///   - x: A closure returning the scaling factor to apply to the x dimension.
-  ///   - y: A closure returning the scaling factor to apply to the y dimension.
+  ///   - size: A closure returning the scaling factors to apply to the x and y dimensions.
   /// - Returns: The modified entity.
-  func scale(
-    x: @escaping (RenderProxy.Context) -> CGFloat? = { _ in nil },
-    y: @escaping (RenderProxy.Context) -> CGFloat? = { _ in nil }
-  ) -> some Entity {
-    ModifiedEntity(entity: self, onBirthRender: { context in
+  func scale(_ size: @escaping (RenderProxy.Context) -> CGSize) -> some Entity {
+    ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
-      if let x = x(context) {
-        p.scale.width *= x
-      }
-      if let y = y(context) {
-        p.scale.height *= y
-      }
+      let s = size(context)
+      p.scale.width *= s.width
+      p.scale.height *= s.height
       return p
     })
   }

@@ -1,5 +1,5 @@
 //
-//  EntityGroup.swift
+//  Group.swift
 //
 //
 //  Created by Ben Myers on 1/17/24.
@@ -8,16 +8,16 @@
 import Foundation
 
 /// A group of entities.
-/// Applying a modifier to an ``EntityGroup`` will affect all its children:
+/// Applying a modifier to an ``Group`` will affect all its children:
 /// ```
 /// // Both particles are twice as large
-/// EntityGroup {
+/// Group {
 ///   Particle { Text("☁️") }
 ///   Particle { Text("☀️") }
 /// }
 /// .scale(2.0)
 /// ```
-public struct EntityGroup: Entity {
+public struct Group: Entity {
   
   // MARK: - Properties
   public var body: EmptyEntity { .init() }
@@ -26,7 +26,7 @@ public struct EntityGroup: Entity {
   // MARK: - Initalizers
   
   public init<E>(@EntityBuilder entities: () -> E) where E: Entity {
-    if let e = entities() as? EntityGroup {
+    if let e = entities() as? Group {
       self = e
     } else {
       self.values = [.init(body: entities())]

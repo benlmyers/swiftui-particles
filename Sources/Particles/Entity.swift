@@ -105,8 +105,8 @@ extension Entity {
     }
   }
   
-  internal func underlyingGroup() -> EntityGroup? {
-    if let group = self as? EntityGroup {
+  internal func underlyingGroup() -> Group? {
+    if let group = self as? Group {
       return group
     } else if self is EmptyEntity {
       return nil

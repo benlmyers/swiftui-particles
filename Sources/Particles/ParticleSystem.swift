@@ -47,11 +47,13 @@ public struct ParticleSystem: View {
         .border(data.debug ? Color.red.opacity(0.5) : Color.clear)
         .overlay {
           HStack {
-            VStack {
-              debugView
+            if data.debug {
+              VStack {
+                debugView
+                Spacer()
+              }
               Spacer()
             }
-            Spacer()
           }
         }
       }
@@ -74,13 +76,13 @@ public struct ParticleSystem: View {
   public init<E>(@EntityBuilder entity: () -> E) where E: Entity {
     let e: E = entity()
     self.data = .init()
-    self.data.createSingle(entity: e)
+    self.data.initialEntity = e
   }
   
   // MARK: - Methods
   
   /// Enables debug mode for this particle system.
-  /// When enabled, a border is shown around the system's edges.
+  /// When enabled, a border is shown around the system's edges, and statistics are displayed.
   /// - Returns: A modified `ParticleSystem`
   public func debug() -> ParticleSystem {
     self.data.debug = true
@@ -89,6 +91,10 @@ public struct ParticleSystem: View {
   
   private func renderer(_ context: inout GraphicsContext, size: CGSize) {
     self.data.systemSize = size
+    if let initialEntity = self.data.initialEntity, data.currentFrame > 1 {
+      self.data.createSingle(entity: initialEntity)
+      self.data.initialEntity = nil
+    }
     data.updatePhysics()
     data.updateRenders()
     data.advanceFrame()

@@ -24,6 +24,7 @@ public extension ParticleSystem {
     /// The date of the last frame update in the ``ParticleSystem``.
     public private(set) var lastFrameUpdate: Date = .distantPast
     
+    internal var initialEntity: (any Entity)?
     internal private(set) var nextEntityRegistry: EntityID = .zero
     internal private(set) var nextProxyRegistry: ProxyID = .zero
     
@@ -41,7 +42,7 @@ public extension ParticleSystem {
     private var lastEmitted: [ProxyID: UInt16] = [:]
     // ID of emitter entity -> Entity IDs to create children with
     private var emitEntities: [EntityID: [EntityID]] = [:]
-    // ID of entity contained in EntityGroup -> Group entity top-level ID
+    // ID of entity contained in Group -> Group entity top-level ID
     private var entityGroups: [EntityID: EntityID] = [:]
     
     // MARK: - Computed Properties
@@ -185,9 +186,9 @@ public extension ParticleSystem {
     
     internal func memorySummary() -> String {
       var arr: [String] = []
-      arr.append("\(systemSize.width)x\(systemSize.height) | \(currentFrame)")
-      arr.append("\(entities.count) entities, \(views.count) views")
-      arr.append("\(physicsProxies.count) physics, \(renderProxies.count) renders")
+      arr.append("\(Int(systemSize.width)) x \(Int(systemSize.height)) | Frame \(currentFrame)")
+      arr.append("Proxies: \(physicsProxies.count) physics, \(renderProxies.count) renders")
+      arr.append("System: \(entities.count) entities, \(views.count) views")
       return arr.joined(separator: "\n")
     }
     
