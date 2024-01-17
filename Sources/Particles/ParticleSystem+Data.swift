@@ -104,6 +104,7 @@ public extension ParticleSystem {
           physicsProxies.removeValue(forKey: proxyID)
           renderProxies.removeValue(forKey: proxyID)
           proxyEntities.removeValue(forKey: proxyID)
+          continue
         }
         guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
         guard let entity: any Entity = entities[entityID] else { continue }
@@ -230,9 +231,11 @@ public extension ParticleSystem {
       guard let entity = self.entities[id] else { return nil }
       var physics = PhysicsProxy(currentFrame: currentFrame)
       if let inherit {
-        physics = inherit
+        physics.position = inherit.position
+        physics.rotation = inherit.rotation
+        physics.velocity = inherit.velocity
       }
-      if entity is Emitter {
+      if let _ = entity.underlyingEmitter() {
         physics.lifetime = .infinity
       }
       let context = PhysicsProxy.Context(physics: physics, system: self)

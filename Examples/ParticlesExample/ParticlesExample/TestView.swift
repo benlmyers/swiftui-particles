@@ -31,6 +31,7 @@ struct CrazyEmitter: Entity {
         Particle {
           Circle().foregroundColor(color).frame(width: 10.0, height: 10.0)
         }
+        .lifetime(0.5)
         .initialVelocity { c in
           return .init(angle: .degrees(Double(c.system.proxiesSpawned) * 8.0), magnitude: 2.0)
         }
