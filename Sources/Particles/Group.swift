@@ -20,6 +20,7 @@ import Foundation
 public struct Group: Entity {
   
   // MARK: - Properties
+  
   public var body: EmptyEntity { .init() }
   internal var values: [AnyEntity]
   

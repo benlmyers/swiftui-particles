@@ -250,21 +250,14 @@ public extension Entity {
   
   /// Sets the initial acceleration of the entity using the values returned by the provided closures.
   /// - Parameters:
-  ///   - x: A closure returning the x-acceleration, in pixels per second squared, to set the entity upon creation.
-  ///   - y: A closure returning the y-acceleration, in pixels per second squared, to set the entity upon creation.
+  ///   - acceleration: A closure returning the acceleration, in pixels per second squared, to set the entity upon creation.
   /// - Returns: The modified entity.
-  func initialAcceleration(
-    x: @escaping (PhysicsProxy.Context) -> CGFloat? = { _ in nil },
-    y: @escaping (PhysicsProxy.Context) -> CGFloat? = { _ in nil }
-  ) -> some Entity {
+  func initialAcceleration(_ acceleration: @escaping (PhysicsProxy.Context) -> CGVector) -> some Entity {
     ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
-      if let x = x(context) {
-        p.acceleration.dx = x
-      }
-      if let y = y(context) {
-        p.acceleration.dy = y
-      }
+      let a = acceleration(context)
+      p.acceleration.dx = a.dx
+      p.acceleration.dy = a.dy
       return p
     })
   }
@@ -292,18 +285,12 @@ public extension Entity {
   ///   - x: A closure returning the x-acceleration, in pixels per second squared, to set the entity's acceleration to.
   ///   - y: A closure returning the y-acceleration, in pixels per second squared, to set the entity's acceleration to.
   /// - Returns: The modified entity.
-  func setAcceleration(
-    x: @escaping (PhysicsProxy.Context) -> CGFloat? = { _ in nil },
-    y: @escaping (PhysicsProxy.Context) -> CGFloat? = { _ in nil }
-  ) -> some Entity {
+  func setAcceleration(_ acceleration: @escaping (PhysicsProxy.Context) -> CGVector) -> some Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
-      if let x = x(context) {
-        p.acceleration.dx = x
-      }
-      if let y = y(context) {
-        p.acceleration.dy = y
-      }
+      let a = acceleration(context)
+      p.acceleration.dx = a.dx
+      p.acceleration.dy = a.dy
       return p
     })
   }

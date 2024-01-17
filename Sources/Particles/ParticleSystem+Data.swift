@@ -52,6 +52,16 @@ public extension ParticleSystem {
       return Date().timeIntervalSince(inception)
     }
     
+    /// The total number of proxies alive.
+    public var proxiesAlive: Int {
+      return physicsProxies.count
+    }
+    
+    /// The total number of proxies spawned in the simulation.
+    public var proxiesSpawned: Int {
+      return Int(nextProxyRegistry)
+    }
+    
     // MARK: - Initalizers
     
     init() {}
@@ -61,7 +71,7 @@ public extension ParticleSystem {
     internal func emitChildren() {
       let proxyIDs = physicsProxies.keys
       for proxyID in proxyIDs {
-        guard let _: PhysicsProxy = physicsProxies[proxyID] else { continue }
+        guard let proxy: PhysicsProxy = physicsProxies[proxyID] else { continue }
         guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
         guard let entity: any Entity = entities[entityID] else { continue }
         guard let emitter = entity.underlyingEmitter() else { continue }
@@ -70,7 +80,12 @@ public extension ParticleSystem {
           let emitAt: UInt16 = emitted + UInt16(emitter.emitInterval * 60.0)
           guard currentFrame >= emitAt else { continue }
         }
-        for protoEntity in protoEntities {
+        var finalEntities: [EntityID] = protoEntities
+        if let chooser = emitter.emitChooser, !protoEntities.isEmpty {
+          let context = PhysicsProxy.Context(physics: proxy, system: self)
+          finalEntities = [protoEntities[chooser(context) % protoEntities.count]]
+        }
+        for protoEntity in finalEntities {
           guard let _: ProxyID = self.create(protoEntity, inherit: entityID) else { continue }
           self.lastEmitted[proxyID] = currentFrame
         }
@@ -157,19 +172,21 @@ public extension ParticleSystem {
     }
     
     @discardableResult
-    internal func createSingle<E>(entity: E) -> [EntityID] where E: Entity {
+    internal func createSingle<E>(entity: E, spawn: Bool = true) -> [EntityID] where E: Entity {
       var result: [EntityID] = []
       if let group = entity.underlyingGroup() {
         for v in group.values {
           guard let e = v.body as? any Entity else { continue }
           let modified = applyGroup(to: e, group: entity)
-          result.append(contentsOf: self.createSingle(entity: modified))
+          result.append(contentsOf: self.createSingle(entity: modified, spawn: spawn))
         }
       } else {
         let entityID: EntityID = self.register(entity: entity)
-        self.create(entityID)
+        if spawn {
+          self.create(entityID)
+        }
         if let emitter = entity.underlyingEmitter(), let e = emitter.prototype.body as? any Entity {
-          self.emitEntities[entityID] = self.createSingle(entity: e)
+          self.emitEntities[entityID] = self.createSingle(entity: e, spawn: false)
         }
         result.append(entityID)
       }

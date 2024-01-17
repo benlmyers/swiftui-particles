@@ -7,7 +7,6 @@
 
 import SwiftUI
 import Particles
-import ParticlesCore
 
 struct ContentView: View {
   

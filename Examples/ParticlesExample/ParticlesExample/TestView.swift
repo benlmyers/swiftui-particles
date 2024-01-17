@@ -6,8 +6,8 @@
 //
 
 import SwiftUI
-import Foundation
 import Particles
+import Foundation
 
 struct TestView: View {
   
@@ -15,12 +15,19 @@ struct TestView: View {
   
   var body: some View {
     ParticleSystem {
-      Emitter {
-        Particle {
-          Circle().foregroundColor(.red).frame(width: 20.0, height: 20.0)
+//      Emitter {
+        ForEach(in: [Color.red, .orange, .yellow, .green, .blue, .purple]) { color in
+          Particle {
+            Circle().foregroundColor(color).frame(width: 20.0, height: 20.0)
+          }
         }
-        .setPosition(.center)
-      }
+        .initialPosition(.center)
+        .initialVelocity { context in
+            .init(dx: .random(in: -1.0 ... 1.0), dy: .random(in: -1.0 ... 1.0))
+        }
+        .setAcceleration(y: 0.01)
+//      }
+//      .emitSingle()
     }
     .debug()
   }
