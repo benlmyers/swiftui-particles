@@ -65,17 +65,6 @@ public extension Entity {
     })
   }
   
-  /// Applies a blur effect to the entity using the value returned by the provided closure.
-  /// - Parameter size: A closure returning the size of the blur radius in pixels.
-  /// - Returns: The modified entity.
-  func blur(_ size: @escaping (RenderProxy.Context) -> CGFloat) -> some Entity {
-    ModifiedEntity(entity: self, onUpdateRender: { context in
-      var p = context.render
-      p.blur = size(context)
-      return p
-    })
-  }
-  
   /// Scales the entity by the specified size in both the x and y directions.
   /// - Parameter size: The scaling factor to apply to both the x and y dimensions.
   /// - Returns: The modified entity.
@@ -86,12 +75,12 @@ public extension Entity {
   /// Scales the entity by the size returned by the provided closure in both the x and y directions.
   /// - Parameter size: A closure returning the scaling factor to apply to both the x and y dimensions.
   /// - Returns: The modified entity.
-  func scale(_ size: @escaping (RenderProxy.Context) -> CGFloat) -> some Entity {
+  func setScale(_ size: @escaping (RenderProxy.Context) -> CGFloat) -> some Entity {
     ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
       let s = size(context)
-      p.scale.width *= s
-      p.scale.height *= s
+      p.scale.width = s
+      p.scale.height = s
       return p
     })
   }
@@ -118,12 +107,12 @@ public extension Entity {
   /// - Parameters:
   ///   - size: A closure returning the scaling factors to apply to the x and y dimensions.
   /// - Returns: The modified entity.
-  func scale(_ size: @escaping (RenderProxy.Context) -> CGSize) -> some Entity {
+  func setScale(_ size: @escaping (RenderProxy.Context) -> CGSize) -> some Entity {
     ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
       let s = size(context)
-      p.scale.width *= s.width
-      p.scale.height *= s.height
+      p.scale.width = s.width
+      p.scale.height = s.height
       return p
     })
   }

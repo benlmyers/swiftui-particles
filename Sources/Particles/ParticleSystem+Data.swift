@@ -18,7 +18,7 @@ public extension ParticleSystem {
     /// Whether this ``ParticleSystem`` is in debug mode.
     public internal(set) var debug: Bool = false
     /// The size of the ``ParticleSystem``, in pixels.
-    public internal(set) var systemSize: CGSize = .zero
+    public internal(set) var size: CGSize = .zero
     /// The current frame of the ``ParticleSystem``.
     public private(set) var currentFrame: UInt16 = .zero
     /// The date of the last frame update in the ``ParticleSystem``.
@@ -48,7 +48,7 @@ public extension ParticleSystem {
     // MARK: - Computed Properties
     
     /// The amount of time, in seconds, that has elapsed since the ``ParticleSystem`` was created.
-    public var systemTime: TimeInterval {
+    public var time: TimeInterval {
       return Date().timeIntervalSince(inception)
     }
     
@@ -139,9 +139,9 @@ public extension ParticleSystem {
         }
         guard
           physics.position.x > -20.0,
-          physics.position.x < systemSize.width + 20.0,
+          physics.position.x < size.width + 20.0,
           physics.position.y > -20.0,
-          physics.position.y < systemSize.height + 20.0
+          physics.position.y < size.height + 20.0
         else { continue }
         context.drawLayer { context in
           if let render {
@@ -207,7 +207,7 @@ public extension ParticleSystem {
     
     internal func memorySummary() -> String {
       var arr: [String] = []
-      arr.append("\(Int(systemSize.width)) x \(Int(systemSize.height)) | Frame \(currentFrame)")
+      arr.append("\(Int(size.width)) x \(Int(size.height)) | Frame \(currentFrame)")
       arr.append("Proxies: \(physicsProxies.count) physics, \(renderProxies.count) renders")
       arr.append("System: \(entities.count) entities, \(views.count) views")
       return arr.joined(separator: "\n")

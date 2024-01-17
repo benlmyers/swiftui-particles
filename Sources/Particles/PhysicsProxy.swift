@@ -46,7 +46,7 @@ public struct PhysicsProxy {
     
     // MARK: - Stored Properties
     
-    var physics: PhysicsProxy
+    public internal(set) var physics: PhysicsProxy
     
     public private(set) weak var system: ParticleSystem.Data!
     

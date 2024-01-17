@@ -90,7 +90,7 @@ public struct ParticleSystem: View {
   }
   
   private func renderer(_ context: inout GraphicsContext, size: CGSize) {
-    self.data.systemSize = size
+    self.data.size = size
     if let initialEntity = self.data.initialEntity, data.currentFrame > 1 {
       self.data.createSingle(entity: initialEntity)
       self.data.initialEntity = nil

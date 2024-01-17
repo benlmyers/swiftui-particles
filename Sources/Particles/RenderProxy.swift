@@ -38,9 +38,10 @@ public struct RenderProxy: Equatable {
     
     // MARK: - Properties
     
-    var physics: PhysicsProxy
-    var render: RenderProxy
-    weak var system: ParticleSystem.Data?
+    public internal(set) var physics: PhysicsProxy
+    public internal(set) var render: RenderProxy
+    
+    public private(set) weak var system: ParticleSystem.Data!
     
     // MARK: - Initalizers
     
@@ -61,7 +62,7 @@ public extension RenderProxy {
   var hueRotation: Angle { get {
     Angle(degrees: Double(_hueRotation) * 1.41176)
   } set {
-    _hueRotation = UInt8(floor((newValue.degrees.truncatingRemainder(dividingBy: 360.0) * 0.7083)))
+    _hueRotation = UInt8(clamping: Int(floor((newValue.degrees.truncatingRemainder(dividingBy: 360.0) * 0.7083))))
   }}
   var blur: CGFloat { get {
     CGFloat(_blur) * 3.0

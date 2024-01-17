@@ -50,10 +50,10 @@ public extension Entity {
   func initialPosition(_ point: UnitPoint) -> some Entity {
     ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
-      if let w = context.system?.systemSize.width {
+      if let w = context.system?.size.width {
         p.position.x = w * point.x
       }
-      if let h = context.system?.systemSize.height {
+      if let h = context.system?.size.height {
         p.position.y = h * point.y
       }
       return p
@@ -124,7 +124,7 @@ public extension Entity {
   func setPosition(_ point: UnitPoint) -> some Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
-      guard let size = context.system?.systemSize else {
+      guard let size = context.system?.size else {
         return p
       }
       p.position.x = size.width * point.x
@@ -157,7 +157,7 @@ public extension Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
       let point = point(context)
-      guard let size = context.system?.systemSize else {
+      guard let size = context.system?.size else {
         return p
       }
       p.position.x = size.width * point.x
