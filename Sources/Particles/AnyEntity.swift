@@ -8,8 +8,10 @@
 import Foundation
 
 public struct AnyEntity {
+  
   public var body: Any
   public typealias Body = Any
+  
   init<T>(body: T) where T: Entity {
     self.body = body
   }

@@ -15,6 +15,7 @@ struct TestView: View {
   
   var body: some View {
     VStack {
+      Text("Test")
       Button("\(x)", action: { x += 1 })
       ParticleSystem {
         Particle {

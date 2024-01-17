@@ -8,6 +8,6 @@
 import Foundation
 
 public struct EmptyEntity: Entity {
-  public var body: Never { fatalError() }
   public typealias Body = Never
+  public var body: Never { fatalError() }
 }

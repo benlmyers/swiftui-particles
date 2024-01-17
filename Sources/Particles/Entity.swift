@@ -8,9 +8,22 @@
 import SwiftUI
 import Foundation
 
+// MARK: - Protocol Definition
+
+/// A protocol used to define the behavior of objects within a ``ParticleSystem``.
+/// Like views in SwiftUI, new entity types can be defined using ``Entity/body`` conformance:
+/// ```
+/// struct MyCustomParticle: Entity {
+///   var body: some Entity {
+///     Particle { Text("☀️") }
+///       .hueRotation(.degrees(45.0))
+///       .scale({ _ in .random(in: 1.0 ... 3.0) })
+///   }
+/// }
+/// ```
 public protocol Entity {
-  var body: Self.Body { get }
   associatedtype Body: Entity
+  var body: Self.Body { get }
   func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy
   func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy
   func onRenderBirth(_ context: RenderProxy.Context) -> RenderProxy
@@ -19,7 +32,48 @@ public protocol Entity {
 
 extension Never: Entity {}
 
+// MARK: - Default Implementation
+
 extension Entity {
+  
+  public func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
+    if self is EmptyEntity {
+      return context.physics
+    } else {
+      return body.onPhysicsBirth(context)
+    }
+  }
+  
+  public func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy {
+    var result: PhysicsProxy
+    if self is EmptyEntity {
+      result = context.physics
+    } else {
+      result = body.onPhysicsUpdate(context)
+    }
+    result.velocity.dx += result.acceleration.dx
+    result.velocity.dy += result.acceleration.dy
+    result.position.x += result.velocity.dx
+    result.position.y += result.velocity.dy
+    result.rotation.degrees += result.torque.degrees
+    return result
+  }
+  
+  public func onRenderBirth(_ context: RenderProxy.Context) -> RenderProxy {
+    if self is EmptyEntity {
+      return context.render
+    } else {
+      return body.onRenderBirth(context)
+    }
+  }
+  
+  public func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy {
+    if self is EmptyEntity {
+      return context.render
+    } else {
+      return body.onRenderUpdate(context)
+    }
+  }
   
   internal func viewToRegister() -> AnyView? {
     if let particle = self as? Particle {
@@ -48,42 +102,6 @@ extension Entity {
       return nil
     } else {
       return body.underlyingEmitter()
-    }
-  }
-  
-  public func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
-    if self is EmptyEntity {
-      return context.physics
-    } else {
-      return body.onPhysicsBirth(context)
-    }
-  }
-  public func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy {
-    var result: PhysicsProxy
-    if self is EmptyEntity {
-      result = context.physics
-    } else {
-      result = body.onPhysicsUpdate(context)
-    }
-    result.velocity.dx += result.acceleration.dx
-    result.velocity.dy += result.acceleration.dy
-    result.position.x += result.velocity.dx
-    result.position.y += result.velocity.dy
-    result.rotation.degrees += result.torque.degrees
-    return result
-  }
-  public func onRenderBirth(_ context: RenderProxy.Context) -> RenderProxy {
-    if self is EmptyEntity {
-      return context.render
-    } else {
-      return body.onRenderBirth(context)
-    }
-  }
-  public func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy {
-    if self is EmptyEntity {
-      return context.render
-    } else {
-      return body.onRenderUpdate(context)
     }
   }
 }
