@@ -16,7 +16,14 @@ struct TestView: View {
   var body: some View {
     ParticleSystem {
       CrazyEmitter()
-      Fire(color: .red)
+      Emitter {
+        Fire(color: .red)
+      }
+      .initialTorque(.down)
+//      Fire(color: .red)
+      Burst {
+        Image(systemName: "star.fill").resizable().frame(width: 300.0, height: 300.0)
+      }
     }
     .debug()
   }

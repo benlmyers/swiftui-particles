@@ -124,4 +124,14 @@ extension Entity {
       return body.underlyingEmitter()
     }
   }
+  
+  internal func underlyingBurst() -> Burst? {
+    if let burst = self as? Burst {
+      return burst
+    } else if self is EmptyEntity {
+      return nil
+    } else {
+      return body.underlyingBurst()
+    }
+  }
 }
