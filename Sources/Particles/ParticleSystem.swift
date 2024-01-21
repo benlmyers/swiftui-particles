@@ -95,6 +95,7 @@ public struct ParticleSystem: View {
       self.data.createSingle(entity: initialEntity)
       self.data.initialEntity = nil
     }
+    data.destroyExpiredEntities()
     data.updatePhysics()
     data.updateRenders()
     data.advanceFrame()

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Dispatch
 import Foundation
 import CoreGraphics
 
@@ -95,7 +96,7 @@ public extension ParticleSystem {
       }
     }
     
-    internal func updatePhysics() {
+    internal func destroyExpiredEntities() {
       let proxyIDs = physicsProxies.keys
       for proxyID in proxyIDs {
         guard let proxy: PhysicsProxy = physicsProxies[proxyID] else { continue }
@@ -107,29 +108,85 @@ public extension ParticleSystem {
           physicsProxies.removeValue(forKey: proxyID)
           renderProxies.removeValue(forKey: proxyID)
           proxyEntities.removeValue(forKey: proxyID)
-          continue
+          return
         }
-        guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
-        guard let entity: any Entity = entities[entityID] else { continue }
-        let context = PhysicsProxy.Context(physics: proxy, system: self)
-        let newPhysics = entity.onPhysicsUpdate(context)
-        physicsProxies[proxyID] = newPhysics
+      }
+    }
+    
+    internal func updatePhysics() {
+      let proxyIDs = physicsProxies.keys
+      let group = DispatchGroup()
+      let queue = DispatchQueue(label: "com.benmyers.particles.physics.update", attributes: .concurrent)
+      var newPhysicsProxies: [ProxyID: PhysicsProxy] = [:]
+      var lock = NSLock()
+      for (proxyID, entityID) in proxyEntities {
+        group.enter()
+        queue.async { [weak self] in
+          guard let self else {
+            group.leave()
+            return
+          }
+          guard let proxy: PhysicsProxy = physicsProxies[proxyID] else {
+            group.leave()
+            return
+          }
+          guard let entity: any Entity = entities[entityID] else {
+            group.leave()
+            return
+          }
+          let context = PhysicsProxy.Context(physics: proxy, system: self)
+          let newPhysics = entity.onPhysicsUpdate(context)
+          lock.lock()
+          newPhysicsProxies[proxyID] = newPhysics
+          lock.unlock()
+          group.leave()
+        }
+      }
+      group.wait()
+      for (proxyID, newPhysicsProxy) in newPhysicsProxies {
+        physicsProxies[proxyID] = newPhysicsProxy
       }
     }
     
     internal func updateRenders() {
       if fps < 45 {
-        guard currentFrame % 3 == 0 else { return }
+        guard currentFrame % 10 == 0 else { return }
       }
       let proxyIDs = physicsProxies.keys
-      for proxyID in proxyIDs {
-        guard let renderProxy: RenderProxy = renderProxies[proxyID] else { continue }
-        guard let physicsProxy: PhysicsProxy = physicsProxies[proxyID] else { continue }
-        guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
-        guard let entity: any Entity = entities[entityID] else { continue }
-        let context = RenderProxy.Context(physics: physicsProxy, render: renderProxy, system: self)
-        let newPhysics = entity.onRenderUpdate(context)
-        renderProxies[proxyID] = newPhysics
+      let group = DispatchGroup()
+      let queue = DispatchQueue(label: "com.benmyers.particles.physics.update", attributes: .concurrent)
+      var newRenderProxies: [ProxyID: RenderProxy] = [:]
+      var lock = NSLock()
+      for (proxyID, entityID) in proxyEntities {
+        group.enter()
+        queue.async { [weak self] in
+          guard let self else {
+            group.leave()
+            return
+          }
+          guard let renderProxy: RenderProxy = renderProxies[proxyID] else {
+            group.leave()
+            return
+          }
+          guard let physicsProxy: PhysicsProxy = physicsProxies[proxyID] else {
+            group.leave()
+            return
+          }
+          guard let entity: any Entity = entities[entityID] else {
+            group.leave()
+            return
+          }
+          let context = RenderProxy.Context(physics: physicsProxy, render: renderProxy, system: self)
+          let newRender = entity.onRenderUpdate(context)
+          lock.lock()
+          newRenderProxies[proxyID] = newRender
+          lock.unlock()
+          group.leave()
+        }
+      }
+      group.wait()
+      for (proxyID, newRenderProxy) in newRenderProxies {
+        renderProxies[proxyID] = newRenderProxy
       }
     }
     

@@ -35,7 +35,7 @@ struct CrazyEmitter: Entity {
         .hueRotation { c in
           .degrees(c.render.hueRotation.degrees + 10)
         }
-        .lifetime(2.8)
+        .lifetime(99)
         .initialVelocity { c in
           return .init(angle: .degrees(Double(c.system.proxiesSpawned) * 8.0), magnitude: 1.0)
         }
