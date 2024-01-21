@@ -29,6 +29,9 @@ public extension ParticleSystem {
     internal private(set) var nextProxyRegistry: ProxyID = .zero
     
     private var inception: Date = Date()
+    private var last60: Date = .distantPast
+    private var fps: Double = .zero
+    
     private var entities: [EntityID: any Entity] = [:]
     // ID of entity -> View to render
     private var views: [EntityID: AnyView] = .init()
@@ -115,6 +118,9 @@ public extension ParticleSystem {
     }
     
     internal func updateRenders() {
+      if fps < 45 {
+        guard currentFrame % 3 == 0 else { return }
+      }
       let proxyIDs = physicsProxies.keys
       for proxyID in proxyIDs {
         guard let renderProxy: RenderProxy = renderProxies[proxyID] else { continue }
@@ -146,6 +152,9 @@ public extension ParticleSystem {
         context.drawLayer { context in
           if let render {
             context.opacity = render.opacity
+            if render.blendMode != .normal {
+              context.blendMode = render.blendMode
+            }
             if !render.hueRotation.degrees.isZero {
               context.addFilter(.hueRotation(render.hueRotation))
             }
@@ -162,6 +171,7 @@ public extension ParticleSystem {
             return
           }
           context.draw(resolved, at: .zero)
+//          context.stroke(.init(ellipseIn: .init(x: 0, y: 0, width: 10, height: 10)), with: .color(.red), style: .init())
         }
       }
     }
@@ -173,6 +183,11 @@ public extension ParticleSystem {
         self.currentFrame = 0
       }
       self.lastFrameUpdate = Date()
+      if self.currentFrame % 15 == 0 {
+        let fps: Double = 15.0 / Date().timeIntervalSince(self.last60)
+        self.fps = fps
+        self.last60 = Date()
+      }
     }
     
     @discardableResult
@@ -207,7 +222,7 @@ public extension ParticleSystem {
     
     internal func memorySummary() -> String {
       var arr: [String] = []
-      arr.append("\(Int(size.width)) x \(Int(size.height)) | Frame \(currentFrame)")
+      arr.append("\(Int(size.width)) x \(Int(size.height)) | Frame \(currentFrame) | \(Int(fps)) FPS")
       arr.append("Proxies: \(physicsProxies.count) physics, \(renderProxies.count) renders")
       arr.append("System: \(entities.count) entities, \(views.count) views")
       return arr.joined(separator: "\n")

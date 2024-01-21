@@ -27,7 +27,7 @@ struct CrazyEmitter: Entity {
   let colors = [Color.red, .orange, .yellow, .green, .blue, .purple, .pink, .white]
   
   var body: some Entity {
-    Emitter(interval: 0.02) {
+    Emitter(interval: 0.001) {
       ForEach(colors) { color in
         Particle {
           Circle().foregroundColor(color).frame(width: 10.0, height: 10.0)
@@ -35,7 +35,7 @@ struct CrazyEmitter: Entity {
         .hueRotation { c in
           .degrees(c.render.hueRotation.degrees + 10)
         }
-        .lifetime(0.8)
+        .lifetime(2.8)
         .initialVelocity { c in
           return .init(angle: .degrees(Double(c.system.proxiesSpawned) * 8.0), magnitude: 1.0)
         }

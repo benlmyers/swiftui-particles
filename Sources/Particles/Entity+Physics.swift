@@ -28,7 +28,7 @@ public extension Entity {
     })
   }
   
-  /// Sets the initial position of the entity.
+  /// Sets the initial position of the entity using the provided closure.
   /// - Parameters:
   ///   - point: A closure returning the 2D point, in pixels, to set the entity upon creation.
   ///   - y: A closure returning the y-position, in pixels, to set the entity upon creation.

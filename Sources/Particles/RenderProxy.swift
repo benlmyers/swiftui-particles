@@ -17,8 +17,14 @@ public struct RenderProxy: Equatable {
   private var _opacity: UInt8
   private var _hueRotation: UInt8
   private var _blur: UInt8
+  #if arch(arm64)
   private var _scaleX: Float16
   private var _scaleY: Float16
+  #else
+  private var _scaleX: Float32
+  private var _scaleY: Float32
+  #endif
+  private var _blendMode: Int32
   
   // MARK: - Initializers
   
@@ -28,6 +34,7 @@ public struct RenderProxy: Equatable {
     self._blur = .zero
     self._scaleX = 1
     self._scaleY = 1
+    self._blendMode = GraphicsContext.BlendMode.normal.rawValue
   }
   
   // MARK: - Subtypes
@@ -72,7 +79,12 @@ public extension RenderProxy {
   var scale: CGSize { get {
     CGSize(width: CGFloat(_scaleX), height: CGFloat(_scaleY))
   } set {
-    _scaleX = Float16(newValue.width)
-    _scaleY = Float16(newValue.height)
+    _scaleX = .init(newValue.width)
+    _scaleY = .init(newValue.height)
+  }}
+  var blendMode: GraphicsContext.BlendMode { get {
+    .init(rawValue: _blendMode)
+  } set {
+    _blendMode = newValue.rawValue
   }}
 }

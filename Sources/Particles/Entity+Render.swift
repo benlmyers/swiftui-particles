@@ -65,6 +65,17 @@ public extension Entity {
     })
   }
   
+  /// Applies a blending mode to the entity.
+  /// - Parameter mode: The blending mode to use.
+  /// - Returns: The modified entity.
+  func blendMode(_ mode: GraphicsContext.BlendMode) -> some Entity {
+    ModifiedEntity(entity: self, onBirthRender: { context in
+      var p = context.render
+      p.blendMode = mode
+      return p
+    })
+  }
+  
   /// Scales the entity by the specified size in both the x and y directions.
   /// - Parameter size: The scaling factor to apply to both the x and y dimensions.
   /// - Returns: The modified entity.

@@ -15,14 +15,22 @@ public struct PhysicsProxy {
   
   private var _x: UInt16
   private var _y: UInt16
+  private var _inception: UInt16
+  private var _rotation: UInt8
+  private var _torque: Int8
+  #if arch(arm64)
   private var _velX: Float16
   private var _velY: Float16
   private var _accX: Float16
   private var _accY: Float16
-  private var _rotation: UInt8
-  private var _torque: Int8
-  private var _inception: UInt16
   private var _lifetime: Float16
+  #else
+  private var _velX: Float32
+  private var _velY: Float32
+  private var _accX: Float32
+  private var _accY: Float32
+  private var _lifetime: Float32
+  #endif
   
   // MARK: - Initalizers
   init(currentFrame: UInt16) {
@@ -73,16 +81,16 @@ public extension PhysicsProxy {
   var velocity: CGVector { get {
     CGVector(dx: CGFloat(_velX), dy: CGFloat(_velY))
   } set {
-    _velX = Float16(newValue.dx)
-    _velY = Float16(newValue.dy)
+    _velX = .init(newValue.dx)
+    _velY = .init(newValue.dy)
   }}
   
   /// The acceleration of the entity, in pixels **per frame per frame**.
   var acceleration: CGVector { get {
     CGVector(dx: CGFloat(_accX), dy: CGFloat(_accY))
   } set {
-    _accX = Float16(newValue.dx)
-    _accY = Float16(newValue.dy)
+    _accX = .init(newValue.dx)
+    _accY = .init(newValue.dy)
   }}
   
   /// The rotation angle of the entity.
@@ -108,6 +116,6 @@ public extension PhysicsProxy {
   var lifetime: Double { get {
     Double(_lifetime)
   } set {
-    _lifetime = Float16(newValue)
+    _lifetime = .init(newValue)
   }}
 }
