@@ -25,6 +25,8 @@ let package = Package(
 //      dependencies: ["ParticlesCore"])
     .target(
       name: "ParticlesPresets",
-      dependencies: ["Particles"]),
+      dependencies: ["Particles"],
+      resources: [.process("Resources")]
+    ),
   ]
 )

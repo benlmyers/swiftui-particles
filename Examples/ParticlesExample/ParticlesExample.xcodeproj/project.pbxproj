@@ -12,7 +12,7 @@
 		EED626852A4990B300A3C3F4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED626842A4990B300A3C3F4 /* ContentView.swift */; };
 		EED626872A4990B500A3C3F4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EED626862A4990B500A3C3F4 /* Assets.xcassets */; };
 		EED6268B2A4990B500A3C3F4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EED6268A2A4990B500A3C3F4 /* Preview Assets.xcassets */; };
-		EEDD6D5C2B466DA000D0B421 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDD6D5B2B466DA000D0B421 /* TestView.swift */; };
+		EEE123B32B5E3F9100C43002 /* ParticlesPresets in Frameworks */ = {isa = PBXBuildFile; productRef = EEE123B22B5E3F9100C43002 /* ParticlesPresets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,7 +23,6 @@
 		EED626882A4990B500A3C3F4 /* ParticlesExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ParticlesExample.entitlements; sourceTree = "<group>"; };
 		EED6268A2A4990B500A3C3F4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		EED626922A4991B400A3C3F4 /* swiftui-particles */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "swiftui-particles"; path = ../..; sourceTree = "<group>"; };
-		EEDD6D5B2B466DA000D0B421 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +31,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EE695F0C2ACB767E002D8F5B /* Particles in Frameworks */,
+				EEE123B32B5E3F9100C43002 /* ParticlesPresets in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,7 +60,6 @@
 			isa = PBXGroup;
 			children = (
 				EED626822A4990B300A3C3F4 /* ParticlesExampleApp.swift */,
-				EEDD6D5B2B466DA000D0B421 /* TestView.swift */,
 				EED626842A4990B300A3C3F4 /* ContentView.swift */,
 				EED626862A4990B500A3C3F4 /* Assets.xcassets */,
 				EED626882A4990B500A3C3F4 /* ParticlesExample.entitlements */,
@@ -110,6 +109,7 @@
 			name = ParticlesExample;
 			packageProductDependencies = (
 				EE695F0B2ACB767E002D8F5B /* Particles */,
+				EEE123B22B5E3F9100C43002 /* ParticlesPresets */,
 			);
 			productName = ParticlesExample;
 			productReference = EED6267F2A4990B300A3C3F4 /* ParticlesExample.app */;
@@ -123,7 +123,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1520;
 				TargetAttributes = {
 					EED6267E2A4990B300A3C3F4 = {
 						CreatedOnToolsVersion = 14.3.1;
@@ -165,7 +165,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EEDD6D5C2B466DA000D0B421 /* TestView.swift in Sources */,
 				EED626852A4990B300A3C3F4 /* ContentView.swift in Sources */,
 				EED626832A4990B300A3C3F4 /* ParticlesExampleApp.swift in Sources */,
 			);
@@ -207,9 +206,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -265,9 +266,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -291,6 +294,7 @@
 				CODE_SIGN_ENTITLEMENTS = ParticlesExample/ParticlesExample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ParticlesExample/Preview Content\"";
 				DEVELOPMENT_TEAM = 32P4CZ483U;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -330,6 +334,7 @@
 				CODE_SIGN_ENTITLEMENTS = ParticlesExample/ParticlesExample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ParticlesExample/Preview Content\"";
 				DEVELOPMENT_TEAM = 32P4CZ483U;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -388,6 +393,10 @@
 		EE695F0B2ACB767E002D8F5B /* Particles */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Particles;
+		};
+		EEE123B22B5E3F9100C43002 /* ParticlesPresets */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ParticlesPresets;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

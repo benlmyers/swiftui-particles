@@ -7,13 +7,15 @@
 
 import SwiftUI
 import Particles
+import ParticlesPresets
 
 struct ContentView: View {
   
   var body: some View {
-    VStack {
-      TestView()
+    ParticleSystem {
+      Preset.Fire()
     }
+    .debug()
     .padding()
   }
 }

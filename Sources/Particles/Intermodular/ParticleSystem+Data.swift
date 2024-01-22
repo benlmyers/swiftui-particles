@@ -116,11 +116,10 @@ public extension ParticleSystem {
     }
     
     internal func updatePhysics() {
-      let proxyIDs = physicsProxies.keys
       let group = DispatchGroup()
       let queue = DispatchQueue(label: "com.benmyers.particles.physics.update", attributes: .concurrent)
       var newPhysicsProxies: [ProxyID: PhysicsProxy] = [:]
-      var lock = NSLock()
+      let lock = NSLock()
       for (proxyID, entityID) in proxyEntities {
         group.enter()
         queue.async { [weak self] in
@@ -154,11 +153,10 @@ public extension ParticleSystem {
       if fps < 45 {
         guard currentFrame % 10 == 0 else { return }
       }
-      let proxyIDs = physicsProxies.keys
       let group = DispatchGroup()
       let queue = DispatchQueue(label: "com.benmyers.particles.physics.update", attributes: .concurrent)
       var newRenderProxies: [ProxyID: RenderProxy] = [:]
-      var lock = NSLock()
+      let lock = NSLock()
       for (proxyID, entityID) in proxyEntities {
         group.enter()
         queue.async { [weak self] in
@@ -236,10 +234,13 @@ public extension ParticleSystem {
     }
     
     internal func advanceFrame() {
-      if self.currentFrame < .max {
-        self.currentFrame += 1
+      if self.currentFrame > .max - 601 {
+        self.currentFrame = 2
+        for k in self.lastEmitted.keys {
+          self.lastEmitted[k] = 0
+        }
       } else {
-        self.currentFrame = 0
+        self.currentFrame += 1
       }
       self.lastFrameUpdate = Date()
       if self.currentFrame % 15 == 0 {
@@ -251,7 +252,6 @@ public extension ParticleSystem {
     
     @discardableResult
     internal func createSingle<E>(entity: E, spawn: Bool = true) -> [EntityID] where E: Entity {
-      print("Creating single w entity reg \(self.nextEntityRegistry)")
       var result: [EntityID] = []
       if let group = entity.underlyingGroup() {
         for v in group.values {
