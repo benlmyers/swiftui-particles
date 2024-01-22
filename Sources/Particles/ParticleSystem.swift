@@ -29,9 +29,29 @@ public struct ParticleSystem: View {
   internal typealias ProxyID = UInt16
   internal typealias GroupID = UInt8
   
+  // MARK: - Static Properties
+  
+  static var data: [String: ParticleSystem.Data] = [:]
+  
   // MARK: - Stored Properties
   
-  internal var data: Self.Data
+  internal var _data: Self.Data?
+  private var _id: String?
+  
+  internal var data: Self.Data {
+    if let _data {
+      return _data
+    } else if let _id {
+      if let d = Self.data[_id] {
+        return d
+      } else {
+        Self.data[_id] = .init()
+        return Self.data[_id]!
+      }
+    } else {
+      fatalError()
+    }
+  }
   
   // MARK: - Computed Properties
   
@@ -75,8 +95,8 @@ public struct ParticleSystem: View {
   
   public init<E>(@EntityBuilder entity: () -> E) where E: Entity {
     let e: E = entity()
-    self.data = .init()
-    self.data.initialEntity = e
+    self._data = .init()
+    self._data?.initialEntity = e
   }
   
   // MARK: - Methods
@@ -89,14 +109,30 @@ public struct ParticleSystem: View {
     return self
   }
   
+  public func statePersistent(_ id: String) -> ParticleSystem {
+    var copy = self
+    copy._id = id
+    if !Self.data.contains(where: { $0.key == id }) {
+      Self.data[id] = .init()
+    }
+    Self.data[id]?.initialEntity = copy._data?.initialEntity
+    copy._data = nil
+    return copy
+  }
+  
   private func renderer(_ context: inout GraphicsContext, size: CGSize) {
     self.data.size = size
     if let initialEntity = self.data.initialEntity, data.currentFrame > 1 {
-      self.data.createSingle(entity: initialEntity)
+      if self.data.nextEntityRegistry > .zero {
+        self.data.nextEntityRegistry = .zero
+        self.data.createSingle(entity: initialEntity, spawn: false)
+      } else {
+        self.data.createSingle(entity: initialEntity, spawn: true)
+      }
       self.data.initialEntity = nil
     }
-    data.destroyExpiredEntities()
     data.updatePhysics()
+    data.destroyExpiredEntities()
     data.updateRenders()
     data.advanceFrame()
     data.emitChildren()

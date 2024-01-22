@@ -26,7 +26,7 @@ public extension ParticleSystem {
     public private(set) var lastFrameUpdate: Date = .distantPast
     
     internal var initialEntity: (any Entity)?
-    internal private(set) var nextEntityRegistry: EntityID = .zero
+    internal var nextEntityRegistry: EntityID = .zero
     internal private(set) var nextProxyRegistry: ProxyID = .zero
     
     private var inception: Date = Date()
@@ -109,6 +109,8 @@ public extension ParticleSystem {
           renderProxies.removeValue(forKey: proxyID)
           proxyEntities.removeValue(forKey: proxyID)
           return
+        } else {
+//          print("Still alive, remains \(deathFrame - Int(currentFrame))")
         }
       }
     }
@@ -249,6 +251,7 @@ public extension ParticleSystem {
     
     @discardableResult
     internal func createSingle<E>(entity: E, spawn: Bool = true) -> [EntityID] where E: Entity {
+      print("Creating single w entity reg \(self.nextEntityRegistry)")
       var result: [EntityID] = []
       if let group = entity.underlyingGroup() {
         for v in group.values {

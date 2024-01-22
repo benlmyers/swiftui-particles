@@ -14,18 +14,14 @@ struct TestView: View {
   @State var x: Int = 1
   
   var body: some View {
-    ParticleSystem {
-      CrazyEmitter()
-      Emitter {
-        Fire(color: .red)
+    VStack {
+      Button("\(x)") { x += 1 }
+      ParticleSystem {
+        CrazyEmitter(x: x)
       }
-      .initialTorque(.down)
-//      Fire(color: .red)
-      Burst {
-        Image(systemName: "star.fill").resizable().frame(width: 300.0, height: 300.0)
-      }
+      .statePersistent("1")
+      .debug()
     }
-    .debug()
   }
 }
 
@@ -33,19 +29,22 @@ struct CrazyEmitter: Entity {
   
   let colors = [Color.red, .orange, .yellow, .green, .blue, .purple, .pink, .white]
   
+  var x: Int
+  
   var body: some Entity {
-    Emitter(interval: 0.001) {
+    Emitter(interval: 0.01) {
       ForEach(colors) { color in
         Particle {
           Circle().foregroundColor(color).frame(width: 10.0, height: 10.0)
         }
-        .hueRotation { c in
-          .degrees(c.render.hueRotation.degrees + 10)
-        }
-        .lifetime(99)
+//        .hueRotation { c in
+//          .degrees(c.render.hueRotation.degrees + 10)
+//        }
+        .lifetime(0.8)
         .initialVelocity { c in
-          return .init(angle: .degrees(Double(c.system.proxiesSpawned) * 8.0), magnitude: 1.0)
+          return .init(angle: .degrees(Double(x) * 20.0), magnitude: 1.0)
         }
+        .initialAcceleration(y: 0.01)
       }
     }
     .emitSingle()
