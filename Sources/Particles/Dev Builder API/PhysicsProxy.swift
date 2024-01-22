@@ -8,7 +8,7 @@
 import SwiftUI
 import Foundation
 
-/// A proxy representing a single spawned entity's data within a ``ParticleSystem``.
+/// A proxy representing a single spawned entity's physics data within a ``ParticleSystem``.
 public struct PhysicsProxy {
   
   // MARK: - Properties

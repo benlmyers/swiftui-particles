@@ -7,7 +7,7 @@ let package = Package(
   name: "Particles",
   platforms: [.iOS(.v15), .macOS(.v12), .watchOS(.v8)],
   products: [
-//    .library(name: "ParticlesPresets", targets: ["ParticlesPresets"]),
+    .library(name: "ParticlesPresets", targets: ["ParticlesPresets"]),
 //    .library(name: "ParticlesCore", targets: ["ParticlesCore"]),
     .library(name: "Particles", targets: ["Particles"])
   ],
@@ -21,10 +21,10 @@ let package = Package(
 //    ),
     .target(
       name: "Particles"
-    )
+    ),
 //      dependencies: ["ParticlesCore"])
-//    .target(
-//      name: "ParticlesPresets",
-//      dependencies: ["ParticlesCore", "Particles"]),
+    .target(
+      name: "ParticlesPresets",
+      dependencies: ["Particles"]),
   ]
 )

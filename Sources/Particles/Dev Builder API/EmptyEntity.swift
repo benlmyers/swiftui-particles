@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// A type-erased, empty ``Entity`` used for result building.
 public struct EmptyEntity: Entity {
   public typealias Body = Never
   public var body: Never { fatalError() }

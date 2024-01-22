@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// A tyoe-erased ``Entity``.
 public struct AnyEntity {
   
   public var body: Any

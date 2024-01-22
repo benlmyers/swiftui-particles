@@ -8,6 +8,7 @@
 import SwiftUI
 import Foundation
 
+/// A proxy representing a single spawned entity's render data within a ``ParticleSystem``.
 public struct RenderProxy: Equatable {
   
   typealias C = Context
@@ -61,27 +62,37 @@ public struct RenderProxy: Equatable {
 }
 
 public extension RenderProxy {
+  
+  /// The opacity of the particle, 0.0 to 1.0.
   var opacity: Double { get {
     Double(_opacity) / Double(UInt8.max)
   } set {
     _opacity = UInt8(clamping: Int(newValue * Double(UInt8.max)))
   }}
+  
+  /// The hue rotation angle of the particle.
   var hueRotation: Angle { get {
     Angle(degrees: Double(_hueRotation) * 1.41176)
   } set {
     _hueRotation = UInt8(clamping: Int(floor((newValue.degrees.truncatingRemainder(dividingBy: 360.0) * 0.7083))))
   }}
+  
+  /// The blur of the particle.
   var blur: CGFloat { get {
     CGFloat(_blur) * 3.0
   } set {
     _blur = UInt8(clamping: Int(newValue / 3))
   }}
+  
+  /// The x- and y-scale of the particle. Default `1.0 x 1.0`.
   var scale: CGSize { get {
     CGSize(width: CGFloat(_scaleX), height: CGFloat(_scaleY))
   } set {
     _scaleX = .init(newValue.width)
     _scaleY = .init(newValue.height)
   }}
+  
+  /// The blending mode of the particle.
   var blendMode: GraphicsContext.BlendMode { get {
     .init(rawValue: _blendMode)
   } set {
