@@ -206,19 +206,20 @@ public extension ParticleSystem {
           physics.position.y > -20.0,
           physics.position.y < size.height + 20.0
         else { continue }
-        context.drawLayer { context in
-          if let render {
-            context.opacity = render.opacity
-            if render.blendMode != .normal {
-              context.blendMode = render.blendMode
-            }
-            if !render.hueRotation.degrees.isZero {
-              context.addFilter(.hueRotation(render.hueRotation))
-            }
-            if !render.blur.isZero {
-              context.addFilter(.blur(radius: render.blur))
-            }
+        if let render {
+          if render.blendMode != .normal {
+            context.blendMode = render.blendMode
           }
+          context.opacity = render.opacity
+          if !render.hueRotation.degrees.isZero {
+            context.addFilter(.hueRotation(render.hueRotation))
+          }
+          if !render.blur.isZero {
+            context.addFilter(.blur(radius: render.blur))
+          }
+        }
+        context.drawLayer { context in
+          
           context.translateBy(x: physics.position.x, y: physics.position.y)
           if let render, render.scale.width != 1.0 || render.scale.height != 1.0 {
             context.scaleBy(x: render.scale.width, y: render.scale.height)

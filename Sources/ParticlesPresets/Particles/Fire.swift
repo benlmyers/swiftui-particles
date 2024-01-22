@@ -28,11 +28,15 @@ public extension Preset {
     public var body: some Entity {
       Emitter {
         Particle {
-          Text("hi")
-//          Image(packageResource: "flame", ofType: "png")
+          Image("flame", bundle: .module)
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+            .frame(width: 40.0, height: 40.0)
         }
         .initialVelocity(y: -0.1)
         .initialPosition(.center)
+        .opacity(0.5)
+        .blendMode(.colorDodge)
       }
     }
     

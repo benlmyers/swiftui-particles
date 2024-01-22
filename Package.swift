@@ -26,7 +26,7 @@ let package = Package(
     .target(
       name: "ParticlesPresets",
       dependencies: ["Particles"],
-      resources: [.process("Resources")]
+      resources: [.process("Resources"), .process("flame2.png")]
     ),
   ]
 )
