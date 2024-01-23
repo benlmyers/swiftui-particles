@@ -98,6 +98,8 @@ extension Entity {
   internal func viewToRegister() -> AnyView? {
     if let particle = self as? Particle {
       return particle.view
+    } else if let burst = self as? Burst {
+      return burst.view
     } else if self is EmptyEntity {
       return nil
     } else {
