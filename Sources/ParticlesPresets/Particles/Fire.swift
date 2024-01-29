@@ -22,27 +22,30 @@ public extension Preset {
       )
     }
     
-    var colors: [Color]
-    var spawnWidth: CGFloat
+    var color: Color
+    var width: CGFloat
     
     public var body: some Entity {
-      Emitter {
+      Emitter(interval: 0.5) {
         Particle {
           Image("flame", bundle: .module)
             .resizable()
             .aspectRatio(contentMode: .fill)
-            .frame(width: 40.0, height: 40.0)
+            .frame(width: width, height: width)
         }
-        .initialVelocity(y: -0.1)
         .initialPosition(.center)
         .opacity(0.5)
         .blendMode(.colorDodge)
+        .onUpdate(perform: { physics, render, system in
+          physics.position.x += 0.010 * width * cos(system.time + Double(system.proxiesSpawned))
+          physics.position.y += 0.008 * width * sin(system.time + Double(system.proxiesSpawned))
+        })
       }
     }
     
-    public init(colors: [Color] = [.red, .orange, .yellow], spawnWidth: CGFloat = 5.0) {
-      self.colors = colors
-      self.spawnWidth = spawnWidth
+    public init(color: Color = .red, width: CGFloat = 40.0) {
+      self.color = color
+      self.width = width
     }
   }
 }

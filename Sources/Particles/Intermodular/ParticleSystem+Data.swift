@@ -136,7 +136,7 @@ public extension ParticleSystem {
             return
           }
           let context = PhysicsProxy.Context(physics: proxy, system: self)
-          let newPhysics = entity.onPhysicsUpdate(context)
+          let newPhysics = entity._onPhysicsUpdate(context)
           lock.lock()
           newPhysicsProxies[proxyID] = newPhysics
           lock.unlock()
@@ -177,7 +177,7 @@ public extension ParticleSystem {
             return
           }
           let context = RenderProxy.Context(physics: physicsProxy, render: renderProxy, system: self)
-          let newRender = entity.onRenderUpdate(context)
+          let newRender = entity._onRenderUpdate(context)
           lock.lock()
           newRenderProxies[proxyID] = newRender
           lock.unlock()
@@ -291,13 +291,13 @@ public extension ParticleSystem {
     
     private func applyGroup<E>(to entity: E, group: any Entity) -> some Entity where E: Entity {
       let m = ModifiedEntity(entity: entity, onBirthPhysics: { c in
-        group.onPhysicsBirth(c)
+        group._onPhysicsBirth(c)
       }, onUpdatePhysics: { c in
-        group.onPhysicsUpdate(c)
+        group._onPhysicsUpdate(c)
       }, onBirthRender: { c in
-        group.onRenderBirth(c)
+        group._onRenderBirth(c)
       }, onUpdateRender: { c in
-        group.onRenderUpdate(c)
+        group._onRenderUpdate(c)
       })
       return m
     }
@@ -315,11 +315,11 @@ public extension ParticleSystem {
         physics.lifetime = .infinity
       }
       let context = PhysicsProxy.Context(physics: physics, system: self)
-      let newPhysics = entity.onPhysicsBirth(context)
+      let newPhysics = entity._onPhysicsBirth(context)
       self.physicsProxies[nextProxyRegistry] = newPhysics
       if let _: AnyView = entity.viewToRegister() {
-        let newRender = entity.onRenderBirth(.init(physics: newPhysics, render: RenderProxy(), system: self))
-        let updateRender = entity.onRenderUpdate(.init(physics: newPhysics, render: RenderProxy(), system: self))
+        let newRender = entity._onRenderBirth(.init(physics: newPhysics, render: RenderProxy(), system: self))
+        let updateRender = entity._onRenderUpdate(.init(physics: newPhysics, render: RenderProxy(), system: self))
         if newRender != RenderProxy() || updateRender != RenderProxy() {
           self.renderProxies[nextProxyRegistry] = newRender
         }

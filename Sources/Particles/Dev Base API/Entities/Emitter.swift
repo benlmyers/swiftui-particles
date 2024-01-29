@@ -52,4 +52,12 @@ public struct Emitter: Entity {
     copy.emitChooser = nil
     return copy
   }
+  
+  /// Modifies the ``Emitter`` to spawn a specified number of entities.
+  /// Under the hood, this modifier is equivalent to `.lifetime(count * emitInterval)`.
+  /// - Parameter count: The number of entities particles that can be spawned before the emitter is to be destroyed.
+  /// - Returns: The modified entity.
+  public func maxSpawn(count: Int) -> some Entity {
+    self.lifetime(Double(count) * emitInterval)
+  }
 }
