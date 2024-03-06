@@ -11,9 +11,6 @@ import SwiftUI
 public struct Burst: Entity {
   
   internal var view: AnyView = .init(EmptyView())
-  private var color: Color
-  private var fillColor: Color
-  private var density: Int
   
   var colorRBA: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
     return color.rgba
@@ -29,8 +26,8 @@ public struct Burst: Entity {
   
   public init<V>(
     skipping backgroundColor: Color = Color.clear,
-    fillingWith fillColor: Color = Color.purple,
-    density particleDensity: Int = 1,
+    particle: (Particle) -> () = { _ in },
+    view: () -> AnyView = { AnyView(Circle().frame(width: 1, height:1)) },
     @ViewBuilder v: () -> V
   ) where V: View {
     self.color = backgroundColor
