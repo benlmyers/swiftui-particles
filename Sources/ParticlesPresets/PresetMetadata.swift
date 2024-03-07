@@ -22,4 +22,6 @@ public struct PresetMetadata {
   public var author: String
   /// A URL pointing to an image/GIF of the preset in action.
   public var previewURL: URL?
+  /// An integer representing the version number of this preset.
+  public var version: Int
 }

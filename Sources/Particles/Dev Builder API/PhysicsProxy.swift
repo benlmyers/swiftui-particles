@@ -18,6 +18,7 @@ public struct PhysicsProxy {
   private var _inception: UInt16
   private var _rotation: UInt8
   private var _torque: Int8
+  private var _randomSeed : SIMD4<UInt8>
   #if arch(arm64)
   private var _velX: Float16
   private var _velY: Float16
@@ -44,6 +45,7 @@ public struct PhysicsProxy {
     _torque = .zero
     _inception = currentFrame
     _lifetime = 5.0
+    _randomSeed = .random(in: .min ... .max)
   }
   
   // MARK: - Subtypes
@@ -118,4 +120,10 @@ public extension PhysicsProxy {
   } set {
     _lifetime = .init(newValue)
   }}
+  
+  /// Four random seeds that can be used to customize the behavior of spawned particles.
+  /// Each of the integer values contains a value 0-255.
+  var seed: (UInt8, UInt8, UInt8, UInt8) {
+    (_randomSeed.x, _randomSeed.y, _randomSeed.z, _randomSeed.w)
+  }
 }

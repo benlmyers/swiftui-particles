@@ -18,34 +18,34 @@ public extension Preset {
         name: "Fire",
         target: "ParticlesPresets",
         description: "Heat up your SwiftUI views with fire particles.",
-        author: "benlmyers"
+        author: "benlmyers",
+        version: 1
       )
     }
     
     var color: Color
-    var width: CGFloat
+    var spawnPoint: UnitPoint
+    var spawnRadius: CGSize
     
     public var body: some Entity {
-      Emitter(interval: 0.5) {
+      Emitter(interval: 0.1) {
         Particle {
-          Image("flame", bundle: .module)
+          Image("circle", bundle: .module)
             .resizable()
             .aspectRatio(contentMode: .fill)
-            .frame(width: width, height: width)
+            .frame(width: 10.0, height: 10.0)
+            .foregroundColor(.yellow)
         }
         .initialPosition(.center)
         .opacity(0.5)
-        .blendMode(.colorDodge)
-        .onUpdate(perform: { physics, render, system in
-          physics.position.x += 0.010 * width * cos(system.time + Double(system.proxiesSpawned))
-          physics.position.y += 0.008 * width * sin(system.time + Double(system.proxiesSpawned))
-        })
+        .blendMode(.screen)
       }
     }
     
-    public init(color: Color = .red, width: CGFloat = 40.0) {
+    public init(color: Color = .yellow, spawnPoint: UnitPoint = .center, spawnRadius: CGSize = .init(width: 50.0, height: 4.0)) {
       self.color = color
-      self.width = width
+      self.spawnPoint = spawnPoint
+      self.spawnRadius = spawnRadius
     }
   }
 }
