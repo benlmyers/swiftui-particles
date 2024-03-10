@@ -115,7 +115,7 @@ public extension Entity {
   ///   - xIn: The x-range, in pixels, to offset the initial x-position by. Set to `nil` for no behavior.
   ///   - yIn: The y-range, in pixels, to offset the initial y-position by. Set to `nil` for no behavior.
   /// - Returns: The modified entity.
-  func initialOffset(xIn: ClosedRange<CGFloat>, yIn: ClosedRange<CGFloat>) -> some Entity {
+  func initialOffset(xIn: ClosedRange<CGFloat> = .zero ... .zero, yIn: ClosedRange<CGFloat> = .zero ... .zero) -> some Entity {
     initialOffset { _ in
       return .random(in: xIn)
     } withY: { _ in

@@ -45,7 +45,7 @@ public extension Entity {
   /// - Parameter angle: The angle of rotation in hue space.
   /// - Returns: The modified entity.
   func hueRotation(_ angle: Angle) -> some Entity {
-    ModifiedEntity(entity: self, onUpdateRender: { context in
+    ModifiedEntity(entity: self, onBirthRender: { context in
       var p = context.render
       p.hueRotation = angle
       return p
@@ -58,7 +58,8 @@ public extension Entity {
   func hueRotation(_ withAngle: @escaping (RenderProxy.Context) -> Angle) -> some Entity {
     ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
-      p.hueRotation = withAngle(context)
+      let hr = withAngle(context)
+      p.hueRotation = hr
       return p
     })
   }
@@ -67,9 +68,12 @@ public extension Entity {
   /// - Parameter angle: The angle of rotation in hue space.
   /// - Returns: The modified entity.
   func hueRotation(angleIn: ClosedRange<Angle>) -> some Entity {
-    hueRotation { _ in
-        .random(degreesIn: min(angleIn.lowerBound.degrees, angleIn.upperBound.degrees) ... max(angleIn.upperBound.degrees, angleIn.lowerBound.degrees))
-    }
+    ModifiedEntity(entity: self, onBirthRender: { context in
+      var p = context.render
+      let hr = Angle.random(degreesIn: min(angleIn.lowerBound.degrees, angleIn.upperBound.degrees) ... max(angleIn.upperBound.degrees, angleIn.lowerBound.degrees))
+      p.hueRotation = hr
+      return p
+    })
   }
   
   /// Applies a blur effect to the entity.

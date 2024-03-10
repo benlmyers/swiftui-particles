@@ -28,17 +28,19 @@ public extension Preset {
     var spawnRadius: CGSize
     
     public var body: some Entity {
-      Emitter(interval: 0.1) {
+      Emitter(interval: 0.01) {
         Particle {
-          Image("circle", bundle: .module)
-            .resizable()
-            .aspectRatio(contentMode: .fill)
-            .frame(width: 10.0, height: 10.0)
-            .foregroundColor(.yellow)
+          RadialGradient(colors: [.yellow, .clear], center: .center, startRadius: 2.0, endRadius: 12.0)
+            .clipShape(Circle())
+            .frame(width: 40.0, height: 40.0)
         }
         .initialPosition(.center)
+        .hueRotation(.degrees(0))
+        .initialOffset(xIn: -spawnRadius.width/2 ... spawnRadius.width/2, yIn: -spawnRadius.height/2 ... spawnRadius.height/2)
+        .initialVelocity(xIn: -0.8 ... 0.8, yIn: -1.0 ... 0.5)
+        .fixAcceleration(y: -0.01)
         .opacity(0.5)
-        .blendMode(.screen)
+        .blendMode(.exclusion)
       }
     }
     

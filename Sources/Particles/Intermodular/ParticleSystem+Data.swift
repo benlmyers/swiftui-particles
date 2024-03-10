@@ -206,30 +206,34 @@ public extension ParticleSystem {
           physics.position.y > -20.0,
           physics.position.y < size.height + 20.0
         else { continue }
-        if let render {
-          if render.blendMode != .normal {
-            context.blendMode = render.blendMode
-          }
-          context.opacity = render.opacity
-          if !render.hueRotation.degrees.isZero {
-            context.addFilter(.hueRotation(render.hueRotation))
-          }
-          if !render.blur.isZero {
-            context.addFilter(.blur(radius: render.blur))
-          }
+        if let render, render.blendMode != .normal {
+          context.blendMode = render.blendMode
         }
         context.drawLayer { context in
+          if let render {
+            context.opacity = render.opacity
+            if !render.hueRotation.degrees.isZero {
+              context.addFilter(.hueRotation(render.hueRotation))
+            }
+            if !render.blur.isZero {
+              context.addFilter(.blur(radius: render.blur))
+            }
+          }
           
-          context.translateBy(x: physics.position.x, y: physics.position.y)
-          if let render, render.scale.width != 1.0 || render.scale.height != 1.0 {
-            context.scaleBy(x: render.scale.width, y: render.scale.height)
+          context.drawLayer { context in
+            
+            context.translateBy(x: physics.position.x, y: physics.position.y)
+            if let render, render.scale.width != 1.0 || render.scale.height != 1.0 {
+              context.scaleBy(x: render.scale.width, y: render.scale.height)
+            }
+            context.rotate(by: physics.rotation)
+            guard let resolved = context.resolveSymbol(id: entityID) else {
+              return
+            }
+            
+            context.draw(resolved, at: .zero)
+            //          context.stroke(.init(ellipseIn: .init(x: 0, y: 0, width: 10, height: 10)), with: .color(.red), style: .init())
           }
-          context.rotate(by: physics.rotation)
-          guard let resolved = context.resolveSymbol(id: entityID) else {
-            return
-          }
-          context.draw(resolved, at: .zero)
-//          context.stroke(.init(ellipseIn: .init(x: 0, y: 0, width: 10, height: 10)), with: .color(.red), style: .init())
         }
       }
     }
