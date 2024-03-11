@@ -28,19 +28,23 @@ public extension Preset {
     var spawnRadius: CGSize
     
     public var body: some Entity {
-      Emitter(interval: 0.01) {
+      Emitter(interval: 0.005) {
         Particle {
-          RadialGradient(colors: [.yellow, .clear], center: .center, startRadius: 2.0, endRadius: 12.0)
+          RadialGradient(colors: [.red, .clear], center: .center, startRadius: 2.0, endRadius: 12.0)
             .clipShape(Circle())
-            .frame(width: 40.0, height: 40.0)
+            .frame(width: 70.0, height: 70.0)
         }
         .initialPosition(.center)
-        .hueRotation(.degrees(0))
+        .hueRotation(angleIn: .degrees(0.0) ... .degrees(50.0))
+        .initialTorque(angleIn: .degrees(0.0) ... .degrees(8))
+        .scale({ c in
+          return .init(width: 1.0 + 0.05 * sin(0.1 * Double(c.physics.seed.0) * c.system.time + Double(c.physics.seed.1)), height: 1.0 + 0.05 * cos(0.1 * Double(c.physics.seed.2) * c.system.time + Double(c.physics.seed.3)))
+        })
         .initialOffset(xIn: -spawnRadius.width/2 ... spawnRadius.width/2, yIn: -spawnRadius.height/2 ... spawnRadius.height/2)
-        .initialVelocity(xIn: -0.8 ... 0.8, yIn: -1.0 ... 0.5)
+        .initialVelocity(xIn: -0.2 ... 0.2, yIn: -0.3 ... 0.3)
         .fixAcceleration(y: -0.01)
-        .opacity(0.5)
-        .blendMode(.exclusion)
+        .opacity(0.8)
+        .blendMode(.hardLight)
       }
     }
     

@@ -191,48 +191,55 @@ public extension ParticleSystem {
     }
     
     internal func performRenders(_ context: inout GraphicsContext) {
-      for proxyID in physicsProxies.keys {
-        let render: RenderProxy? = renderProxies[proxyID]
-        guard let physics: PhysicsProxy = physicsProxies[proxyID] else { continue }
-        guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
-        if views[entityID] == nil {
-          guard let entity: any Entity = entities[entityID] else { continue }
-          guard let view: AnyView = entity.viewToRegister() else { continue }
-          views[entityID] = view
-        }
-        guard
-          physics.position.x > -20.0,
-          physics.position.x < size.width + 20.0,
-          physics.position.y > -20.0,
-          physics.position.y < size.height + 20.0
-        else { continue }
-        if let render, render.blendMode != .normal {
-          context.blendMode = render.blendMode
-        }
-        context.drawLayer { context in
-          if let render {
-            context.opacity = render.opacity
-            if !render.hueRotation.degrees.isZero {
-              context.addFilter(.hueRotation(render.hueRotation))
-            }
-            if !render.blur.isZero {
-              context.addFilter(.blur(radius: render.blur))
-            }
+      
+      context.drawLayer { context in
+        let rect = CGRect(origin: .zero, size: size)
+        for proxyID in physicsProxies.keys {
+          let render: RenderProxy? = renderProxies[proxyID]
+          guard let physics: PhysicsProxy = physicsProxies[proxyID] else { continue }
+          guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
+          if views[entityID] == nil {
+            guard let entity: any Entity = entities[entityID] else { continue }
+            guard let view: AnyView = entity.viewToRegister() else { continue }
+            views[entityID] = view
           }
-          
+          guard
+            physics.position.x > -20.0,
+            physics.position.x < size.width + 20.0,
+            physics.position.y > -20.0,
+            physics.position.y < size.height + 20.0
+          else { continue }
+          if let render, render.blendMode != .normal {
+            context.blendMode = render.blendMode
+          }
+          if let render, render.opacity.isZero == true {
+            context.opacity = render.opacity
+          }
           context.drawLayer { context in
-            
-            context.translateBy(x: physics.position.x, y: physics.position.y)
-            if let render, render.scale.width != 1.0 || render.scale.height != 1.0 {
-              context.scaleBy(x: render.scale.width, y: render.scale.height)
+            if let render {
+              
+              if !render.hueRotation.degrees.isZero {
+                context.addFilter(.hueRotation(render.hueRotation))
+              }
+              if !render.blur.isZero {
+                context.addFilter(.blur(radius: render.blur))
+              }
             }
-            context.rotate(by: physics.rotation)
-            guard let resolved = context.resolveSymbol(id: entityID) else {
-              return
-            }
             
-            context.draw(resolved, at: .zero)
-            //          context.stroke(.init(ellipseIn: .init(x: 0, y: 0, width: 10, height: 10)), with: .color(.red), style: .init())
+            context.drawLayer { context in
+              
+              context.translateBy(x: physics.position.x, y: physics.position.y)
+              if let render, render.scale.width != 1.0 || render.scale.height != 1.0 {
+                context.scaleBy(x: render.scale.width, y: render.scale.height)
+              }
+              context.rotate(by: physics.rotation)
+              guard let resolved = context.resolveSymbol(id: entityID) else {
+                return
+              }
+              
+              context.draw(resolved, at: .zero)
+              //          context.stroke(.init(ellipseIn: .init(x: 0, y: 0, width: 10, height: 10)), with: .color(.red), style: .init())
+            }
           }
         }
       }
