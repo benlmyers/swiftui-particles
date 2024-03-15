@@ -13,7 +13,16 @@ struct ContentView: View {
   
   var body: some View {
     ParticleSystem {
-      Preset.Fire()
+//      Preset.Fire()
+      Emitter {
+        Particle {
+          Circle().frame(width: 30.0, height: 30.0).foregroundStyle(.red)
+        }
+        .initialPosition(.center)
+        .initialVelocity(y: 0.3)
+        .transition(.opacity)
+        .lifetime(3)
+      }
     }
     .debug()
     .background(Color.black)

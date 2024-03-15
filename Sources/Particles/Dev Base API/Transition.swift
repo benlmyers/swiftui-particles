@@ -5,14 +5,15 @@
 //  Created by Ben Myers on 3/14/24.
 //
 
+import SwiftUI
 import Foundation
 
 public protocol Transition {
-  func withPhysics(_ context: PhysicsProxy.Context, frames: Int, untilEndOf bound: TransitionBound) -> PhysicsProxy
-  func withRender(_ context: RenderProxy.Context, frames: Int, untilEndOf bound: TransitionBound) -> RenderProxy
+  func modifyRender(progress: Double, context: inout GraphicsContext)
 }
 
-public enum TransitionBound {
+public enum TransitionBounds {
   case birth
   case death
+  case birthAndDeath
 }

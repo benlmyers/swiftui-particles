@@ -134,4 +134,14 @@ extension Entity {
       return body.underlyingBurst()
     }
   }
+  
+  internal func underlyingTransition() -> (AnyTransition, TransitionBounds, Double)? {
+    if let e = self as? TransitionEntity<Body> {
+      return (e.transition, e.bounds, e.duration)
+    } else if self is EmptyEntity {
+      return nil
+    } else {
+      return body.underlyingTransition()
+    }
+  }
 }

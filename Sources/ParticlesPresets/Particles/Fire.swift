@@ -34,7 +34,7 @@ public extension Preset {
             .clipShape(Circle())
             .frame(width: 70.0, height: 70.0)
         }
-        .transition(.opacity, onDeath: true)
+        .transition(.opacity)
         .initialPosition(.center)
         .hueRotation(angleIn: .degrees(0.0) ... .degrees(50.0))
         .initialTorque(angleIn: .degrees(0.0) ... .degrees(8))

@@ -202,8 +202,8 @@ public extension ParticleSystem {
           let render: RenderProxy? = renderProxies[proxyID]
           guard let physics: PhysicsProxy = physicsProxies[proxyID] else { continue }
           guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
+          guard let entity: any Entity = entities[entityID] else { continue }
           if views[entityID] == nil {
-            guard let entity: any Entity = entities[entityID] else { continue }
             guard let view: AnyView = entity.viewToRegister() else { continue }
             views[entityID] = view
           }
@@ -227,6 +227,13 @@ public extension ParticleSystem {
               if !render.blur.isZero {
                 context.addFilter(.blur(radius: render.blur))
               }
+            }
+            if let (transition, bounds, duration) = entity.underlyingTransition() {
+              let c = PhysicsProxy.Context(physics: physics, system: self)
+              transition.modifyRender(
+                getTransitionProgress(bounds: bounds, duration: duration, context: c),
+                &context
+              )
             }
             context.drawLayer { context in
               context.translateBy(x: physics.position.x, y: physics.position.y)
@@ -348,6 +355,21 @@ public extension ParticleSystem {
       let id = nextEntityRegistry
       nextEntityRegistry += 1
       return id
+    }
+    
+    private func getTransitionProgress(bounds: TransitionBounds, duration: TimeInterval, context: PhysicsProxy.Context) -> Double {
+      switch bounds {
+      case .birth:
+        return 1 - min(max(context.timeAlive / duration, 0.0), 1.0)
+      case .death:
+        return min(max((context.timeAlive - context.physics.lifetime + duration) / duration, 0.0), 1.0)
+      case .birthAndDeath:
+        if context.timeAlive < context.physics.lifetime / 2.0 {
+          return getTransitionProgress(bounds: .birth, duration: duration, context: context)
+        } else {
+          return getTransitionProgress(bounds: .death, duration: duration, context: context)
+        }
+      }
     }
   }
 }
