@@ -15,7 +15,7 @@ public struct RenderProxy: Equatable {
   
   // MARK: - Properties
   
-  private var _opacity: UInt8
+  private var _opacity: UInt16
   private var _hueRotation: UInt8
   private var _blur: UInt8
   #if arch(arm64)
@@ -65,9 +65,9 @@ public extension RenderProxy {
   
   /// The opacity of the particle, 0.0 to 1.0.
   var opacity: Double { get {
-    Double(_opacity) / Double(UInt8.max)
+    Double(_opacity) / Double(UInt16.max)
   } set {
-    _opacity = UInt8(clamping: Int(newValue * Double(UInt8.max)))
+    _opacity = UInt16(clamping: Int(newValue * Double(UInt16.max)))
   }}
   
   /// The hue rotation angle of the particle.

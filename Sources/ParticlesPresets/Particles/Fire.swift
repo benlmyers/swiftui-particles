@@ -34,6 +34,7 @@ public extension Preset {
             .clipShape(Circle())
             .frame(width: 70.0, height: 70.0)
         }
+        .transition(.opacity, onDeath: true)
         .initialPosition(.center)
         .hueRotation(angleIn: .degrees(0.0) ... .degrees(50.0))
         .initialTorque(angleIn: .degrees(0.0) ... .degrees(8))
@@ -43,8 +44,8 @@ public extension Preset {
         .initialOffset(xIn: -spawnRadius.width/2 ... spawnRadius.width/2, yIn: -spawnRadius.height/2 ... spawnRadius.height/2)
         .initialVelocity(xIn: -0.2 ... 0.2, yIn: -0.3 ... 0.3)
         .fixAcceleration(y: -0.01)
-        .opacity(0.8)
-        .blendMode(.hardLight)
+        .lifetime(in: 1.0 ... 2.0)
+        .blendMode(.plusLighter)
       }
     }
     

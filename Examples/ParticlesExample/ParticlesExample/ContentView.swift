@@ -15,6 +15,7 @@ struct ContentView: View {
     ParticleSystem {
       Preset.Fire()
     }
+    .debug()
     .background(Color.black)
   }
 }

@@ -23,6 +23,14 @@ public extension Angle {
     return degrees == 0.0
   }
   
+  static func += (left: inout Angle, right: Angle) {
+    left = Angle(degrees: left.degrees + right.degrees)
+  }
+  
+  static func -= (left: inout Angle, right: Angle) {
+    left = Angle(degrees: left.degrees - right.degrees)
+  }
+  
   /// Returns a random angle.
   /// - Returns: A randomly generated angle.
   static func random() -> Angle {

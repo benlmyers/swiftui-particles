@@ -34,7 +34,7 @@ public struct PhysicsProxy {
   #endif
   
   // MARK: - Initalizers
-  init(currentFrame: UInt16) {
+  init(currentFrame: Int) {
     _x = .zero
     _y = .zero
     _velX = .zero
@@ -43,7 +43,7 @@ public struct PhysicsProxy {
     _accY = .zero
     _rotation = .zero
     _torque = .zero
-    _inception = currentFrame
+    _inception = UInt16(currentFrame % Int(UInt16.max))
     _lifetime = 5.0
     _randomSeed = .random(in: .min ... .max)
   }
@@ -59,6 +59,12 @@ public struct PhysicsProxy {
     public internal(set) var physics: PhysicsProxy
     
     public private(set) weak var system: ParticleSystem.Data!
+    
+    // MARK: - Computed Properties
+    
+    public var timeAlive: TimeInterval {
+      return (Double(system.currentFrame) - Double(physics.inception)) / Double(system.averageFrameRate)
+    }
     
     // MARK: - Initalizers
     
