@@ -32,22 +32,22 @@ public protocol Entity {
   /// A method transforms a ``PhysicsProxy`` via ``PhysicsProxy/Context`` to an updated model upon the entity's **birth**.
   /// - Parameter context: The context of the proxy, including the proxy data and surrounding ``ParticleSystem`` data.
   /// - Returns: The updated ``PhysicsProxy`` after modifiers have been applied on birth.
-  func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy
+  func _onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy
   
   /// A method transforms a ``PhysicsProxy`` via ``PhysicsProxy/Context`` to an updated model upon the entity's **update**.
   /// - Parameter context: The context of the proxy, including the proxy data and surrounding ``ParticleSystem`` data.
   /// - Returns: The updated ``PhysicsProxy`` after modifiers have been applied on update.
-  func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy
+  func _onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy
   
   /// A method transforms a ``RenderProxy`` via ``RenderProxy/Context`` to an updated model upon the entity's **birth**.
   /// - Parameter context: The context of the proxy, including the proxy data and surrounding ``ParticleSystem`` data.
   /// - Returns: The updated ``RenderProxy`` after modifiers have been applied on birth.
-  func onRenderBirth(_ context: RenderProxy.Context) -> RenderProxy
+  func _onRenderBirth(_ context: RenderProxy.Context) -> RenderProxy
   
   /// A method transforms a ``RenderProxy`` via ``RenderProxy/Context`` to an updated model upon the entity's **update**.
   /// - Parameter context: The context of the proxy, including the proxy data and surrounding ``ParticleSystem`` data.
   /// - Returns: The updated ``RenderProxy`` after modifiers have been applied on update.
-  func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy
+  func _onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy
 }
 
 extension Never: Entity {}
@@ -56,20 +56,20 @@ extension Never: Entity {}
 
 extension Entity {
   
-  public func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
+  public func _onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
     if self is EmptyEntity {
       return context.physics
     } else {
-      return body.onPhysicsBirth(context)
+      return body._onPhysicsBirth(context)
     }
   }
   
-  public func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy {
+  public func _onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy {
     var result: PhysicsProxy
     if self is EmptyEntity {
       result = context.physics
     } else {
-      result = body.onPhysicsUpdate(context)
+      result = body._onPhysicsUpdate(context)
     }
     result.velocity.dx += result.acceleration.dx
     result.velocity.dy += result.acceleration.dy
@@ -79,19 +79,19 @@ extension Entity {
     return result
   }
   
-  public func onRenderBirth(_ context: RenderProxy.Context) -> RenderProxy {
+  public func _onRenderBirth(_ context: RenderProxy.Context) -> RenderProxy {
     if self is EmptyEntity {
       return context.render
     } else {
-      return body.onRenderBirth(context)
+      return body._onRenderBirth(context)
     }
   }
   
-  public func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy {
+  public func _onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy {
     if self is EmptyEntity {
       return context.render
     } else {
-      return body.onRenderUpdate(context)
+      return body._onRenderUpdate(context)
     }
   }
   
@@ -134,6 +134,16 @@ extension Entity {
       return nil
     } else {
       return body.underlyingBurst()
+    }
+  }
+  
+  internal func underlyingTransition() -> (AnyTransition, TransitionBounds, Double)? {
+    if let e = self as? TransitionEntity<Body> {
+      return (e.transition, e.bounds, e.duration)
+    } else if self is EmptyEntity {
+      return nil
+    } else {
+      return body.underlyingTransition()
     }
   }
 }

@@ -22,21 +22,30 @@ public extension Entity {
   }
   
   /// Adjusts the opacity of the entity using the value returned by the provided closure.
-  /// - Parameter value: A closure returning the opacity value to multiply the current opacity by.
+  /// - Parameter withValue: A closure returning the opacity value to multiply the current opacity by.
   /// - Returns: The modified entity.
-  func opacity(_ value: @escaping (RenderProxy.Context) -> Double) -> some Entity {
+  func opacity(_ withValue: @escaping (RenderProxy.Context) -> Double) -> some Entity {
     ModifiedEntity(entity: self, onBirthRender: { context in
       var p = context.render
-      p.opacity *= value(context)
+      p.opacity *= withValue(context)
       return p
     })
+  }
+  
+  /// Adjusts the opacity of the entity randomly.
+  /// - Parameter value: The range to randomly choose an opacity value to multiply the current opacity by.
+  /// - Returns: The modified entity.
+  func opacity(in range: ClosedRange<Double>) -> some Entity {
+    opacity { _ in
+        .random(in: range)
+    }
   }
   
   /// Applies a hue rotation to the entity.
   /// - Parameter angle: The angle of rotation in hue space.
   /// - Returns: The modified entity.
   func hueRotation(_ angle: Angle) -> some Entity {
-    ModifiedEntity(entity: self, onUpdateRender: { context in
+    ModifiedEntity(entity: self, onBirthRender: { context in
       var p = context.render
       p.hueRotation = angle
       return p
@@ -44,12 +53,25 @@ public extension Entity {
   }
   
   /// Applies a hue rotation to the entity using the value returned by the provided closure.
-  /// - Parameter angle: A closure returning the angle of rotation in hue space.
+  /// - Parameter withAngle: A closure returning the angle of rotation in hue space.
   /// - Returns: The modified entity.
-  func hueRotation(_ angle: @escaping (RenderProxy.Context) -> Angle) -> some Entity {
+  func hueRotation(_ withAngle: @escaping (RenderProxy.Context) -> Angle) -> some Entity {
     ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
-      p.hueRotation = angle(context)
+      let hr = withAngle(context)
+      p.hueRotation = hr
+      return p
+    })
+  }
+  
+  /// Applies a hue rotation to the entity.
+  /// - Parameter angle: The angle of rotation in hue space.
+  /// - Returns: The modified entity.
+  func hueRotation(angleIn: ClosedRange<Angle>) -> some Entity {
+    ModifiedEntity(entity: self, onBirthRender: { context in
+      var p = context.render
+      let hr = Angle.random(degreesIn: min(angleIn.lowerBound.degrees, angleIn.upperBound.degrees) ... max(angleIn.upperBound.degrees, angleIn.lowerBound.degrees))
+      p.hueRotation = hr
       return p
     })
   }
@@ -76,26 +98,6 @@ public extension Entity {
     })
   }
   
-  /// Scales the entity by the specified size in both the x and y directions.
-  /// - Parameter size: The scaling factor to apply to both the x and y dimensions.
-  /// - Returns: The modified entity.
-  func scale(_ size: CGFloat) -> some Entity {
-    self.scale(x: size, y: size)
-  }
-  
-  /// Scales the entity by the size returned by the provided closure in both the x and y directions.
-  /// - Parameter size: A closure returning the scaling factor to apply to both the x and y dimensions.
-  /// - Returns: The modified entity.
-  func setScale(_ size: @escaping (RenderProxy.Context) -> CGFloat) -> some Entity {
-    ModifiedEntity(entity: self, onUpdateRender: { context in
-      var p = context.render
-      let s = size(context)
-      p.scale.width = s
-      p.scale.height = s
-      return p
-    })
-  }
-  
   /// Scales the entity in the x and y directions by the specified sizes.
   /// - Parameters:
   ///   - x: The scaling factor to apply to the x dimension. Set to `nil` for no behavior.
@@ -114,14 +116,34 @@ public extension Entity {
     })
   }
   
-  /// Scales the entity in the x and y directions by the sizes returned by the provided closures.
-  /// - Parameters:
-  ///   - size: A closure returning the scaling factors to apply to the x and y dimensions.
+  /// Scales the entity by the specified size in both the x and y directions.
+  /// - Parameter size: The scaling factor to apply to both the x and y dimensions.
   /// - Returns: The modified entity.
-  func setScale(_ size: @escaping (RenderProxy.Context) -> CGSize) -> some Entity {
+  func scale(_ factor: CGFloat) -> some Entity {
+    self.scale(x: factor, y: factor)
+  }
+  
+  /// Scales the entity by the size returned by the provided closure in both the x and y directions.
+  /// - Parameter withSize: A closure returning the scaling factor to apply to both the x and y dimensions.
+  /// - Returns: The modified entity.
+  func scale(_ withFactor: @escaping (RenderProxy.Context) -> CGFloat) -> some Entity {
     ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
-      let s = size(context)
+      let s = withFactor(context)
+      p.scale.width = s
+      p.scale.height = s
+      return p
+    })
+  }
+  
+  /// Scales the entity in the x and y directions by the sizes returned by the provided closures.
+  /// - Parameters:
+  ///   - withSize: A closure returning the scaling factors to apply to the x and y dimensions.
+  /// - Returns: The modified entity.
+  func scale(_ withSize: @escaping (RenderProxy.Context) -> CGSize) -> some Entity {
+    ModifiedEntity(entity: self, onUpdateRender: { context in
+      var p = context.render
+      let s = withSize(context)
       p.scale.width = s.width
       p.scale.height = s.height
       return p

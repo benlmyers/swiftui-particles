@@ -18,6 +18,7 @@ public struct PhysicsProxy {
   private var _inception: UInt16
   private var _rotation: UInt8
   private var _torque: Int8
+  private var _randomSeed : SIMD4<UInt8>
   #if arch(arm64)
   private var _velX: Float16
   private var _velY: Float16
@@ -33,7 +34,7 @@ public struct PhysicsProxy {
   #endif
   
   // MARK: - Initalizers
-  init(currentFrame: UInt16) {
+  init(currentFrame: Int) {
     _x = .zero
     _y = .zero
     _velX = .zero
@@ -42,8 +43,9 @@ public struct PhysicsProxy {
     _accY = .zero
     _rotation = .zero
     _torque = .zero
-    _inception = currentFrame
+    _inception = UInt16(currentFrame % Int(UInt16.max))
     _lifetime = 5.0
+    _randomSeed = .random(in: .min ... .max)
   }
   
   // MARK: - Subtypes
@@ -57,6 +59,12 @@ public struct PhysicsProxy {
     public internal(set) var physics: PhysicsProxy
     
     public private(set) weak var system: ParticleSystem.Data!
+    
+    // MARK: - Computed Properties
+    
+    public var timeAlive: TimeInterval {
+      return (Double(system.currentFrame) - Double(physics.inception)) / Double(system.averageFrameRate)
+    }
     
     // MARK: - Initalizers
     
@@ -118,4 +126,10 @@ public extension PhysicsProxy {
   } set {
     _lifetime = .init(newValue)
   }}
+  
+  /// Four random seeds that can be used to customize the behavior of spawned particles.
+  /// Each of the integer values contains a value 0-255.
+  var seed: (UInt8, UInt8, UInt8, UInt8) {
+    (_randomSeed.x, _randomSeed.y, _randomSeed.z, _randomSeed.w)
+  }
 }
