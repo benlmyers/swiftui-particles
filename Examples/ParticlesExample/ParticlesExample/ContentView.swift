@@ -13,16 +13,12 @@ struct ContentView: View {
   
   var body: some View {
     ParticleSystem {
-      Preset.Fire()
-//      Emitter {
-//        Particle {
-//          Circle().frame(width: 30.0, height: 30.0).foregroundStyle(.red)
-//        }
-//        .initialPosition(.center)
-//        .initialVelocity(y: 0.3)
-//        .transition(.scale)
-//        .lifetime(3)
-//      }
+//      Preset.Fire()
+      Burst(v: {
+        RadialGradient(colors: [.red, .clear], center: .center, startRadius: 2.0, endRadius: 12.0)
+          .clipShape(Circle())
+          .frame(width: 90.0, height: 90.0)
+      })
     }
     .debug()
     .background(Color.black)

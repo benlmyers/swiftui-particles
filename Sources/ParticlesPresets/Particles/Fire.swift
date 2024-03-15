@@ -31,9 +31,11 @@ public extension Preset {
     public var body: some Entity {
       Emitter(interval: 0.005) {
         Particle {
-          RadialGradient(colors: [.red, .clear], center: .center, startRadius: 2.0, endRadius: 12.0)
-            .clipShape(Circle())
-            .frame(width: 90.0, height: 90.0)
+          HStack {
+            RadialGradient(colors: [.red, .clear], center: .center, startRadius: 2.0, endRadius: 12.0)
+              .clipShape(Circle())
+              .frame(width: 90.0, height: 90.0)
+          }
         }
         .initialPosition(.center)
         .hueRotation(angleIn: .degrees(0.0) ... .degrees(50.0))

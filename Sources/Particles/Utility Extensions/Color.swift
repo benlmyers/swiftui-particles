@@ -21,9 +21,14 @@ extension Color {
 #endif
   
   var rgba: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
-    let color = asNative.usingColorSpace(.deviceRGB)!
-    var t = (CGFloat(), CGFloat(), CGFloat(), CGFloat())
-    color.getRed(&t.0, green: &t.1, blue: &t.2, alpha: &t.3)
-    return t
+//    let color = asNative.usingColorSpace(.deviceRGB)!
+//    var t = (CGFloat(), CGFloat(), CGFloat(), CGFloat())
+//    color.getRed(&t.0, green: &t.1, blue: &t.2, alpha: &t.3)
+//    return t
+    return (0,0,0,0)
+  }
+  
+  static func toColor(from rgba: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)) -> Color {
+    return Color(red: Double(rgba.red), green: Double(rgba.green), blue: Double(rgba.blue), opacity: Double(rgba.alpha))
   }
 }

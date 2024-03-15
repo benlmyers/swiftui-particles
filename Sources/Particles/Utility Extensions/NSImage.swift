@@ -10,9 +10,7 @@ import AppKit
 
 extension NSImage {
   var cgImage: CGImage? {
-    var proposedRect = CGRect(origin: .zero, size: size)
-    
-    return cgImage(forProposedRect: &proposedRect,
+    return cgImage(forProposedRect: nil,
                    context: nil,
                    hints: nil)
   }
