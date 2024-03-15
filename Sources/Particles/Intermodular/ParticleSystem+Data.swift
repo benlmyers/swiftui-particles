@@ -228,17 +228,17 @@ public extension ParticleSystem {
                 context.addFilter(.blur(radius: render.blur))
               }
             }
-            if let (transition, bounds, duration) = entity.underlyingTransition() {
-              let c = PhysicsProxy.Context(physics: physics, system: self)
-              transition.modifyRender(
-                getTransitionProgress(bounds: bounds, duration: duration, context: c),
-                &context
-              )
-            }
             context.drawLayer { context in
               context.translateBy(x: physics.position.x, y: physics.position.y)
               if let render, render.scale.width != 1.0 || render.scale.height != 1.0 {
                 context.scaleBy(x: render.scale.width, y: render.scale.height)
+              }
+              if let (transition, bounds, duration) = entity.underlyingTransition() {
+                let c = PhysicsProxy.Context(physics: physics, system: self)
+                transition.modifyRender(
+                  getTransitionProgress(bounds: bounds, duration: duration, context: c),
+                  &context
+                )
               }
               context.rotate(by: physics.rotation)
               guard let resolved = context.resolveSymbol(id: entityID) else {
