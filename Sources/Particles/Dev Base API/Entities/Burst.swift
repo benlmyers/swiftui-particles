@@ -5,72 +5,98 @@
 //  Created by Ben Myers on 1/21/24.
 //
 
-import Foundation
+import CoreGraphics
 import SwiftUI
+import Foundation
 
-public struct Burst: Entity {
+public struct Burst<E>: Entity where E: Entity {
   
-  // MARK: - Properties
+  // MARK: - Propertiesf
   
-  internal var imagePixels: [(x: Int, y: Int)] = []
-  internal var view: AnyView = .init(EmptyView())
-  internal var viewAsImage: CGImage? = nil
-  internal var color: Color?
+  private var customView: AnyView
+  private var withBehavior: (any Entity) -> E
+  private var spawns: [(CGPoint, Color)]
+
+  // MARK: - Initalizers
   
-  /// Color in RGBA format.
-  var colorRBA: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)? {
-    return color?.rgba
+  /// Creates a new Burst particle.
+  /// - Parameter view: The view that is used as a source layer to choose where to spawn various colored particles.
+  /// - Parameter withBehavior: A closure that allows you to define the behavior of each spawned entity using Entity Modifiers on the closure parameter.
+  /// - Parameter maxSpawns: The number of particles to spawn on the source layer.
+  /// - Parameter ignoringColor: The color to ignore when spawning particles on the source layer. Particles will not spawn atop the ignored color.
+  /// - Parameter customView: A custom view to use the the spawned particle. By default this is a circle. Keep in mind that the color appearance of each custom view will be overridden by the color in the source layer, `view`.
+  public init<Base, ParticleView>(
+    @ViewBuilder view: () -> Base,
+    withBehavior: @escaping (any Entity) -> E,
+    maxSpawns: Int = 200,
+    ignoringColor: Color = .clear,
+    @ViewBuilder customView: () -> ParticleView = { Circle().frame(width: 10.0, height: 10.0) }
+  ) where Base: View, ParticleView: View {
+    
+    guard let viewImage = view().asImage().cgImage, let imgData = viewImage.dataProvider?.data else {
+      fatalError("Particles could not convert view to image correctly. (Burst)")
+    }
+    
+    func getPixelColorAt(x: Int, y: Int) -> Color? {
+      let data: UnsafePointer<UInt8> = CFDataGetBytePtr(imgData)
+      let pixelInfo: Int = ((viewImage.width * y) + x) * 4
+      let r = CGFloat(data[pixelInfo]) / CGFloat(255.0)
+      let g = CGFloat(data[pixelInfo + 1]) / CGFloat(255.0)
+      let b = CGFloat(data[pixelInfo + 2]) / CGFloat(255.0)
+      let a = CGFloat(data[pixelInfo + 3]) / CGFloat(255.0)
+      let color = Color(red: Double(r), green: Double(g), blue: Double(b), opacity: Double(a))
+      return color
+    }
+    
+    var i: Int = 0
+    var j: Int = 0
+    var spawnPositionsUsed: [Int: Set<Int>] = [:]
+    var spawns: [(CGPoint, Color)] = []
+    
+    while i < 99999, j < maxSpawns {
+      i += 1
+      let x: Int = .random(in: 0 ... viewImage.width)
+      let y: Int = .random(in: 0 ... viewImage.height)
+      if spawnPositionsUsed[x]?.contains(y) ?? false {
+        continue
+      }
+      if let color = getPixelColorAt(x: x, y: y), color != ignoringColor {
+        spawns.append((CGPoint(x: x, y: y), color))
+        j += 1
+      }
+      if spawnPositionsUsed.keys.contains(x) {
+        spawnPositionsUsed[x]!.insert(y)
+      } else {
+        spawnPositionsUsed[x] = .init(arrayLiteral: y)
+      }
+    }
+    
+    self.spawns = spawns
+    self.customView = .init(customView())
+    self.withBehavior = withBehavior
   }
-  /// CFData of the image.
-  private var imgData: CFData? {
-    viewAsImage?.dataProvider?.data
-  }
+  
+//  public init<Base, ParticleView>(
+//    @ViewBuilder view: () -> Base,
+//    maxSpawns: Int = 200,
+//    ignoringColor: Color = .clear,
+//    @ViewBuilder customView: () -> ParticleView = { Circle().frame(width: 10.0, height: 10.0) }
+//  ) {
+//    self.init(view: view, withBehavior: { e in
+//      e.initialVelocity(xIn: -0.5 ... 0.5, yIn: -0.5 ... 0.5)
+//    }, maxSpawns: maxSpawns, ignoringColor: ignoringColor, customView: customView)
+//  }
   
   // MARK: - Body Entity
   
   public var body: some Entity {
     Emitter {
-      ForEach(imagePixels) { pixel in
-        Particle {
-          Circle()
-            .fill(Color.toColor(from: getPixelColor(x: pixel.0, y: pixel.1)))
-            .frame(width: 1, height: 1)
-        }
-        .initialPosition(x: CGFloat(pixel.x), y: CGFloat(pixel.y))
+      ForEach(spawns, copiesViews: false) { spawn in
+        withBehavior(
+          Particle(anyView: customView)
+            .initialPosition(x: spawn.0.x, y: spawn.0.y)
+        )
       }
     }
-  }
-  
-  public init<V>(
-    color: Color? = nil,
-    particle: (Particle) -> () = { _ in },
-    view: () -> AnyView = { AnyView(Circle().frame(width: 1, height:1)) },
-    @ViewBuilder v: () -> V
-  ) where V: View {
-    self.color = color
-    self.view = AnyView(v())
-    self.viewAsImage = v().asImage().cgImage
-    guard let viewAsImage else {
-      print("Particles can not convert view to image correctly. No drawing operations performed")
-      return
-    }
-    for width in 0..<viewAsImage.width {
-      for height in 0..<viewAsImage.height {
-        imagePixels.append((width, height))
-      }
-    }
-  }
-  
-  private func getPixelColor(x: Int, y: Int) -> (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
-    guard let viewAsImage else { return ( 0,0,0,0 ) }
-    let data: UnsafePointer<UInt8> = CFDataGetBytePtr(imgData)
-    let pixelInfo: Int = ((viewAsImage.width * y) + x) * 4
-    
-    let r = CGFloat(data[pixelInfo]) / CGFloat(255.0)
-    let g = CGFloat(data[pixelInfo + 1]) / CGFloat(255.0)
-    let b = CGFloat(data[pixelInfo + 2]) / CGFloat(255.0)
-    let a = CGFloat(data[pixelInfo + 3]) / CGFloat(255.0)
-    
-    return (r, g, b, a)
   }
 }

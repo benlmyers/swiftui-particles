@@ -13,7 +13,7 @@ import UIKit
 import AppKit
 #endif
 
-extension View {
+internal extension View {
   #if os(iOS)
   func asImage() -> UIImage {
     let controller = UIHostingController(rootView: self)
@@ -36,7 +36,7 @@ extension View {
 }
 
 #if os(iOS)
-extension UIImage {
+internal extension UIImage {
   convenience init(view: UIView) {
     UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, 0.0)
     view.layer.render(in: UIGraphicsGetCurrentContext()!)
@@ -46,7 +46,7 @@ extension UIImage {
   }
 }
 #else
-extension NSImage {
+internal extension NSImage {
   convenience init(view: NSView) {
     guard let bitmapRepresentation = view.bitmapImageRepForCachingDisplay(in: view.bounds) else {
       self.init()

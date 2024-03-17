@@ -240,6 +240,18 @@ public extension ParticleSystem {
                   &context
                 )
               }
+              if let overlay: Color = entity.underlyingColorOverlay() {
+                var m: ColorMatrix = ColorMatrix()
+                m.r1 = 0
+                m.g2 = 0
+                m.b3 = 0
+                m.a4 = 1
+                m.r5 = 1
+                m.g5 = 1
+                m.b5 = 1
+                context.addFilter(.colorMultiply(overlay))
+                context.addFilter(.colorMatrix(m))
+              }
               context.rotate(by: physics.rotation)
               guard let resolved = context.resolveSymbol(id: entityID) else {
                 return
@@ -249,6 +261,18 @@ public extension ParticleSystem {
           }
         }
       }
+    }
+    
+    private func colorToRGBA(color: Color) -> (r: Float, g: Float, b: Float, a: Float) {
+      if let components = color.cgColor?.components, components.count == 4 {
+        let r = Float(components[0])
+        let g = Float(components[1])
+        let b = Float(components[2])
+        let a = Float(components[3])
+        return (r: r, g: g, b: b, a: a)
+      }
+      // Default RGBA values if the conversion fails
+      return (r: 0.0, g: 0.0, b: 0.0, a: 1.0)
     }
     
     internal func advanceFrame() {

@@ -8,10 +8,13 @@
 import Foundation
 
 internal struct TransitionEntity<E>: Entity where E: Entity {
+  
   internal private(set) var transition: AnyTransition
   internal private(set) var bounds: TransitionBounds
   internal private(set) var duration: TimeInterval
+  
   var body: E
+  
   init(
     entity: E,
     transition: AnyTransition,
