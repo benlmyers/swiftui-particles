@@ -32,7 +32,7 @@ public extension Preset {
       Emitter(interval: 0.005) {
         Particle {
           HStack {
-            RadialGradient(colors: [.red, .clear], center: .center, startRadius: 2.0, endRadius: 12.0)
+            RadialGradient(colors: [color, .clear], center: .center, startRadius: 2.0, endRadius: 12.0)
               .clipShape(Circle())
               .frame(width: 90.0, height: 90.0)
           }
@@ -49,6 +49,7 @@ public extension Preset {
         .lifetime(in: flameLifetime +/- 0.3)
         .blendMode(.plusLighter)
         .transition(.scale, on: .death, duration: 0.5)
+//        .colorOverlay(.red)
       }
     }
     

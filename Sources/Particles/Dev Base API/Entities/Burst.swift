@@ -30,10 +30,10 @@ public struct Burst<E2>: Entity where E2: Entity {
     withBehavior: @escaping (Particle) -> E2,
     maxSpawns: Int = 200,
     ignoringColor: Color = .clear,
-    @ViewBuilder customView: () -> ParticleView = { Circle().frame(width: 10.0, height: 10.0) }
+    @ViewBuilder customView: () -> ParticleView = { Circle().frame(width: 1.0, height: 1.0) }
   ) where Base: View, ParticleView: View {
     
-    guard let viewImage = view().asImage().cgImage, let imgData = viewImage.dataProvider?.data else {
+    guard let viewImage = view().asImage()?.cgImage, let imgData = viewImage.dataProvider?.data else {
       fatalError("Particles could not convert view to image correctly. (Burst)")
     }
     
@@ -44,7 +44,9 @@ public struct Burst<E2>: Entity where E2: Entity {
       let g = CGFloat(data[pixelInfo + 1]) / CGFloat(255.0)
       let b = CGFloat(data[pixelInfo + 2]) / CGFloat(255.0)
       let a = CGFloat(data[pixelInfo + 3]) / CGFloat(255.0)
+      print("Found color \(Int(r * 255)) \(Int(g * 255)) \(Int(b * 255)) \(Int(a * 255))")
       let color = Color(red: Double(r), green: Double(g), blue: Double(b), opacity: Double(a))
+      if a == 0 || r + g + b < 0.1 { return nil }
       return color
     }
     
@@ -55,12 +57,12 @@ public struct Burst<E2>: Entity where E2: Entity {
     
     while i < 99999, j < maxSpawns {
       i += 1
-      let x: Int = .random(in: 0 ... viewImage.width)
-      let y: Int = .random(in: 0 ... viewImage.height)
+      let x: Int = .random(in: 0 ... viewImage.width) / 2
+      let y: Int = .random(in: 0 ... viewImage.height) / 2
       if spawnPositionsUsed[x]?.contains(y) ?? false {
         continue
       }
-      if let color = getPixelColorAt(x: x, y: y), color != ignoringColor {
+      if let color = getPixelColorAt(x: x, y: y) {
         spawns.append((CGPoint(x: x, y: y), color))
         j += 1
       }
@@ -90,13 +92,11 @@ public struct Burst<E2>: Entity where E2: Entity {
   // MARK: - Body Entity
   
   public var body: some Entity {
-    Emitter {
-      ForEach(spawns, copiesViews: false) { spawn in
-        withBehavior(
-          Particle(anyView: customView)
-        )
-        .initialPosition(x: spawn.0.x, y: spawn.0.y)
-      }
+    ForEach(spawns, copiesViews: false) { spawn in
+      withBehavior(
+        Particle(anyView: customView)
+      )
+      .initialPosition(x: spawn.0.x, y: spawn.0.y)
     }
   }
 }

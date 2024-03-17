@@ -263,17 +263,17 @@ public extension ParticleSystem {
       }
     }
     
-    private func colorToRGBA(color: Color) -> (r: Float, g: Float, b: Float, a: Float) {
-      if let components = color.cgColor?.components, components.count == 4 {
-        let r = Float(components[0])
-        let g = Float(components[1])
-        let b = Float(components[2])
-        let a = Float(components[3])
-        return (r: r, g: g, b: b, a: a)
-      }
-      // Default RGBA values if the conversion fails
-      return (r: 0.0, g: 0.0, b: 0.0, a: 1.0)
-    }
+//    private func colorToRGBA(color: Color) -> (r: Float, g: Float, b: Float, a: Float) {
+//      if let components = color.cgColor?.components, components.count == 4 {
+//        let r = Float(components[0])
+//        let g = Float(components[1])
+//        let b = Float(components[2])
+//        let a = Float(components[3])
+//        return (r: r, g: g, b: b, a: a)
+//      }
+//      // Default RGBA values if the conversion fails
+//      return (r: 0.0, g: 0.0, b: 0.0, a: 1.0)
+//    }
     
     internal func advanceFrame() {
       if self.currentFrame > .max - 601 {
