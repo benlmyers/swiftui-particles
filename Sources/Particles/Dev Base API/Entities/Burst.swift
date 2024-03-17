@@ -9,12 +9,12 @@ import CoreGraphics
 import SwiftUI
 import Foundation
 
-public struct Burst<E>: Entity where E: Entity {
+public struct Burst<E2>: Entity where E2: Entity {
   
   // MARK: - Propertiesf
   
   private var customView: AnyView
-  private var withBehavior: (any Entity) -> E
+  private var withBehavior: (Particle) -> E2
   private var spawns: [(CGPoint, Color)]
 
   // MARK: - Initalizers
@@ -27,7 +27,7 @@ public struct Burst<E>: Entity where E: Entity {
   /// - Parameter customView: A custom view to use the the spawned particle. By default this is a circle. Keep in mind that the color appearance of each custom view will be overridden by the color in the source layer, `view`.
   public init<Base, ParticleView>(
     @ViewBuilder view: () -> Base,
-    withBehavior: @escaping (any Entity) -> E,
+    withBehavior: @escaping (Particle) -> E2,
     maxSpawns: Int = 200,
     ignoringColor: Color = .clear,
     @ViewBuilder customView: () -> ParticleView = { Circle().frame(width: 10.0, height: 10.0) }
@@ -94,8 +94,8 @@ public struct Burst<E>: Entity where E: Entity {
       ForEach(spawns, copiesViews: false) { spawn in
         withBehavior(
           Particle(anyView: customView)
-            .initialPosition(x: spawn.0.x, y: spawn.0.y)
         )
+        .initialPosition(x: spawn.0.x, y: spawn.0.y)
       }
     }
   }
