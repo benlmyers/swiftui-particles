@@ -219,15 +219,7 @@ public extension ParticleSystem {
             
           }
           context.drawLayer { context in
-            if let render {
-              context.opacity = render.opacity
-              if !render.hueRotation.degrees.isZero {
-                context.addFilter(.hueRotation(render.hueRotation))
-              }
-              if !render.blur.isZero {
-                context.addFilter(.blur(radius: render.blur))
-              }
-            }
+            
             context.drawLayer { context in
               context.translateBy(x: physics.position.x, y: physics.position.y)
               context.rotate(by: physics.rotation)
@@ -253,7 +245,15 @@ public extension ParticleSystem {
                 context.addFilter(.colorMultiply(overlay))
                 context.addFilter(.colorMatrix(m))
               }
-              context.rotate(by: physics.rotation)
+              if let render {
+                context.opacity = render.opacity
+                if !render.hueRotation.degrees.isZero {
+                  context.addFilter(.hueRotation(render.hueRotation))
+                }
+                if !render.blur.isZero {
+                  context.addFilter(.blur(radius: render.blur))
+                }
+              }
               guard let resolved = context.resolveSymbol(id: entityID) else {
                 return
               }

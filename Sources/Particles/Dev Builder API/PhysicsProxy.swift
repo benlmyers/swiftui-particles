@@ -16,8 +16,8 @@ public struct PhysicsProxy {
   private var _x: UInt16
   private var _y: UInt16
   private var _inception: UInt16
-  private var _rotation: UInt8
-  private var _torque: Int8
+  private var _rotation: UInt16
+  private var _torque: Int16
   private var _randomSeed : SIMD4<UInt8>
   #if arch(arm64)
   private var _velX: Float16
@@ -103,19 +103,20 @@ public extension PhysicsProxy {
   
   /// The rotation angle of the entity.
   var rotation: Angle { get {
-    Angle(degrees: Double(_rotation) * 1.41176)
+    Angle(degrees: Double(_rotation) * (360.0 / Double(UInt16.max - 1)))
   } set {
-    let normalizedAngle = (newValue.degrees + 360.0).truncatingRemainder(dividingBy: 360.0)
-    let angleRatio = normalizedAngle / 360.0
-    _rotation = UInt8(angleRatio * 255)
-//    _rotation = UInt8(Int(ceil((newValue.degrees.truncatingRemainder(dividingBy: 360.0) * 0.7083))) % Int(UInt8.max))
+    let normalizedAngle: Double = (newValue.degrees + 360.0).truncatingRemainder(dividingBy: 360.0)
+    let angleRatio: Double = normalizedAngle / 360.0
+    _rotation = UInt16(angleRatio * Double(UInt16.max - 1))
   }}
   
   /// The rotational torque angle of the entity **per frame**.
   var torque: Angle { get {
-    Angle(degrees: Double(_torque) * 1.41176)
+    Angle(degrees: Double(_torque) * (360.0 / Double(Int16.max - 1)))
   } set {
-    _torque = Int8(floor((newValue.degrees.truncatingRemainder(dividingBy: 360.0) * 0.7083)))
+    let normalizedAngle: Double = (newValue.degrees + 360.0).truncatingRemainder(dividingBy: 360.0)
+    let angleRatio: Double = normalizedAngle / 360.0
+    _torque = Int16(angleRatio * Double(Int16.max - 1))
   }}
   
   /// The frame number upon which the entity was created.

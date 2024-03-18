@@ -23,7 +23,7 @@ public extension Preset {
       )
     }
     
-    var spawnWidth: CGFloat = 300.0
+    var spawnWidth: CGFloat = 700.0
     var snowSize: CGFloat
     var snowLifetime: TimeInterval
     
@@ -40,15 +40,23 @@ public extension Preset {
             .aspectRatio(contentMode: .fill)
             .frame(width: snowSize, height: snowSize)
         }
+        .initialVelocity(xIn: -0.1 ... 0.1, yIn: 0.02 ... 0.08)
+        .initialPosition(.top)
         .initialOffset(xIn: -spawnWidth/2.0 ... spawnWidth/2.0)
-        .initialPosition(.center)
-        .initialTorque(angleIn: .degrees(-1.0) ... .degrees(1.0))
-        .initialAcceleration(y: 0.01)
+        .fixAcceleration({ c in
+          return CGVectorMake(0.0005 * sin(c.system.time * 1.8), 0.003)
+        })
+        .opacity(in: 0.5 ... 1.0)
         .transition(.scale)
-        .colorOverlay(.red)
+        .colorOverlay(.init(red: 0.7, green: 0.9, blue: 0.9))
+        .initialTorque(angleIn: .degrees(-1.0) ... .degrees(1.0))
+        .hueRotation(angleIn: .degrees(-360.0) ... .degrees(30.0))
+        .blendMode(.plusLighter)
         .scale { c in
-          CGSize(width: sin(0.01 * Double(c.physics.seed.0) * c.system.time), height: 1.0)
+          let s = CGFloat.random(in: 0.3 ... 1.0, seed: c.physics.seed.0)
+          return CGSize(width: s * sin(0.04 * Double(c.physics.seed.0) * c.system.time), height: s)
         }
+//        .initialTorque(.degrees(2))
       }
     }
   }

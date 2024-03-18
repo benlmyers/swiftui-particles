@@ -25,9 +25,9 @@ public extension Entity {
   /// - Parameter withValue: A closure returning the opacity value to multiply the current opacity by.
   /// - Returns: The modified entity.
   func opacity(_ withValue: @escaping (RenderProxy.Context) -> Double) -> some Entity {
-    ModifiedEntity(entity: self, onBirthRender: { context in
+    ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
-      p.opacity *= withValue(context)
+      p.opacity = withValue(context)
       return p
     })
   }
@@ -36,9 +36,11 @@ public extension Entity {
   /// - Parameter value: The range to randomly choose an opacity value to multiply the current opacity by.
   /// - Returns: The modified entity.
   func opacity(in range: ClosedRange<Double>) -> some Entity {
-    opacity { _ in
-        .random(in: range)
-    }
+    ModifiedEntity(entity: self, onBirthRender: { context in
+      var p = context.render
+      p.opacity = .random(in: range)
+      return p
+    })
   }
   
   /// Applies a hue rotation to the entity.
@@ -132,6 +134,19 @@ public extension Entity {
       let s = withFactor(context)
       p.scale.width = s
       p.scale.height = s
+      return p
+    })
+  }
+  
+  /// Scales the entity by the specified size in both the x and y directions.
+  /// - Parameter range: A range to randomly scale the entity by.
+  /// - Returns: The modified entity.
+  func scale(factorIn range: ClosedRange<CGFloat>) -> some Entity {
+    ModifiedEntity(entity: self, onBirthRender: { context in
+      var p = context.render
+      let s: CGFloat = CGFloat.random(in: range)
+      p.scale.width *= s
+      p.scale.height *= s
       return p
     })
   }
