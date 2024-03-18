@@ -8,7 +8,7 @@
 import Foundation
 
 /// A group of entities.
-/// Applying a modifier to an ``Group`` will affect all its children:
+/// Applying a modifier to a ``Group`` will affect all its children:
 /// ```
 /// // Both particles are twice as large
 /// Group {

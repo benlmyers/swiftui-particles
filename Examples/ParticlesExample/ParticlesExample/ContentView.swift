@@ -16,8 +16,6 @@ struct ContentView: View {
 //      Preset.Fire()
       Preset.Snow()
     }
-    .debug()
-    .background(Color.black)
   }
 }
 

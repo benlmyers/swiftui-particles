@@ -125,15 +125,15 @@ extension Entity {
     }
   }
   
-  internal func underlyingBurst() -> Burst? {
-    if let burst = self as? Burst {
-      return burst
-    } else if self is EmptyEntity {
-      return nil
-    } else {
-      return body.underlyingBurst()
-    }
-  }
+//  internal func underlyingBurst() -> Burst? {
+//    if let burst = self as? Burst {
+//      return burst
+//    } else if self is EmptyEntity {
+//      return nil
+//    } else {
+//      return body.underlyingBurst()
+//    }
+//  }
   
   internal func underlyingTransition() -> (AnyTransition, TransitionBounds, Double)? {
     if let e = self as? TransitionEntity<Body> {
@@ -142,6 +142,16 @@ extension Entity {
       return nil
     } else {
       return body.underlyingTransition()
+    }
+  }
+  
+  internal func underlyingColorOverlay() -> Color? {
+    if let colorOverlay = self as? ColorOverlayEntity<Body> {
+      return colorOverlay.color
+    } else if self is EmptyEntity {
+      return nil
+    } else {
+      return body.underlyingColorOverlay()
     }
   }
 }

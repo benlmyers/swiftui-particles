@@ -30,4 +30,8 @@ public struct Particle: Entity {
   public init<V>(@ViewBuilder view: () -> V) where V: View {
     self.view = .init(view())
   }
+  
+  internal init(anyView: AnyView) {
+    self.view = anyView
+  }
 }

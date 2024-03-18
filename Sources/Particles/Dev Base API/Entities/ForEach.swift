@@ -16,19 +16,21 @@ import Foundation
 ///   }
 /// }
 /// ```
-public struct ForEach<T>: Entity {
+public struct ForEach<Data>: Entity where Data: RandomAccessCollection {
   
   // MARK: - Properties
   
   public var body: Group { .init(values: data.map({ .init(body: mapping($0)) })) }
   
-  internal var data: [T]
-  internal var mapping: (T) -> any Entity
+  internal var data: Data
+  internal var mapping: (Data.Element) -> any Entity
+  internal var copiesViews: Bool
   
   // MARK: - Initalizers
   
-  public init<E>(_ data: [T], @EntityBuilder mapping: @escaping (T) -> E) where E: Entity {
+  public init<E>(_ data: Data, copiesViews: Bool = true, @EntityBuilder mapping: @escaping (Data.Element) -> E) where E: Entity {
     self.data = data
     self.mapping = mapping
+    self.copiesViews = copiesViews
   }
 }
