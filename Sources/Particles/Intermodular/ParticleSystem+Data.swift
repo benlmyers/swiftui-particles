@@ -216,49 +216,55 @@ public extension ParticleSystem {
           else { continue }
           if let render, render.blendMode != .normal {
             context.blendMode = render.blendMode
-            
           }
           context.drawLayer { context in
-            
-            context.drawLayer { context in
-              context.translateBy(x: physics.position.x, y: physics.position.y)
-              context.rotate(by: physics.rotation)
-              if let render, render.scale.width != 1.0 || render.scale.height != 1.0 {
-                context.scaleBy(x: render.scale.width, y: render.scale.height)
+            context.translateBy(x: physics.position.x, y: physics.position.y)
+            context.rotate(by: physics.rotation)
+            if let (color, radius, opacity) = entity.underlyingGlow() {
+              context.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
+            }
+            if let overlay: Color = entity.underlyingColorOverlay() {
+              var m: ColorMatrix = ColorMatrix()
+              m.r1 = 0
+              m.g2 = 0
+              m.b3 = 0
+              m.a4 = 1
+              m.r5 = 1
+              m.g5 = 1
+              m.b5 = 1
+              context.addFilter(.colorMultiply(overlay))
+              context.addFilter(.colorMatrix(m))
+            }
+            if let render, render.scale.width != 1.0 || render.scale.height != 1.0 {
+              context.scaleBy(x: render.scale.width, y: render.scale.height)
+            }
+            if let render {
+              context.opacity = render.opacity
+              if !render.hueRotation.degrees.isZero {
+                context.addFilter(.hueRotation(render.hueRotation))
               }
-              if let (transition, bounds, duration) = entity.underlyingTransition() {
-                let c = PhysicsProxy.Context(physics: physics, system: self)
+              if !render.blur.isZero {
+                context.addFilter(.blur(radius: render.blur))
+              }
+            }
+            let transitions = entity.underlyingTransitions()
+            if !transitions.isEmpty {
+              let c = PhysicsProxy.Context(physics: physics, system: self)
+              // (transition, bounds, duration)
+              for t in transitions {
+                let transition: AnyTransition = t.0
+                let bounds: TransitionBounds = t.1
+                let duration: Double = t.2
                 transition.modifyRender(
                   getTransitionProgress(bounds: bounds, duration: duration, context: c),
                   &context
                 )
               }
-              if let overlay: Color = entity.underlyingColorOverlay() {
-                var m: ColorMatrix = ColorMatrix()
-                m.r1 = 0
-                m.g2 = 0
-                m.b3 = 0
-                m.a4 = 1
-                m.r5 = 1
-                m.g5 = 1
-                m.b5 = 1
-                context.addFilter(.colorMultiply(overlay))
-                context.addFilter(.colorMatrix(m))
-              }
-              if let render {
-                context.opacity = render.opacity
-                if !render.hueRotation.degrees.isZero {
-                  context.addFilter(.hueRotation(render.hueRotation))
-                }
-                if !render.blur.isZero {
-                  context.addFilter(.blur(radius: render.blur))
-                }
-              }
-              guard let resolved = context.resolveSymbol(id: entityID) else {
-                return
-              }
-              context.draw(resolved, at: .zero)
             }
+            guard let resolved = context.resolveSymbol(id: entityID) else {
+              return
+            }
+            context.draw(resolved, at: .zero)
           }
         }
       }

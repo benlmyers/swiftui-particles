@@ -53,18 +53,27 @@ public extension Preset {
           return CGVectorMake(0.0005 * sin(c.system.time * 1.8), 0.003)
         })
         .opacity(in: 0.5 ... 1.0)
-        .transition(.opacity, duration: parameters.snowLifetime / 5.0)
+        .transition(.opacity)
         .colorOverlay(.init(red: 0.7, green: 0.9, blue: 0.9))
         .initialTorque(angleIn: .degrees(-1.0) ... .degrees(1.0))
         .hueRotation(angleIn: .degrees(-360.0) ... .degrees(30.0))
         .blendMode(.plusLighter)
-        .lifetime(parameters.snowLifetime)
+        .lifetime(2)
         .scale { c in
           let s = CGFloat.random(in: 0.3 ... 1.0, seed: c.physics.seed.0)
           return CGSize(width: s * sin(0.02 * Double(c.physics.seed.0) * c.system.time), height: s)
         }
       }
     }
+    
+//    public struct Drift: Entity {
+//      
+//      internal var parameters: Snow.Parameters
+//      
+//      public var body: some Entity {
+//        
+//      }
+//    }
     
     internal struct Parameters {
       var spawnWidth: CGFloat = 700.0

@@ -135,13 +135,24 @@ extension Entity {
 //    }
 //  }
   
-  internal func underlyingTransition() -> (AnyTransition, TransitionBounds, Double)? {
+  internal func underlyingTransitions() -> [(AnyTransition, TransitionBounds, Double)] {
+    var result: [(AnyTransition, TransitionBounds, Double)] = []
     if let e = self as? TransitionEntity<Body> {
-      return (e.transition, e.bounds, e.duration)
+      result.append((e.transition, e.bounds, e.duration))
+    } else if self is EmptyEntity {
+      return result
+    }
+    result.append(contentsOf: body.underlyingTransitions())
+    return result
+  }
+  
+  internal func underlyingGlow() -> (Color, CGFloat, Double)? {
+    if let glowEntity = self as? GlowEntity<Body> {
+      return (glowEntity.color, glowEntity.radius, glowEntity.opacity)
     } else if self is EmptyEntity {
       return nil
     } else {
-      return body.underlyingTransition()
+      return body.underlyingGlow()
     }
   }
   
