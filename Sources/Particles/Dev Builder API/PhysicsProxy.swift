@@ -105,7 +105,10 @@ public extension PhysicsProxy {
   var rotation: Angle { get {
     Angle(degrees: Double(_rotation) * 1.41176)
   } set {
-    _rotation = UInt8(ceil((newValue.degrees.truncatingRemainder(dividingBy: 360.0) * 0.7083)))
+    let normalizedAngle = (newValue.degrees + 360.0).truncatingRemainder(dividingBy: 360.0)
+    let angleRatio = normalizedAngle / 360.0
+    _rotation = UInt8(angleRatio * 255)
+//    _rotation = UInt8(Int(ceil((newValue.degrees.truncatingRemainder(dividingBy: 360.0) * 0.7083))) % Int(UInt8.max))
   }}
   
   /// The rotational torque angle of the entity **per frame**.
@@ -129,7 +132,7 @@ public extension PhysicsProxy {
   
   /// Four random seeds that can be used to customize the behavior of spawned particles.
   /// Each of the integer values contains a value 0-255.
-  var seed: (UInt8, UInt8, UInt8, UInt8) {
-    (_randomSeed.x, _randomSeed.y, _randomSeed.z, _randomSeed.w)
+  var seed: (Int, Int, Int, Int) {
+    (Int(_randomSeed.x), Int(_randomSeed.y), Int(_randomSeed.z), Int(_randomSeed.w))
   }
 }

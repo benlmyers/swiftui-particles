@@ -230,6 +230,7 @@ public extension ParticleSystem {
             }
             context.drawLayer { context in
               context.translateBy(x: physics.position.x, y: physics.position.y)
+              context.rotate(by: physics.rotation)
               if let render, render.scale.width != 1.0 || render.scale.height != 1.0 {
                 context.scaleBy(x: render.scale.width, y: render.scale.height)
               }
@@ -240,7 +241,6 @@ public extension ParticleSystem {
                   &context
                 )
               }
-              context.rotate(by: physics.rotation)
               guard let resolved = context.resolveSymbol(id: entityID) else {
                 return
               }

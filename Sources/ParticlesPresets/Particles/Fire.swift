@@ -26,15 +26,17 @@ public extension Preset {
     var color: Color
     var spawnPoint: UnitPoint
     var spawnRadius: CGSize
+    var flameSize: CGFloat = 1.0
     var flameLifetime: TimeInterval = 1.0
     
     public var body: some Entity {
       Emitter(interval: 0.005) {
         Particle {
-          RadialGradient(colors: [.red, .clear], center: .center, startRadius: 2.0, endRadius: 12.0)
+          RadialGradient(colors: [color, .clear], center: .center, startRadius: 2.0, endRadius: 12.0)
             .clipShape(Circle())
-            .frame(width: 90.0, height: 90.0)
+            .frame(width: 150.0 * flameSize, height: 150.0 * flameSize)
         }
+        .initialOffset(xIn: -spawnRadius.width/2 ... spawnRadius.width/2, yIn: -spawnRadius.height/2 ... spawnRadius.height/2)
         .initialPosition(.center)
         .hueRotation(angleIn: .degrees(0.0) ... .degrees(50.0))
         .initialTorque(angleIn: .degrees(0.0) ... .degrees(8))
@@ -46,7 +48,8 @@ public extension Preset {
         .fixAcceleration(y: -0.01)
         .lifetime(in: flameLifetime +/- 0.3)
         .blendMode(.plusLighter)
-        .transition(.scale, on: .death, duration: 0.5)
+//        .transition(.scale, on: .death, duration: 0.3)
+        .transition(.opacity, on: .birthAndDeath, duration: 0.1)
       }
     }
     
