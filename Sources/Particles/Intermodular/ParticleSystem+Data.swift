@@ -20,6 +20,8 @@ public extension ParticleSystem {
     public internal(set) var debug: Bool = false
     /// The size of the ``ParticleSystem``, in pixels.
     public internal(set) var size: CGSize = .zero
+    /// The maximum number of ``RenderProxy``s that can be spawned per ``Entity``.
+    public internal(set) var maxRendersPerEntity: Int = 4
     /// The current frame of the ``ParticleSystem``.
     public private(set) var currentFrame: Int = .zero
     /// The date of the last frame update in the ``ParticleSystem``.
@@ -48,6 +50,10 @@ public extension ParticleSystem {
     private var emitEntities: [EntityID: [EntityID]] = [:]
     // ID of entity contained in Group -> Group entity top-level ID
     private var entityGroups: [EntityID: EntityID] = [:]
+    // ID of proxy -> Delegated Proxy ID containing render data
+    private var renderDelegations: [ProxyID: ProxyID] = [:]
+    
+    private var entityRenderProxies: [EntityID: [ProxyID]] = [:]
     
     // MARK: - Computed Properties
     
@@ -113,7 +119,10 @@ public extension ParticleSystem {
         if Int(currentFrame) >= deathFrame {
           physicsProxies.removeValue(forKey: proxyID)
           renderProxies.removeValue(forKey: proxyID)
-          proxyEntities.removeValue(forKey: proxyID)
+          renderDelegations.removeValue(forKey: proxyID)
+          if let id: EntityID = proxyEntities.removeValue(forKey: proxyID) {
+            entityRenderProxies[id]?.removeAll(where: { $0 == proxyID })
+          }
           return
         } else {
 //          print("Still alive, remains \(deathFrame - Int(currentFrame))")
@@ -199,7 +208,10 @@ public extension ParticleSystem {
     internal func performRenders(_ context: inout GraphicsContext) {
       context.drawLayer { context in
         for proxyID in physicsProxies.keys {
-          let render: RenderProxy? = renderProxies[proxyID]
+          var render: RenderProxy? = renderProxies[proxyID]
+          if render == nil, let delegation: ProxyID = renderDelegations[proxyID] {
+            render = renderProxies[delegation]
+          }
           guard let physics: PhysicsProxy = physicsProxies[proxyID] else { continue }
           guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
           guard let entity: any Entity = entities[entityID] else { continue }
@@ -220,7 +232,7 @@ public extension ParticleSystem {
           context.drawLayer { context in
             context.translateBy(x: physics.position.x, y: physics.position.y)
             context.rotate(by: physics.rotation)
-            if let (color, radius, opacity) = entity.underlyingGlow() {
+            if let (color, radius) = entity.underlyingGlow() {
               context.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
             }
             if let overlay: Color = entity.underlyingColorOverlay() {
@@ -370,6 +382,18 @@ public extension ParticleSystem {
         let updateRender = entity._onRenderUpdate(.init(physics: newPhysics, render: RenderProxy(), system: self))
         if newRender != RenderProxy() || updateRender != RenderProxy() {
           self.renderProxies[nextProxyRegistry] = newRender
+          
+          if self.entityRenderProxies[id]?.count ?? 0 >= maxRendersPerEntity {
+            let oldID: ProxyID = self.entityRenderProxies[id]!.randomElement()!
+            self.renderDelegations[oldID] = nextProxyRegistry
+            self.renderProxies[oldID] = nil
+          }
+          if var arr = self.entityRenderProxies[id] {
+            arr.append(nextProxyRegistry)
+            self.entityRenderProxies[id] = arr
+          } else {
+            self.entityRenderProxies[id] = [nextProxyRegistry]
+          }
         }
       }
       self.proxyEntities[nextProxyRegistry] = id

@@ -32,6 +32,7 @@ public extension Preset {
     public var body: some Entity {
       Emitter(interval: 0.01) {
         Flake(parameters: parameters)
+          .lifetime(2)
       }
     }
     
@@ -58,7 +59,6 @@ public extension Preset {
         .initialTorque(angleIn: .degrees(-1.0) ... .degrees(1.0))
         .hueRotation(angleIn: .degrees(-360.0) ... .degrees(30.0))
         .blendMode(.plusLighter)
-        .lifetime(2)
         .scale { c in
           let s = CGFloat.random(in: 0.3 ... 1.0, seed: c.physics.seed.0)
           return CGSize(width: s * sin(0.02 * Double(c.physics.seed.0) * c.system.time), height: s)

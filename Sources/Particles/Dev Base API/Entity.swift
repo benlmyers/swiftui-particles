@@ -146,9 +146,9 @@ extension Entity {
     return result
   }
   
-  internal func underlyingGlow() -> (Color, CGFloat, Double)? {
+  internal func underlyingGlow() -> (Color, CGFloat)? {
     if let glowEntity = self as? GlowEntity<Body> {
-      return (glowEntity.color, glowEntity.radius, glowEntity.opacity)
+      return (glowEntity.color, glowEntity.radius)
     } else if self is EmptyEntity {
       return nil
     } else {

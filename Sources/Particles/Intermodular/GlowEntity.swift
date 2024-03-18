@@ -11,19 +11,16 @@ internal struct GlowEntity<E>: Entity where E: Entity {
   
   internal private(set) var color: Color
   internal private(set) var radius: CGFloat
-  internal private(set) var opacity: Double
   
   var body: E
   
   init(
     entity: E,
     color: Color,
-    radius: CGFloat,
-    opacity: Double
+    radius: CGFloat
   ) {
     self.body = entity
     self.color = color
     self.radius = radius
-    self.opacity = opacity
   }
 }
