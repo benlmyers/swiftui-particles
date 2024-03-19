@@ -53,7 +53,7 @@ public extension ParticleSystem {
     // ID of proxy -> Delegated Proxy ID containing render data
     private var renderDelegations: [ProxyID: ProxyID] = [:]
     
-    private var entityRenderProxies: [EntityID: [ProxyID]] = [:]
+//    private var entityRenderProxies: [EntityID: [ProxyID]] = [:]
     
     // MARK: - Computed Properties
     
@@ -120,12 +120,7 @@ public extension ParticleSystem {
           physicsProxies.removeValue(forKey: proxyID)
           renderProxies.removeValue(forKey: proxyID)
           renderDelegations.removeValue(forKey: proxyID)
-          if let id: EntityID = proxyEntities.removeValue(forKey: proxyID) {
-            entityRenderProxies[id]?.removeAll(where: { $0 == proxyID })
-          }
-          return
-        } else {
-//          print("Still alive, remains \(deathFrame - Int(currentFrame))")
+          continue
         }
       }
     }
@@ -376,18 +371,6 @@ public extension ParticleSystem {
         let updateRender = entity._onRenderUpdate(.init(physics: newPhysics, render: RenderProxy(), system: self))
         if newRender != RenderProxy() || updateRender != RenderProxy() {
           self.renderProxies[nextProxyRegistry] = newRender
-          
-          if self.entityRenderProxies[id]?.count ?? 0 >= maxRendersPerEntity {
-            let oldID: ProxyID = self.entityRenderProxies[id]!.randomElement()!
-            self.renderDelegations[oldID] = nextProxyRegistry
-            self.renderProxies[oldID] = nil
-          }
-          if var arr = self.entityRenderProxies[id] {
-            arr.append(nextProxyRegistry)
-            self.entityRenderProxies[id] = arr
-          } else {
-            self.entityRenderProxies[id] = [nextProxyRegistry]
-          }
         }
       }
       self.proxyEntities[nextProxyRegistry] = id

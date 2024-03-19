@@ -34,7 +34,7 @@ public extension Preset {
         Flake(parameters: parameters)
         Drift(parameters: parameters)
       }
-      .emitSingle()
+      .emitAll()
       .initialPosition(.top)
     }
     
