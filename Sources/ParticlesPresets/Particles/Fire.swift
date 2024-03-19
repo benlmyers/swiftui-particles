@@ -53,7 +53,7 @@ public extension Preset {
       }
     }
     
-    public init(color: Color = .yellow, spawnPoint: UnitPoint = .center, spawnRadius: CGSize = .init(width: 50.0, height: 4.0)) {
+    public init(color: Color = .red, spawnPoint: UnitPoint = .center, spawnRadius: CGSize = .init(width: 50.0, height: 4.0)) {
       self.color = color
       self.spawnPoint = spawnPoint
       self.spawnRadius = spawnRadius

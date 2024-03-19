@@ -21,9 +21,9 @@ public extension ParticleSystem {
     /// The size of the ``ParticleSystem``, in pixels.
     public internal(set) var size: CGSize = .zero
     /// The maximum number of ``RenderProxy``s that can be spawned per ``Entity``.
-    public internal(set) var maxRendersPerEntity: Int = 4
+    public internal(set) var maxRendersPerEntity: Int = 499
     /// The current frame of the ``ParticleSystem``.
-    public private(set) var currentFrame: Int = .zero
+    public private(set) var currentFrame: UInt = .zero
     /// The date of the last frame update in the ``ParticleSystem``.
     public private(set) var lastFrameUpdate: Date = .distantPast
     
@@ -45,7 +45,7 @@ public extension ParticleSystem {
     // ID of proxy -> ID of entity containing data behaviors
     private var proxyEntities: [ProxyID: EntityID] = [:]
     // ID of emitter proxy -> Frame such proxy last emitted a child
-    private var lastEmitted: [ProxyID: Int] = [:]
+    private var lastEmitted: [ProxyID: UInt] = [:]
     // ID of emitter entity -> Entity IDs to create children with
     private var emitEntities: [EntityID: [EntityID]] = [:]
     // ID of entity contained in Group -> Group entity top-level ID
@@ -92,8 +92,8 @@ public extension ParticleSystem {
         guard let entity: any Entity = entities[entityID] else { continue }
         guard let emitter = entity.underlyingEmitter() else { continue }
         guard let protoEntities: [EntityID] = emitEntities[entityID] else { continue }
-        if let emitted: Int = lastEmitted[proxyID] {
-          let emitAt: Int = emitted + Int(emitter.emitInterval * 60.0)
+        if let emitted: UInt = lastEmitted[proxyID] {
+          let emitAt: UInt = emitted + UInt(emitter.emitInterval * 60.0)
           guard currentFrame >= emitAt else { continue }
         }
         var finalEntities: [EntityID] = protoEntities
@@ -226,8 +226,9 @@ public extension ParticleSystem {
             physics.position.y < size.height + 20.0,
             currentFrame > physics.inception
           else { continue }
-          if let render, render.blendMode != .normal {
+          if let render {
             context.blendMode = render.blendMode
+            context.opacity = render.opacity
           }
           context.drawLayer { context in
             context.translateBy(x: physics.position.x, y: physics.position.y)
@@ -244,20 +245,13 @@ public extension ParticleSystem {
               m.r5 = 1
               m.g5 = 1
               m.b5 = 1
-              context.addFilter(.colorMultiply(overlay))
               context.addFilter(.colorMatrix(m))
-            }
-            if let render, render.scale.width != 1.0 || render.scale.height != 1.0 {
-              context.scaleBy(x: render.scale.width, y: render.scale.height)
+              context.addFilter(.colorMultiply(overlay))
             }
             if let render {
-              context.opacity = render.opacity
-              if !render.hueRotation.degrees.isZero {
-                context.addFilter(.hueRotation(render.hueRotation))
-              }
-              if !render.blur.isZero {
-                context.addFilter(.blur(radius: render.blur))
-              }
+              context.scaleBy(x: render.scale.width, y: render.scale.height)
+              context.addFilter(.hueRotation(render.hueRotation))
+              context.addFilter(.blur(radius: render.blur))
             }
             let transitions = entity.underlyingTransitions()
             if !transitions.isEmpty {

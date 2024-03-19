@@ -89,6 +89,17 @@ public extension Entity {
     })
   }
   
+  /// Applies a blur effect randomly to the entity.
+  /// - Parameter size: The range of the size of the blur radius in pixels.
+  /// - Returns: The modified entity.
+  func blur(in range: ClosedRange<CGFloat>) -> some Entity {
+    ModifiedEntity(entity: self, onBirthRender: { context in
+      var p = context.render
+      p.blur = .random(in: range)
+      return p
+    })
+  }
+  
   /// Applies a blending mode to the entity.
   /// - Parameter mode: The blending mode to use.
   /// - Returns: The modified entity.

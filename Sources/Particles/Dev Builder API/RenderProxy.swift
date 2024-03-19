@@ -15,22 +15,17 @@ public struct RenderProxy: Equatable {
   
   // MARK: - Properties
   
-  private var _opacity: UInt16
-  private var _hueRotation: UInt8
-  private var _blur: UInt8
-  #if arch(arm64)
-  private var _scaleX: Float16
-  private var _scaleY: Float16
-  #else
-  private var _scaleX: Float32
-  private var _scaleY: Float32
-  #endif
+  private var _opacity: Double
+  private var _hueRotation: Double
+  private var _blur: CGFloat
+  private var _scaleX: CGFloat
+  private var _scaleY: CGFloat
   private var _blendMode: Int32
   
   // MARK: - Initializers
   
   init() {
-    self._opacity = .max
+    self._opacity = 1.0
     self._hueRotation = .zero
     self._blur = .zero
     self._scaleX = 1
@@ -65,23 +60,23 @@ public extension RenderProxy {
   
   /// The opacity of the particle, 0.0 to 1.0.
   var opacity: Double { get {
-    Double(_opacity) / Double(UInt16.max)
+    _opacity
   } set {
-    _opacity = UInt16(clamping: Int(newValue * Double(UInt16.max)))
+    _opacity = newValue
   }}
   
   /// The hue rotation angle of the particle.
   var hueRotation: Angle { get {
-    Angle(degrees: Double(_hueRotation) * 1.41176)
+    .degrees(_hueRotation)
   } set {
-    _hueRotation = UInt8(clamping: Int(floor((newValue.degrees.truncatingRemainder(dividingBy: 360.0) * 0.7083))))
+    _hueRotation = newValue.degrees
   }}
   
   /// The blur of the particle.
   var blur: CGFloat { get {
-    CGFloat(_blur) * 3.0
+    _blur
   } set {
-    _blur = UInt8(clamping: Int(newValue / 3))
+    _blur = newValue
   }}
   
   /// The x- and y-scale of the particle. Default `1.0 x 1.0`.

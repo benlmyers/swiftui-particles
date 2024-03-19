@@ -13,28 +13,21 @@ public struct PhysicsProxy {
   
   // MARK: - Properties
   
-  private var _x: UInt16
-  private var _y: UInt16
-  private var _inception: UInt16
-  private var _rotation: UInt16
-  private var _torque: Int16
-  private var _randomSeed : SIMD4<UInt8>
-  #if arch(arm64)
-  private var _velX: Float16
-  private var _velY: Float16
-  private var _accX: Float16
-  private var _accY: Float16
-  private var _lifetime: Float16
-  #else
-  private var _velX: Float32
-  private var _velY: Float32
-  private var _accX: Float32
-  private var _accY: Float32
-  private var _lifetime: Float32
-  #endif
+  private var _x: CGFloat
+  private var _y: CGFloat
+  private var _inception: UInt
+  private var _rotation: Double
+  private var _torque: Double
+  private var _randomSeed : SIMD4<Double>
+  
+  private var _velX: CGFloat
+  private var _velY: CGFloat
+  private var _accX: CGFloat
+  private var _accY: CGFloat
+  private var _lifetime: Double
   
   // MARK: - Initalizers
-  init(currentFrame: Int) {
+  init(currentFrame: UInt) {
     _x = .zero
     _y = .zero
     _velX = .zero
@@ -43,9 +36,9 @@ public struct PhysicsProxy {
     _accY = .zero
     _rotation = .zero
     _torque = .zero
-    _inception = UInt16(currentFrame % Int(UInt16.max))
+    _inception = UInt(currentFrame)
     _lifetime = 5.0
-    _randomSeed = .random(in: .min ... .max)
+    _randomSeed = .random(in: 0.0 ... 1.0)
   }
   
   // MARK: - Subtypes
@@ -79,15 +72,15 @@ public extension PhysicsProxy {
   
   /// The position of the entity, in pixels.
   var position: CGPoint { get {
-    CGPoint(x: (CGFloat(_x) - 250.0) / 10.0, y: (CGFloat(_y) - 250.0) / 10.0)
+    CGPoint(x: _x, y: _y)
   } set {
-    _x = UInt16(clamping: Int(newValue.x * 10.0) + 250)
-    _y = UInt16(clamping: Int(newValue.y * 10.0) + 250)
+    _x = newValue.x
+    _y = newValue.y
   }}
   
   /// The velocity of the entity, in pixels **per frame**.
   var velocity: CGVector { get {
-    CGVector(dx: CGFloat(_velX), dy: CGFloat(_velY))
+    CGVector(dx: _velX, dy: _velY)
   } set {
     _velX = .init(newValue.dx)
     _velY = .init(newValue.dy)
@@ -103,20 +96,16 @@ public extension PhysicsProxy {
   
   /// The rotation angle of the entity.
   var rotation: Angle { get {
-    Angle(degrees: Double(_rotation) * (360.0 / Double(UInt16.max - 1)))
+    .degrees(_rotation)
   } set {
-    let normalizedAngle: Double = (newValue.degrees + 360.0).truncatingRemainder(dividingBy: 360.0)
-    let angleRatio: Double = normalizedAngle / 360.0
-    _rotation = UInt16(angleRatio * Double(UInt16.max - 1))
+    _rotation = newValue.degrees.truncatingRemainder(dividingBy: 360.0)
   }}
   
   /// The rotational torque angle of the entity **per frame**.
   var torque: Angle { get {
-    Angle(degrees: Double(_torque) * (360.0 / Double(Int16.max - 1)))
+    .degrees(_torque)
   } set {
-    let normalizedAngle: Double = (newValue.degrees + 360.0).truncatingRemainder(dividingBy: 360.0)
-    let angleRatio: Double = normalizedAngle / 360.0
-    _torque = Int16(angleRatio * Double(Int16.max - 1))
+    _torque = newValue.degrees.truncatingRemainder(dividingBy: 360.0)
   }}
   
   /// The frame number upon which the entity was created.
@@ -132,8 +121,8 @@ public extension PhysicsProxy {
   }}
   
   /// Four random seeds that can be used to customize the behavior of spawned particles.
-  /// Each of the integer values contains a value 0-255.
-  var seed: (Int, Int, Int, Int) {
-    (Int(_randomSeed.x), Int(_randomSeed.y), Int(_randomSeed.z), Int(_randomSeed.w))
+  /// Each of the integer values contains a value 0.0 - 1.0.
+  var seed: (Double, Double, Double, Double) {
+    (_randomSeed.x, _randomSeed.y, _randomSeed.z, _randomSeed.w)
   }
 }

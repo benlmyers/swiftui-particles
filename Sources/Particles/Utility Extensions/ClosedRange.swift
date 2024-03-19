@@ -36,8 +36,8 @@ public extension Int {
 
 public extension CGFloat {
   
-  static func random(in range: ClosedRange<CGFloat>, seed: Int) -> CGFloat {
-    srand48(seed)
+  static func random(in range: ClosedRange<CGFloat>, seed: Double) -> CGFloat {
+    srand48(Int(seed * Double(Int.max)))
     return CGFloat(CGFloat(range.lowerBound) + CGFloat(range.upperBound - range.lowerBound) * drand48())
   }
   
