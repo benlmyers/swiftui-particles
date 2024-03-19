@@ -40,9 +40,9 @@ public extension Preset {
         .initialPosition(.center)
         .hueRotation(angleIn: .degrees(0.0) ... .degrees(50.0))
         .initialTorque(angleIn: .degrees(0.0) ... .degrees(8))
-        .scale({ c in
-          return CGSize(width: 1.0 + 0.05 * sin(0.1 * Double(c.physics.seed.0) * c.system.time + Double(c.physics.seed.1)), height: 1.0 + 0.05 * cos(0.1 * Double(c.physics.seed.2) * c.system.time + Double(c.physics.seed.3)))
-        })
+//        .scale({ c in
+//          return CGSize(width: 1.0 + 0.05 * sin(0.1 * Double(c.physics.seed.0) * c.system.time + Double(c.physics.seed.1)), height: 1.0 + 0.05 * cos(0.1 * Double(c.physics.seed.2) * c.system.time + Double(c.physics.seed.3)))
+//        })
         .initialOffset(xIn: -spawnRadius.width/2 ... spawnRadius.width/2, yIn: -spawnRadius.height/2 ... spawnRadius.height/2)
         .initialVelocity(xIn: -0.2 ... 0.2, yIn: -0.3 ... 0.3)
         .fixAcceleration(y: -0.01)

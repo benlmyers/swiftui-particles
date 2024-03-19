@@ -14,7 +14,7 @@ struct ContentView: View {
   var body: some View {
     ParticleSystem {
       Preset.Snow()
-//      Preset.Fire()
+      Preset.Fire()
     }
     .debug()
   }

@@ -34,6 +34,9 @@ public extension ParticleSystem {
     
     private var inception: Date = Date()
     private var last60: Date = .distantPast
+    private var updateRenderTime: TimeInterval = .zero
+    private var updatePhysicsTime: TimeInterval = .zero
+    private var performRenderTime: TimeInterval = .zero
     
     private var entities: [EntityID: any Entity] = [:]
     // ID of entity -> View to render
@@ -50,10 +53,6 @@ public extension ParticleSystem {
     private var emitEntities: [EntityID: [EntityID]] = [:]
     // ID of entity contained in Group -> Group entity top-level ID
     private var entityGroups: [EntityID: EntityID] = [:]
-    // ID of proxy -> Delegated Proxy ID containing render data
-    private var renderDelegations: [ProxyID: ProxyID] = [:]
-    
-//    private var entityRenderProxies: [EntityID: [ProxyID]] = [:]
     
     // MARK: - Computed Properties
     
@@ -119,13 +118,14 @@ public extension ParticleSystem {
         if Int(currentFrame) >= deathFrame {
           physicsProxies.removeValue(forKey: proxyID)
           renderProxies.removeValue(forKey: proxyID)
-          renderDelegations.removeValue(forKey: proxyID)
+          proxyEntities.removeValue(forKey: proxyID)
           continue
         }
       }
     }
     
     internal func updatePhysics() {
+      let flag = Date()
       let group = DispatchGroup()
       let queue = DispatchQueue(label: "com.benmyers.particles.physics.update", attributes: .concurrent)
       var newPhysicsProxies: [ProxyID: PhysicsProxy] = [:]
@@ -157,12 +157,14 @@ public extension ParticleSystem {
       for (proxyID, newPhysicsProxy) in newPhysicsProxies {
         physicsProxies[proxyID] = newPhysicsProxy
       }
+      self.updatePhysicsTime = Date().timeIntervalSince(flag)
     }
     
     internal func updateRenders() {
       if fps < 45 {
         guard currentFrame % 10 == 0 else { return }
       }
+      let flag = Date()
       let group = DispatchGroup()
       let queue = DispatchQueue(label: "com.benmyers.particles.renders.update", attributes: .concurrent)
       var newRenderProxies: [ProxyID: RenderProxy] = [:]
@@ -198,15 +200,14 @@ public extension ParticleSystem {
       for (proxyID, newRenderProxy) in newRenderProxies {
         renderProxies[proxyID] = newRenderProxy
       }
+      self.updateRenderTime = Date().timeIntervalSince(flag)
     }
     
     internal func performRenders(_ context: inout GraphicsContext) {
+      let flag = Date()
       context.drawLayer { context in
         for proxyID in physicsProxies.keys {
           var render: RenderProxy? = renderProxies[proxyID]
-          if render == nil, let delegation: ProxyID = renderDelegations[proxyID] {
-            render = renderProxies[delegation]
-          }
           guard let physics: PhysicsProxy = physicsProxies[proxyID] else { continue }
           guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
           guard let entity: any Entity = entities[entityID] else { continue }
@@ -266,6 +267,7 @@ public extension ParticleSystem {
               return
             }
             context.draw(resolved, at: .zero)
+            self.performRenderTime = Date().timeIntervalSince(flag)
           }
         }
       }
@@ -330,11 +332,14 @@ public extension ParticleSystem {
       return result
     }
     
-    internal func memorySummary() -> String {
+    internal func memorySummary(advanced: Bool = true) -> String {
       var arr: [String] = []
-      arr.append("\(Int(size.width)) x \(Int(size.height)) | Frame \(currentFrame) | \(Int(fps)) FPS")
-      arr.append("Proxies: \(physicsProxies.count) physics, \(renderProxies.count) renders")
-      arr.append("System: \(entities.count) entities, \(views.count) views")
+      arr.append("\(Int(size.width)) x \(Int(size.height)) \t Frame \(currentFrame) \t \(Int(fps)) FPS")
+      arr.append("Proxies: \(physicsProxies.count) physics \t(\(String(format: "%.1f", updatePhysicsTime * 1000))ms) \t\(renderProxies.count) renders \t(\(String(format: "%.1f", updateRenderTime * 1000))ms)")
+      arr.append("System: \(entities.count) entities \t \(views.count) views \t Rendering: \(String(format: "%.1f", performRenderTime * 1000))ms")
+      if advanced {
+        arr.append("PE=\(proxyEntities.count), LE=\(lastEmitted.count), EE=\(emitEntities.count), EG=\(entityGroups.count)")
+      }
       return arr.joined(separator: "\n")
     }
     
