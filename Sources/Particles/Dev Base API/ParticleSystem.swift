@@ -25,9 +25,9 @@ import Foundation
 /// ```
 public struct ParticleSystem: View {
   
-  internal typealias EntityID = UInt8
-  internal typealias ProxyID = UInt16
-  internal typealias GroupID = UInt8
+  internal typealias EntityID = UInt
+  internal typealias ProxyID = UInt
+  internal typealias GroupID = UInt
   
   // MARK: - Static Properties
   

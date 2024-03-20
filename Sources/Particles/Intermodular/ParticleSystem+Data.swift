@@ -38,7 +38,7 @@ public extension ParticleSystem {
     
     private var entities: [EntityID: any Entity] = [:]
     // ID of entity -> View to render
-    private var views: [EntityID: AnyView] = .init()
+    private var views: [EntityID: MaybeView] = .init()
     // ID of proxy -> Physics data
     private var physicsProxies: [ProxyID: PhysicsProxy] = [:]
     // ID of proxy -> Render data
@@ -210,9 +210,15 @@ public extension ParticleSystem {
           guard let physics: PhysicsProxy = physicsProxies[proxyID] else { continue }
           guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
           guard let entity: any Entity = entities[entityID] else { continue }
-          if views[entityID] == nil {
+          var resolvedEntityID: EntityID = entityID
+          if let maybe = views[entityID] {
+            switch maybe {
+            case .merged(let mergedID): resolvedEntityID = mergedID
+            case .some(_): break
+            }
+          } else {
             guard let view: AnyView = entity.viewToRegister() else { continue }
-            views[entityID] = view
+            views[entityID] = .some(view)
           }
           guard
             physics.position.x > -20.0,
@@ -262,7 +268,7 @@ public extension ParticleSystem {
                 )
               }
             }
-            guard let resolved = context.resolveSymbol(id: entityID) else {
+            guard let resolved = context.resolveSymbol(id: resolvedEntityID) else {
               return
             }
             context.draw(resolved, at: .zero)
@@ -302,31 +308,57 @@ public extension ParticleSystem {
     }
     
     @discardableResult
-    internal func createSingle<E>(entity: E, spawn: Bool = true) -> [EntityID] where E: Entity {
-      var result: [EntityID] = []
+    internal func createSingle<E>(entity: E, spawn: Bool = true, mergingView: EntityID? = nil) -> [(EntityID, ProxyID?)] where E: Entity {
+      var result: [(EntityID, ProxyID?)] = []
+      var proxyID: ProxyID?
       if let group = entity.underlyingGroup() {
+        var firstEntityID: EntityID?
         for v in group.values {
           guard let e = v.body as? any Entity else { continue }
-          let modified = applyGroup(to: e, group: entity)
-          result.append(contentsOf: self.createSingle(entity: modified, spawn: spawn))
+          let modified = applyGroupModifiers(to: e, groupRoot: entity)
+          // Merge view
+          var mergingViewParameter: EntityID?
+          if let merges: Group.Merges = group.merges, merges == .views {
+            mergingViewParameter = firstEntityID
+          }
+          let new: [(EntityID, ProxyID?)] = self.createSingle(entity: modified, spawn: spawn, mergingView: mergingViewParameter)
+          // Merge entity
+          if let firstEntityID, let merges: Group.Merges = group.merges, merges == .entities
+          {
+            for n in new {
+              unregister(entityID: n.0)
+              if let proxyID = n.1 {
+                proxyEntities[proxyID] = firstEntityID
+              }
+            }
+          }
+          result.append(contentsOf: new)
+          if firstEntityID == nil {
+            firstEntityID = new.first?.0
+          }
         }
       } else {
         let entityID: EntityID = self.register(entity: entity)
+        if let mergingView: EntityID {
+          self.views[entityID] = .merged(mergingView)
+        }
         if spawn {
-          self.create(entityID)
+          proxyID = self.create(entityID)
         }
         if let emitter = entity.underlyingEmitter(), let e = emitter.prototype.body as? any Entity {
-          self.emitEntities[entityID] = self.createSingle(entity: e, spawn: false)
+          self.emitEntities[entityID] = self.createSingle(entity: e, spawn: false).map({ $0.0 })
         }
-        result.append(entityID)
+        result.append((entityID, proxyID))
       }
       return result
     }
     
     internal func viewPairs() -> [(AnyView, EntityID)] {
       var result: [(AnyView, EntityID)] = []
-      for (id, view) in views {
-        result.append((view, id))
+      for (id, maybe) in views {
+        if case MaybeView.some(let view) = maybe {
+          result.append((view, id))
+        }
       }
       return result
     }
@@ -335,22 +367,22 @@ public extension ParticleSystem {
       var arr: [String] = []
       arr.append("\(Int(size.width)) x \(Int(size.height)) \t Frame \(currentFrame) \t \(Int(fps)) FPS")
       arr.append("Proxies: \(physicsProxies.count) physics \t(\(String(format: "%.1f", updatePhysicsTime * 1000))ms) \t\(renderProxies.count) renders \t(\(String(format: "%.1f", updateRenderTime * 1000))ms)")
-      arr.append("System: \(entities.count) entities \t \(views.count) views \t Rendering: \(String(format: "%.1f", performRenderTime * 1000))ms")
+      arr.append("System: \(entities.count) entities \t \(views.filter({ $0.value.isSome }).count) views \t Rendering: \(String(format: "%.1f", performRenderTime * 1000))ms")
       if advanced {
         arr.append("PE=\(proxyEntities.count), LE=\(lastEmitted.count), EE=\(emitEntities.count), EG=\(entityGroups.count)")
       }
       return arr.joined(separator: "\n")
     }
     
-    private func applyGroup<E>(to entity: E, group: any Entity) -> some Entity where E: Entity {
+    private func applyGroupModifiers<E>(to entity: E, groupRoot: any Entity) -> some Entity where E: Entity {
       let m = ModifiedEntity(entity: entity, onBirthPhysics: { c in
-        group._onPhysicsBirth(c)
+        groupRoot._onPhysicsBirth(c)
       }, onUpdatePhysics: { c in
-        group._onPhysicsUpdate(c)
+        groupRoot._onPhysicsUpdate(c)
       }, onBirthRender: { c in
-        group._onRenderBirth(c)
+        groupRoot._onRenderBirth(c)
       }, onUpdateRender: { c in
-        group._onRenderUpdate(c)
+        groupRoot._onRenderUpdate(c)
       })
       return m
     }
@@ -393,6 +425,10 @@ public extension ParticleSystem {
       return id
     }
     
+    private func unregister(entityID: EntityID) {
+      self.entities.removeValue(forKey: entityID)
+    }
+    
     private func getTransitionProgress(bounds: TransitionBounds, duration: TimeInterval, context: PhysicsProxy.Context) -> Double {
       switch bounds {
       case .birth:
@@ -404,6 +440,21 @@ public extension ParticleSystem {
           return getTransitionProgress(bounds: .birth, duration: duration, context: context)
         } else {
           return getTransitionProgress(bounds: .death, duration: duration, context: context)
+        }
+      }
+    }
+    
+    // MARK: - Subtypes
+    
+    private enum MaybeView {
+      case some(AnyView)
+      case merged(EntityID)
+      var isSome: Bool {
+        switch self {
+        case .some(_):
+          return true
+        case .merged(_):
+          return false
         }
       }
     }

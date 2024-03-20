@@ -92,7 +92,7 @@ public struct Burst<E2>: Entity where E2: Entity {
   // MARK: - Body Entity
   
   public var body: some Entity {
-    ForEach(spawns, copiesViews: false) { spawn in
+    ForEach(spawns) { spawn in
       withBehavior(
         Particle(anyView: customView)
       )
