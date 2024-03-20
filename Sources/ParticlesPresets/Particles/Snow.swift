@@ -25,8 +25,8 @@ public extension Preset {
     
     private var parameters: Parameters
     
-    public init(in width: CGFloat = 750.0, size: CGFloat = 30.0, lifetime: TimeInterval = 5.0, intensity: Int = 50) {
-      self.parameters = .init(intensity: intensity, spawnWidth: width, snowSize: size, snowLifetime: lifetime)
+    public init(size: CGFloat = 30.0, lifetime: TimeInterval = 5.0, intensity: Int = 20) {
+      self.parameters = .init(intensity: intensity, snowSize: size, snowLifetime: lifetime)
     }
     
     public var body: some Entity {
@@ -49,7 +49,10 @@ public extension Preset {
             .aspectRatio(contentMode: .fill)
             .frame(width: parameters.snowSize, height: parameters.snowSize)
         }
-        .initialOffset(xIn: -parameters.spawnWidth/2.0 ... parameters.spawnWidth/2.0)
+        .initialOffset(withX: { c in
+          let w = c.system.size.width * 0.5
+          return .random(in: -w ... w)
+        })
         .initialVelocity(xIn: -0.1 ... 0.1, yIn: 0.02 ... 0.08)
         .fixAcceleration({ c in
           return CGVectorMake(0.0005 * sin(c.physics.seed.2 + c.system.time * 1.8), 0.001)
@@ -78,7 +81,10 @@ public extension Preset {
             .frame(width: 10.0, height: 10.0)
             .clipShape(Circle())
         }
-        .initialOffset(xIn: -parameters.spawnWidth/2.0 ... parameters.spawnWidth/2.0, yIn: -10.0 ... 0.0)
+        .initialOffset(withX: { c in
+          let w = c.system.size.width * 0.5
+          return .random(in: -w ... w)
+        })
         .initialVelocity(xIn: -0.4 ... 0.4, yIn: 0.01 ... 0.03)
         .fixAcceleration({ c in
           return CGVectorMake(0.0004 * sin(c.physics.seed.2 + c.system.time * 1.8), 0.0007 + 0.0008 * cos(c.system.time * 1.8))
@@ -92,7 +98,6 @@ public extension Preset {
     
     internal struct Parameters {
       var intensity: Int = 50
-      var spawnWidth: CGFloat = 700.0
       var snowSize: CGFloat
       var snowLifetime: TimeInterval
     }

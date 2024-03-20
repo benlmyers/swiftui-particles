@@ -129,8 +129,9 @@ public extension ParticleSystem {
       var newPhysicsProxies: [ProxyID: PhysicsProxy] = [:]
       let lock = NSLock()
       for (proxyID, entityID) in proxyEntities {
+        let d = Date()
         group.enter()
-        queue.async { [weak self] in
+        queue.async(group: group) { [weak self] in
           guard let self else {
             group.leave()
             return
@@ -169,7 +170,7 @@ public extension ParticleSystem {
       let lock = NSLock()
       for (proxyID, entityID) in proxyEntities {
         group.enter()
-        queue.async { [weak self] in
+        queue.async(group: group) { [weak self] in
           guard let self else {
             group.leave()
             return
