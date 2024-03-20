@@ -109,14 +109,8 @@ public struct ParticleSystem: View {
     return self
   }
   
-  /// Sets the maximum number of ``RenderProxy`` instances that can be created per ``Entity``.
-  /// Render updates occur every 10 frames when the frame rate is above 45 FPS. The smaller the value of `max`, the faster the update.
-  /// Longer updates will cause the simulation to hang.
-  public func maxRendersPerEntity(_ max: Int) -> ParticleSystem {
-    self.data.maxRendersPerEntity = max
-    return self
-  }
-  
+  /// Marks this particle system as **state persistent**.
+  /// State persistent particle systems to not reset their simulations when the view is re-rendered
   public func statePersistent(_ id: String) -> ParticleSystem {
     var copy = self
     copy._id = id
@@ -139,11 +133,11 @@ public struct ParticleSystem: View {
       }
       self.data.initialEntity = nil
     }
+    data.performRenders(&context)
     data.updatePhysics()
     data.destroyExpiredEntities()
     data.updateRenders()
     data.advanceFrame()
     data.emitChildren()
-    data.performRenders(&context)
   }
 }

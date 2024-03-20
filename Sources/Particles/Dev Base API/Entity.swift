@@ -56,6 +56,9 @@ extension Never: Entity {}
 
 extension Entity {
   
+  private var _initialPhysicsCarried: PhysicsProxy? { get { .init(currentFrame: 0) } set {}}
+  private var _initialRenderCarried: RenderProxy { get { .init() } set {}}
+  
   public func _onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
     if self is EmptyEntity {
       return context.physics

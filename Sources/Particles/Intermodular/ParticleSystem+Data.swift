@@ -20,8 +20,6 @@ public extension ParticleSystem {
     public internal(set) var debug: Bool = false
     /// The size of the ``ParticleSystem``, in pixels.
     public internal(set) var size: CGSize = .zero
-    /// The maximum number of ``RenderProxy``s that can be spawned per ``Entity``.
-    public internal(set) var maxRendersPerEntity: Int = 499
     /// The current frame of the ``ParticleSystem``.
     public private(set) var currentFrame: UInt = .zero
     /// The date of the last frame update in the ``ParticleSystem``.
@@ -207,7 +205,7 @@ public extension ParticleSystem {
       let flag = Date()
       context.drawLayer { context in
         for proxyID in physicsProxies.keys {
-          var render: RenderProxy? = renderProxies[proxyID]
+          let render: RenderProxy? = renderProxies[proxyID]
           guard let physics: PhysicsProxy = physicsProxies[proxyID] else { continue }
           guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
           guard let entity: any Entity = entities[entityID] else { continue }

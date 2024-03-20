@@ -16,7 +16,7 @@ struct ContentView: View {
       Preset.Snow()
       Preset.Fire()
     }
-    .debug()
+//    .debug()
   }
 }
 
