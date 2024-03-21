@@ -73,21 +73,27 @@ struct PerformanceTimer {
   static var callMap: [String: Int] = [:]
   static var timeMap: [String: TimeInterval] = [:]
   
-  func calculateElapsedTime(prints: Bool = false) {
-    let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-    if prints {
-      print("Time elapsed for \(title): \(timeElapsed) s.")
-    }
-    DispatchQueue.main.async {
-      if let c = Self.callMap[title] {
-        Self.callMap[title] = c + 1
-      } else {
-        Self.callMap[title] = 0
+  func calculateElapsedTime(
+    subTitle: String = "",
+    prints: Bool = false,
+    enabling: Bool = false
+  ) {
+    if enabling {
+      let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+      if prints {
+        print("Time elapsed for \(title) \(subTitle): \(timeElapsed) s.")
       }
-      if let t = Self.timeMap[title] {
-        Self.timeMap[title] = t + Double(timeElapsed)
-      } else {
-        Self.timeMap[title] = 0
+      DispatchQueue.main.async {
+        if let c = Self.callMap[title] {
+          Self.callMap[title] = c + 1
+        } else {
+          Self.callMap[title] = 0
+        }
+        if let t = Self.timeMap[title] {
+          Self.timeMap[title] = t + Double(timeElapsed)
+        } else {
+          Self.timeMap[title] = 0
+        }
       }
     }
   }
