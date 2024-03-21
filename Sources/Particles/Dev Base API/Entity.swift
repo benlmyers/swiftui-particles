@@ -99,6 +99,8 @@ extension Entity {
   }
   
   internal func viewToRegister() -> AnyView? {
+    let performanceTimer = PerformanceTimer(title: "VIEW TO REGISTER")
+    performanceTimer.calculateElapsedTime()
     if let particle = self as? Particle {
       return particle.view
     } else if self is EmptyEntity {
@@ -109,6 +111,8 @@ extension Entity {
   }
   
   internal func underlyingGroup() -> Group? {
+    let performanceTimer = PerformanceTimer(title: "UNDERLYING GROUP")
+    performanceTimer.calculateElapsedTime()
     if let group = self as? Group {
       return group
     } else if self is EmptyEntity {
@@ -119,6 +123,8 @@ extension Entity {
   }
   
   internal func underlyingEmitter() -> Emitter? {
+    let performanceTimer = PerformanceTimer(title: "UNDERLYING EMITTER")
+    performanceTimer.calculateElapsedTime()
     if let emitter = self as? Emitter {
       return emitter
     } else if self is EmptyEntity {

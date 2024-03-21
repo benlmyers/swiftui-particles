@@ -312,11 +312,14 @@ public extension ParticleSystem {
     internal func createSingle<E>(entity: E, spawn: Bool = true, mergingView: EntityID? = nil) -> [(EntityID, ProxyID?)] where E: Entity {
       var result: [(EntityID, ProxyID?)] = []
       var proxyID: ProxyID?
+      let performanceTimer = PerformanceTimer(title: "CREATE SINGLE")
       if let group = entity.underlyingGroup() {
         var firstEntityID: EntityID?
         for v in group.values {
           guard let e = v.body as? any Entity else { continue }
+          let r = PerformanceTimer(title: "APPLY GROUP MODIFIERS")
           let modified = applyGroupModifiers(to: e, groupRoot: entity)
+          r.calculateElapsedTime(prints: true, enabling: true)
           // Merge view
           var mergingViewParameter: EntityID?
           if let merges: Group.Merges = group.merges, merges == .views {
@@ -327,7 +330,9 @@ public extension ParticleSystem {
           if let firstEntityID, let merges: Group.Merges = group.merges, merges == .entities
           {
             for n in new {
+              let r = PerformanceTimer(title: "UNREGISTER")
               unregister(entityID: n.0)
+              r.calculateElapsedTime(prints: true, enabling: true)
               if let proxyID = n.1 {
                 proxyEntities[proxyID] = firstEntityID
               }
@@ -351,6 +356,7 @@ public extension ParticleSystem {
         }
         result.append((entityID, proxyID))
       }
+      performanceTimer.calculateElapsedTime(prints: true, enabling: true)
       return result
     }
     
