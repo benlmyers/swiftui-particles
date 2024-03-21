@@ -16,6 +16,8 @@ internal struct ModifiedEntity<E>: Entity where E: Entity {
   private var birthRender: ((RenderProxy.Context) -> RenderProxy)?
   private var updateRender: ((RenderProxy.Context) -> RenderProxy)?
   
+  internal var _confirmedEmptyUnderlyingEmitter: Bool = false
+  
   init(
     entity: E,
     onBirthPhysics: ((PhysicsProxy.Context) -> PhysicsProxy)? = nil,
@@ -28,6 +30,7 @@ internal struct ModifiedEntity<E>: Entity where E: Entity {
     self.updatePhysics = onUpdatePhysics
     self.birthRender = onBirthRender
     self.updateRender = onUpdateRender
+    _confirmedEmptyUnderlyingEmitter = underlyingEmitter() == nil
   }
   
   func _onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
@@ -81,7 +84,7 @@ struct PerformanceTimer {
     if enabling {
       let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
       if prints {
-        print("Time elapsed for \(title) \(subTitle): \(timeElapsed) s.")
+//        print("Time elapsed for \(title) \(subTitle): \(timeElapsed) s.")
       }
       DispatchQueue.main.async {
         if let c = Self.callMap[title] {
@@ -99,8 +102,8 @@ struct PerformanceTimer {
   }
   
   static func printCallMap(resets: Bool = false) {
-    print("Total Calls: \(callMap.sorted { $0.value > $1.value})")
-    print("Total Time Spent: \(timeMap.sorted { $0.value > $1.value })")
+//    print("Total Calls: \(callMap.sorted { $0.value > $1.value})")
+//    print("Total Time Spent: \(timeMap.sorted { $0.value > $1.value })")
     if resets {
       Self.callMap = [:]
       Self.timeMap = [:]

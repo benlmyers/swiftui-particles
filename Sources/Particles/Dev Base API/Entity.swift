@@ -25,6 +25,8 @@ public protocol Entity {
   
   associatedtype Body: Entity
   
+  var _confirmedEmptyUnderlyingEmitter: Bool { get set }
+  
   /// The inner content of the entity.
   /// Inner content often holds additional modifiers to apply to ``PhysicsProxy`` or ``RenderProxy`` instances upon spawn.
   var body: Self.Body { get }
@@ -50,7 +52,9 @@ public protocol Entity {
   func _onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy
 }
 
-extension Never: Entity {}
+extension Never: Entity {
+  public var _confirmedEmptyUnderlyingEmitter: Bool { get { .init() } set {}}
+}
 
 // MARK: - Default Implementation
 
@@ -58,6 +62,8 @@ extension Entity {
   
   private var _initialPhysicsCarried: PhysicsProxy? { get { .init(currentFrame: 0) } set {}}
   private var _initialRenderCarried: RenderProxy { get { .init() } set {}}
+  
+  public var _confirmedEmptyUnderlyingEmitter: Bool { get { false } set {}}
   
   public func _onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
     if self is EmptyEntity {
@@ -123,6 +129,9 @@ extension Entity {
   }
   
   internal func underlyingEmitter() -> Emitter? {
+    if _confirmedEmptyUnderlyingEmitter {
+      return nil
+    }
     let performanceTimer = PerformanceTimer(title: "UNDERLYING EMITTER")
     performanceTimer.calculateElapsedTime()
     if let emitter = self as? Emitter {

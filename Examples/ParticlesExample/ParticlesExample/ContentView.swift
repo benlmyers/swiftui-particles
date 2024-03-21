@@ -15,10 +15,11 @@ struct ContentView: View {
     ZStack {
       ParticleSystem {
 //        Preset.Snow()
-        Burst(pixelDensity: 3) {
+        Burst(pixelDensity: 5) {
           v
         } withBehavior: { p in
           p
+            .initialVelocity(xIn: -0.2 ... 0.2, yIn: -0.2 ... 0.2)
         } customView: {
           Circle().frame(width: 3.0, height: 3.0)
         }
