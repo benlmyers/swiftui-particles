@@ -125,7 +125,7 @@ public extension ParticleSystem {
     internal func updatePhysics() {
       let flag = Date()
       let group = DispatchGroup()
-      let queue = DispatchQueue(label: "com.benmyers.particles.physics.update", attributes: .concurrent)
+      let queue = DispatchQueue(label: "com.benmyers.particles.physics.update", qos: .userInteractive, attributes: .concurrent)
       var newPhysicsProxies: [ProxyID: PhysicsProxy] = [:]
       let lock = NSLock()
       for (proxyID, entityID) in proxyEntities {
@@ -246,6 +246,7 @@ public extension ParticleSystem {
               m.r5 = 1
               m.g5 = 1
               m.b5 = 1
+              context.addFilter(.colorMultiply(overlay))
               context.addFilter(.colorMatrix(m))
               context.addFilter(.colorMultiply(overlay))
             }

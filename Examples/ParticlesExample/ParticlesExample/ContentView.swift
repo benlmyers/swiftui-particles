@@ -12,21 +12,32 @@ import ParticlesPresets
 struct ContentView: View {
   
   var body: some View {
-    ParticleSystem {
-//      Preset.Snow()
-//      Preset.Fire()
-      ForEach(Array(repeating: 1, count: 100), merges: .entities) { c in
-        Particle {
-          Circle()
-            .frame(width: 20.0, height: 20.0)
+    ZStack {
+      ParticleSystem {
+        Burst(maxSpawns: 100) {
+          v
+        } withBehavior: { p in
+          p
+        } customView: {
+          Rectangle().frame(width: 3.0, height: 3.0)
         }
-        .initialPosition(.center)
-        .initialOffset(xIn: -100.0 ... 100.0)
-        .initialVelocity(y: 0.1)
-        .lifetime(10)
+        .initialOffset(y: 50.0)
       }
+      .debug()
+      ZStack(alignment: .topLeading) {
+        Color.black
+        v.offset(y: 50.0)
+      }
+      .opacity(0.1)
     }
-    .debug()
+    .frame(width: 400.0, height: 300.0)
+  }
+  
+  var v: some View {
+    Text("Hello, Demi!")
+      .font(.system(size: 48))
+      .fontWeight(.black)
+      .foregroundStyle(LinearGradient(colors: [.red, .yellow, .blue], startPoint: .topLeading, endPoint: .bottomTrailing))
   }
 }
 
