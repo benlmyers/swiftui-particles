@@ -11,11 +11,12 @@ import Foundation
 
 public struct Burst<E>: Entity where E: Entity {
   
-  // MARK: - Propertiesf
+  // MARK: - Properties
   
   private var customView: AnyView
   private var withBehavior: (Particle) -> E
   private var spawns: [(CGPoint, Color)]
+  private var pixelDensity: Int
   private var viewSize: CGSize
 
   // MARK: - Initalizers
@@ -23,17 +24,20 @@ public struct Burst<E>: Entity where E: Entity {
   /// Creates a new Burst particle.
   /// - Parameter maxSpawns: The number of particles to spawn on the source layer.
   /// - Parameter ignoringColor: The color to ignore when spawning particles on the source layer. Particles will not spawn atop the ignored color.
+  /// - Parameter pixelDensity: View to place for each pixel.
   /// - Parameter view: The view that is used as a source layer to choose where to spawn various colored particles.
   /// - Parameter withBehavior: A closure that allows you to define the behavior of each spawned entity using Entity Modifiers on the closure parameter.
   /// - Parameter customView: A custom view to use the the spawned particle. By default this is a circle. Keep in mind that the color appearance of each custom view will be overridden by the color in the source layer, `view`.
   public init<Base, ParticleView>(
-    maxSpawns: Int = 200,
+    maxSpawns: Int = 99999,
     ignoringColor: Color = .clear,
+    pixelDensity: Int = 3,
     @ViewBuilder view: () -> Base,
     withBehavior: @escaping (Particle) -> E,
     @ViewBuilder customView: () -> ParticleView = { Circle().frame(width: 2.0, height: 2.0) }
   ) where Base: View, ParticleView: View {
     
+    let timer = PerformanceTimer(title: "BURST INIT")
     guard let viewImage = view().asImage()?.cgImage, let imgData = viewImage.dataProvider?.data else {
       fatalError("Particles could not convert view to image correctly. (Burst)")
     }
@@ -52,32 +56,30 @@ public struct Burst<E>: Entity where E: Entity {
       return color
     }
     
-    var i: Int = 0
-    var j: Int = 0
-    var spawnPositionsUsed: [Int: Set<Int>] = [:]
     var spawns: [(CGPoint, Color)] = []
+    var sc = 0
     
-    while i < 99999, j < maxSpawns {
-      i += 1
-      let x: Int = .random(in: 0 ... viewImage.width) / 2
-      let y: Int = .random(in: 0 ... viewImage.height) / 2
-      if spawnPositionsUsed[x]?.contains(y) ?? false {
-        continue
+    for x in stride(from: 0, to: viewImage.width / 2, by: pixelDensity) {
+      if (sc > maxSpawns) {
+        break
       }
-      if let color = getPixelColorAt(x: x, y: y) {
-        spawns.append((CGPoint(x: x, y: y), color))
-        j += 1
-      }
-      if spawnPositionsUsed.keys.contains(x) {
-        spawnPositionsUsed[x]!.insert(y)
-      } else {
-        spawnPositionsUsed[x] = .init(arrayLiteral: y)
+      for y in stride(from: 0, to: viewImage.height / 2, by: pixelDensity) {
+        if let color = getPixelColorAt(x: x, y: y) {
+          spawns.append((CGPoint(x: x, y: y), color))
+          if (sc > maxSpawns) {
+            break
+          }
+          sc += 1
+        }
       }
     }
     
     self.spawns = spawns
     self.customView = .init(customView())
     self.withBehavior = withBehavior
+    self.pixelDensity = pixelDensity
+    
+    timer.calculateElapsedTime(prints: true)
   }
   
   // MARK: - Body Entity
@@ -89,6 +91,7 @@ public struct Burst<E>: Entity where E: Entity {
       )
       .initialPosition(x: spawn.0.x, y: spawn.0.y)
       .colorOverlay(spawn.1)
+      .lifetime(999)
     }
   }
 }

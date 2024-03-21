@@ -14,30 +14,30 @@ struct ContentView: View {
   var body: some View {
     ZStack {
       ParticleSystem {
-        Burst(maxSpawns: 100) {
+//        Preset.Snow()
+        Burst(pixelDensity: 3) {
           v
         } withBehavior: { p in
           p
         } customView: {
-          Rectangle().frame(width: 3.0, height: 3.0)
+          Circle().frame(width: 3.0, height: 3.0)
         }
         .initialOffset(y: 50.0)
       }
       .debug()
       ZStack(alignment: .topLeading) {
-        Color.black
-        v.offset(y: 50.0)
+        Color.clear
+        v.offset(y: 100.0)
       }
-      .opacity(0.1)
     }
     .frame(width: 400.0, height: 300.0)
   }
   
   var v: some View {
-    Text("Hello, Demi!")
+    Text("Hi, Ben!")
       .font(.system(size: 48))
       .fontWeight(.black)
-      .foregroundStyle(LinearGradient(colors: [.red, .yellow, .blue], startPoint: .topLeading, endPoint: .bottomTrailing))
+      .foregroundStyle(LinearGradient(colors: [.red, .yellow, .teal], startPoint: .topLeading, endPoint: .bottomTrailing))
   }
 }
 
