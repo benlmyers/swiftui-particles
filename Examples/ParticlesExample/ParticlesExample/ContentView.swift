@@ -14,12 +14,13 @@ struct ContentView: View {
   var body: some View {
     ZStack {
       ParticleSystem {
-        Burst(pixelDensity: 4) {
+//        Preset.Snow()
+        Burst(pixelDensity: 3) {
           v
         } withBehavior: { p in
           p
         } customView: {
-          Circle().frame(width: 4.0, height: 4.0)
+          Circle().frame(width: 3.0, height: 3.0)
         }
         .initialOffset(y: 50.0)
       }

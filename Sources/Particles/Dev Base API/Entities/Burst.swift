@@ -11,7 +11,7 @@ import Foundation
 
 public struct Burst<E>: Entity where E: Entity {
   
-  // MARK: - Propertiesf
+  // MARK: - Properties
   
   private var customView: AnyView
   private var withBehavior: (Particle) -> E
@@ -37,6 +37,7 @@ public struct Burst<E>: Entity where E: Entity {
     @ViewBuilder customView: () -> ParticleView = { Circle().frame(width: 2.0, height: 2.0) }
   ) where Base: View, ParticleView: View {
     
+    let timer = PerformanceTimer(title: "BURST INIT")
     guard let viewImage = view().asImage()?.cgImage, let imgData = viewImage.dataProvider?.data else {
       fatalError("Particles could not convert view to image correctly. (Burst)")
     }
@@ -77,6 +78,8 @@ public struct Burst<E>: Entity where E: Entity {
     self.customView = .init(customView())
     self.withBehavior = withBehavior
     self.pixelDensity = pixelDensity
+    
+    timer.calculateElapsedTime(prints: true)
   }
   
   // MARK: - Body Entity
