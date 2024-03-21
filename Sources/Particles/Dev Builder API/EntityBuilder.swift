@@ -20,11 +20,11 @@ public struct EntityBuilder {
     content
   }
   
-  public static func buildBlock<E1, E2>(_ c1: E1, _ c2: E2) -> some Entity where E1: Entity, E2: Entity {
+  public static func buildBlock<E1, E2>(_ c1: E1, _ c2: E2) -> Group where E1: Entity, E2: Entity {
     Group(values: [.init(body: c1), .init(body: c2)])
   }
   
-  public static func buildBlock<E1, E2, E3>(_ c1: E1, _ c2: E2, _ c3: E3) -> some Entity where E1: Entity, E2: Entity, E3: Entity {
+  public static func buildBlock<E1, E2, E3>(_ c1: E1, _ c2: E2, _ c3: E3) -> Group where E1: Entity, E2: Entity, E3: Entity {
     Group(values: [.init(body: c1), .init(body: c2), .init(body: c3)])
   }
   
@@ -32,5 +32,45 @@ public struct EntityBuilder {
     _ c1: E1, _ c2: E2, _ c3: E3, _ c4: E4
   ) -> some Entity where E1: Entity, E2: Entity, E3: Entity, E4: Entity {
     Group(values: [.init(body: c1), .init(body: c2), .init(body: c3), .init(body: c4)])
+  }
+  
+//  public static func buildIf<T>(_ content: T) -> EmptyEntity where T: Entity {
+//    return .init()
+//  }
+
+//  public static func buildEither<T>(first: T) -> _ConditionalContent where T: Entity {
+//    return .init(t: first)
+//  }
+//
+//  public static func buildEither<F>(second: F) -> _ConditionalContent where F: Entity {
+//    return .init(f: second)
+//  }
+  
+  public static func buildEither<T>(first: T) -> Group where T: Entity {
+    return .init(values: [.init(body: first), .init(body: EmptyEntity())])
+  }
+
+  public static func buildEither<F>(second: F) -> Group where F: Entity {
+    return .init(values: [.init(body: EmptyEntity()), .init(body: second)])
+  }
+  
+//
+//  public static func buildLimitedAvailability<E>(_ component: E) -> E? where E: Entity {
+//    return component
+//  }
+}
+
+public struct _ConditionalContent: Entity {
+  public var body: EmptyEntity { .init() }
+  var content: C
+  enum C {
+    case t(AnyEntity)
+    case f(AnyEntity)
+  }
+  init<T>(t: T) where T: Entity {
+    self.content = .t(.init(body: t))
+  }
+  init<F>(f: F) where F: Entity {
+    self.content = .f(.init(body: f))
   }
 }

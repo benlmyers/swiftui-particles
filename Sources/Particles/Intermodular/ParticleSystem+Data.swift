@@ -129,7 +129,6 @@ public extension ParticleSystem {
       var newPhysicsProxies: [ProxyID: PhysicsProxy] = [:]
       let lock = NSLock()
       for (proxyID, entityID) in proxyEntities {
-        let d = Date()
         group.enter()
         queue.async(group: group) { [weak self] in
           guard let self else {
@@ -268,9 +267,13 @@ public extension ParticleSystem {
                 )
               }
             }
+            if debug, let e = entity.underlyingEmitter() {
+              context.fill(.init(ellipseIn: .init(origin: .zero, size: .init(width: 10, height: 10))), with: .color(.red))
+            }
             guard let resolved = context.resolveSymbol(id: resolvedEntityID) else {
               return
             }
+            
             context.draw(resolved, at: .zero)
             self.performRenderTime = Date().timeIntervalSince(flag)
           }

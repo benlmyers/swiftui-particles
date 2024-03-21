@@ -11,22 +11,29 @@ import ParticlesPresets
 
 struct ContentView: View {
   
+  @State var x: Bool = true
+  
   var body: some View {
-    ParticleSystem {
-//      Preset.Snow()
-//      Preset.Fire()
-      ForEach(Array(repeating: 1, count: 100), merges: .entities) { c in
-        Particle {
-          Circle()
-            .frame(width: 20.0, height: 20.0)
-        }
-        .initialPosition(.center)
-        .initialOffset(xIn: -100.0 ... 100.0)
-        .initialVelocity(y: 0.1)
-        .lifetime(10)
-      }
+    Button("Switch") {
+      
+      x.toggle()
     }
-    .debug()
+    .padding()
+    VStack {
+      ParticleSystem {
+        Emitter {
+          Particle { EmptyView() }
+        }
+        .fixPosition(.center)
+//        if x {
+//          Preset.Fire()
+//        } else {
+//          Preset.Rain()
+//        }
+      }
+      .statePersistent("1")
+      .debug()
+    }
   }
 }
 
