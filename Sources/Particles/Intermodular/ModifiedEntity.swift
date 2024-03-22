@@ -41,7 +41,6 @@ internal struct ModifiedEntity<E>: Entity where E: Entity {
   }
   
   func _onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy {
-    marker("Physics M")
     guard let data = context.system else { return body._onPhysicsUpdate(context) }
     guard let updatePhysics else { return body._onPhysicsUpdate(context) }
     let newContext: PhysicsProxy.Context = .init(physics: body._onPhysicsUpdate(context), system: data)
