@@ -1,47 +1,55 @@
 //
-//  Burst.swift
+//  Lattice.swift
 //
 //
 //  Created by Ben Myers on 1/21/24.
 //
 
-import CoreGraphics
 import SwiftUI
 import Foundation
+import CoreGraphics
 
-public struct Burst<E>: Entity where E: Entity {
+/// A lattice entity group that 'imitates' a view by creating a grid of colored particles.
+///
+/// You can customize the behavior of each particle to create neat effects on your views:
+/// ```
+/// Lattice(spacing: 3) {
+///   Text("Hello, World!").font(.title).fontWeight(.bold)
+/// } withBehavior: { p in
+///   p
+///     .initialVelocity(xIn: -0.05 ... 0.05, yIn: -0.05 ... 0.05)
+///     .lifetime(4)
+///     .initialAcceleration(y: 0.0002)
+/// } customView: {
+///   Circle().frame(width: 3.0, height: 3.0)
+/// }
+/// ```
+public struct Lattice<E>: Entity where E: Entity {
   
   // MARK: - Properties
   
   private var customView: AnyView
   private var withBehavior: (Particle) -> E
   private var spawns: [(CGPoint, Color)]
-  private var pixelDensity: Int
   private var viewSize: CGSize
 
   // MARK: - Initalizers
   
-  /// Creates a new Burst particle.
-  /// - Parameter maxSpawns: The number of particles to spawn on the source layer.
-  /// - Parameter ignoringColor: The color to ignore when spawning particles on the source layer. Particles will not spawn atop the ignored color.
-  /// - Parameter pixelDensity: View to place for each pixel.
+  /// Creates a new Lattice particle group, which creates a grid of colored particles atop the opaque pixels of a view.
+  /// - Parameter spacing: Distance between each particle in the lattice.
   /// - Parameter view: The view that is used as a source layer to choose where to spawn various colored particles.
   /// - Parameter withBehavior: A closure that allows you to define the behavior of each spawned entity using Entity Modifiers on the closure parameter.
   /// - Parameter customView: A custom view to use the the spawned particle. By default this is a circle. Keep in mind that the color appearance of each custom view will be overridden by the color in the source layer, `view`.
   public init<Base, ParticleView>(
-    maxSpawns: Int = 99999,
-    ignoringColor: Color = .clear,
-    pixelDensity: Int = 3,
+    spacing: Int = 3,
     @ViewBuilder view: () -> Base,
     withBehavior: @escaping (Particle) -> E,
     @ViewBuilder customView: () -> ParticleView = { Circle().frame(width: 2.0, height: 2.0) }
   ) where Base: View, ParticleView: View {
-    
     guard let viewImage = view().asImage()?.cgImage, let imgData = viewImage.dataProvider?.data else {
       fatalError("Particles could not convert view to image correctly. (Burst)")
     }
     viewSize = .init(width: viewImage.width / 2, height: viewImage.height / 2)
-    
     func getPixelColorAt(x: Int, y: Int) -> Color? {
       let data: UnsafePointer<UInt8> = CFDataGetBytePtr(imgData)
       let bpr: Int = viewImage.bytesPerRow
@@ -54,29 +62,17 @@ public struct Burst<E>: Entity where E: Entity {
       if a == 0 || r + g + b < 0.1 { return nil }
       return color
     }
-    
     var spawns: [(CGPoint, Color)] = []
-    var sc = 0
-    
-    for x in stride(from: 0, to: viewImage.width / 2, by: pixelDensity) {
-      if (sc > maxSpawns) {
-        break
-      }
-      for y in stride(from: 0, to: viewImage.height / 2, by: pixelDensity) {
+    for x in stride(from: 0, to: viewImage.width / 2, by: spacing) {
+      for y in stride(from: 0, to: viewImage.height / 2, by: spacing) {
         if let color = getPixelColorAt(x: x, y: y) {
           spawns.append((CGPoint(x: x, y: y), color))
-          if (sc > maxSpawns) {
-            break
-          }
-          sc += 1
         }
       }
     }
-    
     self.spawns = spawns
     self.customView = .init(customView())
     self.withBehavior = withBehavior
-    self.pixelDensity = pixelDensity
   }
   
   // MARK: - Body Entity
@@ -86,23 +82,8 @@ public struct Burst<E>: Entity where E: Entity {
       withBehavior(
         Particle(anyView: customView)
       )
-      .initialPosition(x: spawn.0.x, y: spawn.0.y)
+      .initialOffset(x: spawn.0.x, y: spawn.0.y)
       .colorOverlay(spawn.1)
-//      .lifetime(999)
     }
   }
-}
-
-public extension Burst where E == EmptyEntity {
-  
-  //  public init<Base, ParticleView>(
-  //    @ViewBuilder view: () -> Base,
-  //    maxSpawns: Int = 200,
-  //    ignoringColor: Color = .clear,
-  //    @ViewBuilder customView: () -> ParticleView = { Circle().frame(width: 10.0, height: 10.0) }
-  //  ) {
-  //    self.init(view: view, withBehavior: { e in
-  //      e.initialVelocity(xIn: -0.5 ... 0.5, yIn: -0.5 ... 0.5)
-  //    }, maxSpawns: maxSpawns, ignoringColor: ignoringColor, customView: customView)
-  //  }
 }

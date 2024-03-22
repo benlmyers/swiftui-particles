@@ -8,6 +8,7 @@
 import SwiftUI
 import Foundation
 
+/// A transition modifying the opacity of an entity, making a twinkle effect.
 public struct TwinkleTransition: Transition {
   public func modifyRender(progress: Double, physics: PhysicsProxy.Context, context: inout GraphicsContext) {
     let r = Double.random(in: 0.0 ... 1.0, seed: physics.physics.seed.0)

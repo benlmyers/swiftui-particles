@@ -27,6 +27,8 @@ public struct Particle: Entity {
   
   // MARK: - Initalizers
   
+  /// Create a particle with the appearance of a passed view.
+  /// - Parameter view: The view to create the particle with.
   public init<V>(@ViewBuilder view: () -> V) where V: View {
     self.view = .init(view())
   }

@@ -30,7 +30,7 @@ public extension Preset {
     var flameLifetime: TimeInterval = 1
     
     public var body: some Entity {
-      Emitter(interval: 0.01) {
+      Emitter(every: 0.01) {
         Particle {
           RadialGradient(colors: [color, .clear], center: .center, startRadius: 2.0, endRadius: 25.0)
             .clipShape(Circle())

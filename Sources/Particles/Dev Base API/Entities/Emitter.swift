@@ -30,7 +30,11 @@ public struct Emitter: Entity {
   
   // MARK: - Initalizers
   
-  public init<E>(interval: TimeInterval = 1.0, @EntityBuilder emits: () -> E) where E: Entity {
+  /// Creates an emitter that emits passed entities on an interval.
+  /// If a group of entities is passed in `emits`, you can use ``emitAll()`` or ``emitSingle(choosing:)`` to change the entities spawned in the interval.
+  /// - Parameter interval: The interval to emit entities.
+  /// - Parameter emits: A closure returning the entity/entities to spawn on the interval.
+  public init<E>(every interval: TimeInterval = 1.0, @EntityBuilder emits: () -> E) where E: Entity {
     self.emitInterval = interval
     self.prototype = .init(body: emits())
   }
