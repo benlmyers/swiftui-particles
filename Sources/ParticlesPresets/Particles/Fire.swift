@@ -28,13 +28,19 @@ public extension Preset {
     var spawnRadius: CGSize
     var flameSize: CGFloat = 1.0
     var flameLifetime: TimeInterval = 1
+    var startRadius: CGFloat = 2.0
+    var endRadius: CGFloat = 10.0
     
     public var body: some Entity {
       Emitter(every: 0.01) {
         Particle {
-          RadialGradient(colors: [color, .clear], center: .center, startRadius: 2.0, endRadius: 10.0)
-            .clipShape(Circle())
-            .frame(width: 15.0 * flameSize, height: 15.0 * flameSize)
+          RadialGradient(
+            colors: [color, .clear],
+            center: .center,
+            startRadius: startRadius,
+            endRadius: endRadius
+          )
+          .clipShape(Circle())
         }
         .initialOffset(xIn: -spawnRadius.width/2 ... spawnRadius.width/2, yIn: -spawnRadius.height/2 ... spawnRadius.height/2)
         .initialPosition(.center)
@@ -51,10 +57,20 @@ public extension Preset {
       }
     }
     
-    public init(color: Color = .red, spawnPoint: UnitPoint = .center, spawnRadius: CGSize = .init(width: 20.0, height: 4.0)) {
+    public init(
+      color: Color = .red,
+      spawnPoint: UnitPoint = .center,
+      flameSize: CGFloat = 2.0,
+      spawnRadius: CGSize = .init(width: 20.0, height: 4.0),
+      startRadius: CGFloat = 2.0,
+      endRadius: CGFloat = 10.0
+    ) {
       self.color = color
       self.spawnPoint = spawnPoint
+      self.flameSize = flameSize
       self.spawnRadius = spawnRadius
+      self.startRadius = startRadius
+      self.endRadius = endRadius
     }
   }
 }
