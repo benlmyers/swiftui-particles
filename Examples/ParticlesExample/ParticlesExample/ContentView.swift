@@ -11,30 +11,24 @@ import ParticlesPresets
 
 struct ContentView: View {
   
-  var body: some View {
-    ParticleSystem {
-      Lattice(spacing: 3) {
-        v
-      } withBehavior: { p in
-        p
-          .initialVelocity(xIn: -0.05 ... 0.05, yIn: -0.05 ... 0.05)
-          .initialOffset(y: 100.0)
-          .lifetime(4)
-          .transition(.twinkle, on: .death, duration: 1.0)
-          .initialAcceleration(y: 0.0002)
-      } customView: {
-        Circle().frame(width: 3.0, height: 3.0)
-      }
-    }
-    .debug()
-    .frame(width: 400.0, height: 300.0)
-  }
+  @State var burst: Bool = false
   
-  var v: some View {
-    Text("Hi, Ben!")
-      .font(.system(size: 48))
-      .fontWeight(.black)
-      .foregroundStyle(LinearGradient(colors: [.red, .yellow, .teal], startPoint: .topLeading, endPoint: .bottomTrailing))
+  var body: some View {
+    VStack(spacing: 50) {
+      Text("Whats up")
+        .particleSystem(atop: false) {
+          Preset.Fire()
+        }
+      Text("Not much lol")
+        .emits(every: 0.01, atop: false) {
+          Particle { Text("👋") }.initialVelocity { c in
+              .init(angle: .random(), magnitude: 1.0)
+          }
+        }
+      Text("burst me")
+        .dissolve(if: burst)
+      Button("burst") { burst.toggle() }
+    }
   }
 }
 
