@@ -9,7 +9,7 @@ import SwiftUI
 import Foundation
 
 public struct OpacityTransition: Transition {
-  public func modifyRender(progress: Double, context: inout GraphicsContext) {
+  public func modifyRender(progress: Double, physics: PhysicsProxy.Context, context: inout GraphicsContext) {
     context.opacity = 1 - progress
   }
 }

@@ -9,7 +9,7 @@ import SwiftUI
 import Foundation
 
 public struct ScaleTransition: Transition {
-  public func modifyRender(progress: Double, context: inout GraphicsContext) {
+  public func modifyRender(progress: Double, physics: PhysicsProxy.Context, context: inout GraphicsContext) {
     context.scaleBy(x: 1 - progress, y: 1 - progress)
   }
 }

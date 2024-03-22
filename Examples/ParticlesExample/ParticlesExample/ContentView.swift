@@ -20,6 +20,8 @@ struct ContentView: View {
         } withBehavior: { p in
           p
             .initialVelocity(xIn: -0.2 ... 0.2, yIn: -0.2 ... 0.2)
+            .lifetime(4)
+            .transition(.twinkle, duration: 1.0)
         } customView: {
           Circle().frame(width: 3.0, height: 3.0)
         }

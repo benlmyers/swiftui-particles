@@ -226,6 +226,8 @@ public extension ParticleSystem {
             physics.position.y < size.height + 20.0,
             currentFrame > physics.inception
           else { continue }
+          context.opacity = 1.0
+          context.blendMode = .normal
           if let render {
             context.blendMode = render.blendMode
             context.opacity = render.opacity
@@ -262,8 +264,10 @@ public extension ParticleSystem {
                 let transition: AnyTransition = t.0
                 let bounds: TransitionBounds = t.1
                 let duration: Double = t.2
+                guard c.timeAlive < duration || c.timeAlive > physics.lifetime - duration else { continue }
                 transition.modifyRender(
                   getTransitionProgress(bounds: bounds, duration: duration, context: c),
+                  c,
                   &context
                 )
               }
