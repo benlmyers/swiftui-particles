@@ -14,8 +14,16 @@ public extension View {
   /// Applies a particle system to this view.
   /// - Parameter atop: Whether particles are laid atop the view. Pass `false` to lay particles under the view.
   /// - Parameter entities: The entities to spawn in the particle system.
-  func particleSystem<E>(atop: Bool = true, @EntityBuilder entities: () -> E) -> some View where E: Entity {
-    self.boundlessOverlay(atop: atop, minSize: minSize) {
+  func particleSystem<E>(
+    atop: Bool = true,
+    offset: CGPoint = .zero,
+    @EntityBuilder entities: () -> E
+  ) -> some View where E: Entity {
+    self.boundlessOverlay(
+      atop: atop,
+      minSize: minSize,
+      offset: offset)
+    {
       ParticleSystem(entity: entities)
     }
   }

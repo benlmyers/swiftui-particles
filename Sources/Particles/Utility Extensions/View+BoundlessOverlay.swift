@@ -12,8 +12,19 @@ public extension View {
   /// Applies a boundless overlay to the view.
   /// - Parameter atop: Whether the overlay view goes on top or under the source view.
   /// - Parameter overlay: The view to overlay. This can extend the bounds of the base view without affecting the size of its frame.
-  func boundlessOverlay<V>(atop: Bool = true, minSize: CGSize = .zero, @ViewBuilder overlay: () -> V) -> some View where V: View {
-    BoundlessOverlayWrapper(atop: atop, minSize: minSize, content: { self }, overlay: overlay)
+  func boundlessOverlay<V>(
+    atop: Bool = true,
+    minSize: CGSize = .zero,
+    offset: CGPoint = .zero,
+    @ViewBuilder overlay: () -> V
+  ) -> some View where V: View {
+    BoundlessOverlayWrapper(
+      atop: atop,
+      minSize: minSize,
+      offset: offset,
+      content: { self },
+      overlay: overlay
+    )
   }
 }
 
@@ -23,6 +34,7 @@ fileprivate struct BoundlessOverlayWrapper<Content, Overlay>: View where Content
   
   var content: Content
   var overlay: Overlay
+  var offset: CGPoint
   var atop: Bool
   var minSize: CGSize
   
@@ -49,12 +61,20 @@ fileprivate struct BoundlessOverlayWrapper<Content, Overlay>: View where Content
   var o: some View {
     overlay
       .frame(minWidth: minSize.width, minHeight: minSize.height)
+      .offset(x: offset.x, y: offset.y)
   }
   
-  init(atop: Bool = true, minSize: CGSize = .zero, @ViewBuilder content: () -> Content, @ViewBuilder overlay: () -> Overlay) {
+  init(
+    atop: Bool = true,
+    minSize: CGSize = .zero,
+    offset: CGPoint = .zero,
+    @ViewBuilder content: () -> Content,
+    @ViewBuilder overlay: () -> Overlay
+  ) {
     self.content = content()
     self.overlay = overlay()
     self.minSize = minSize
+    self.offset = offset
     self.atop = atop
   }
 }
