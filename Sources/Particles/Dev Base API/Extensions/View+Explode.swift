@@ -8,7 +8,7 @@
 import SwiftUI
 
 extension View {
-  func explode(if condition: Bool) -> some View {
+  public func explode(if condition: Bool) -> some View {
     self.opacity(condition ? 0.0 : 1.0).boundlessOverlay(atop: true, minSize: .init(width: 300.0, height: 300.0)) {
       ZStack {
         ParticleSystem {
@@ -18,7 +18,7 @@ extension View {
                 if condition {
                   return CGVector(angle: Angle.degrees(Double.random(in: 0.0 ... 360.0, seed: c.physics.seed.0)), magnitude: 0.7)
                 }
-                return . zero
+                return .zero
               }
               .initialPosition(.center).initialVelocity(xIn: -0.01 ... 0.01, yIn: -0.01 ... 0.01)
               .transition(.twinkle)
