@@ -25,6 +25,8 @@ public protocol Entity {
   
   associatedtype Body: Entity
   
+  var _confirmedEmptyUnderlyingEmitter: Bool { get set }
+  
   /// The inner content of the entity.
   /// Inner content often holds additional modifiers to apply to ``PhysicsProxy`` or ``RenderProxy`` instances upon spawn.
   var body: Self.Body { get }
@@ -50,7 +52,9 @@ public protocol Entity {
   func _onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy
 }
 
-extension Never: Entity {}
+extension Never: Entity {
+  public var _confirmedEmptyUnderlyingEmitter: Bool { get { .init() } set {}}
+}
 
 // MARK: - Default Implementation
 
@@ -58,6 +62,8 @@ extension Entity {
   
   private var _initialPhysicsCarried: PhysicsProxy? { get { .init(currentFrame: 0) } set {}}
   private var _initialRenderCarried: RenderProxy { get { .init() } set {}}
+  
+  public var _confirmedEmptyUnderlyingEmitter: Bool { get { false } set {}}
   
   public func _onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
     if self is EmptyEntity {
@@ -119,6 +125,9 @@ extension Entity {
   }
   
   internal func underlyingEmitter() -> Emitter? {
+    if _confirmedEmptyUnderlyingEmitter {
+      return nil
+    }
     if let emitter = self as? Emitter {
       return emitter
     } else if self is EmptyEntity {
@@ -127,16 +136,6 @@ extension Entity {
       return body.underlyingEmitter()
     }
   }
-  
-//  internal func underlyingBurst() -> Burst? {
-//    if let burst = self as? Burst {
-//      return burst
-//    } else if self is EmptyEntity {
-//      return nil
-//    } else {
-//      return body.underlyingBurst()
-//    }
-//  }
   
   internal func underlyingTransitions() -> [(AnyTransition, TransitionBounds, Double)] {
     var result: [(AnyTransition, TransitionBounds, Double)] = []

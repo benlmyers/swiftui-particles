@@ -125,7 +125,7 @@ public extension ParticleSystem {
     internal func updatePhysics() {
       let flag = Date()
       let group = DispatchGroup()
-      let queue = DispatchQueue(label: "com.benmyers.particles.physics.update", attributes: .concurrent)
+      let queue = DispatchQueue(label: "com.benmyers.particles.physics.update", qos: .userInteractive, attributes: .concurrent)
       var newPhysicsProxies: [ProxyID: PhysicsProxy] = [:]
       let lock = NSLock()
       for (proxyID, entityID) in proxyEntities {
@@ -226,6 +226,8 @@ public extension ParticleSystem {
             physics.position.y < size.height + 20.0,
             currentFrame > physics.inception
           else { continue }
+          context.opacity = 1.0
+          context.blendMode = .normal
           if let render {
             context.blendMode = render.blendMode
             context.opacity = render.opacity
@@ -245,6 +247,7 @@ public extension ParticleSystem {
               m.r5 = 1
               m.g5 = 1
               m.b5 = 1
+              context.addFilter(.colorMultiply(overlay))
               context.addFilter(.colorMatrix(m))
               context.addFilter(.colorMultiply(overlay))
             }
@@ -261,8 +264,10 @@ public extension ParticleSystem {
                 let transition: AnyTransition = t.0
                 let bounds: TransitionBounds = t.1
                 let duration: Double = t.2
+                guard c.timeAlive < duration || c.timeAlive > physics.lifetime - duration else { continue }
                 transition.modifyRender(
                   getTransitionProgress(bounds: bounds, duration: duration, context: c),
+                  c,
                   &context
                 )
               }
@@ -318,7 +323,10 @@ public extension ParticleSystem {
         var firstEntityID: EntityID?
         for v in group.values {
           guard let e = v.body as? any Entity else { continue }
-          let modified = applyGroupModifiers(to: e, groupRoot: entity)
+          var modified = e
+          if group.appliesModifiers {
+            modified = applyGroupModifiers(to: e, groupRoot: entity)
+          }
           // Merge view
           var mergingViewParameter: EntityID?
           if let merges: Group.Merges = group.merges, merges == .views {

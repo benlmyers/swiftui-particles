@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3C247D4D2BADBF8D00488B02 /* FireView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D492BADBF8D00488B02 /* FireView.swift */; };
+		3C247D4E2BADBF8D00488B02 /* SmokeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4A2BADBF8D00488B02 /* SmokeView.swift */; };
+		3C247D4F2BADBF8D00488B02 /* GhostRiderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4B2BADBF8D00488B02 /* GhostRiderView.swift */; };
+		3C247D502BADBF8D00488B02 /* SnowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4C2BADBF8D00488B02 /* SnowView.swift */; };
+		EE4265512BAE1C5C005193F1 /* MagicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE4265502BAE1C5C005193F1 /* MagicView.swift */; };
 		EE695F0C2ACB767E002D8F5B /* Particles in Frameworks */ = {isa = PBXBuildFile; productRef = EE695F0B2ACB767E002D8F5B /* Particles */; };
 		EED626832A4990B300A3C3F4 /* ParticlesExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED626822A4990B300A3C3F4 /* ParticlesExampleApp.swift */; };
 		EED626852A4990B300A3C3F4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED626842A4990B300A3C3F4 /* ContentView.swift */; };
@@ -16,6 +21,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3C247D492BADBF8D00488B02 /* FireView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireView.swift; sourceTree = "<group>"; };
+		3C247D4A2BADBF8D00488B02 /* SmokeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmokeView.swift; sourceTree = "<group>"; };
+		3C247D4B2BADBF8D00488B02 /* GhostRiderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GhostRiderView.swift; sourceTree = "<group>"; };
+		3C247D4C2BADBF8D00488B02 /* SnowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnowView.swift; sourceTree = "<group>"; };
+		EE4265502BAE1C5C005193F1 /* MagicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicView.swift; sourceTree = "<group>"; };
 		EED6267F2A4990B300A3C3F4 /* ParticlesExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ParticlesExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EED626822A4990B300A3C3F4 /* ParticlesExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticlesExampleApp.swift; sourceTree = "<group>"; };
 		EED626842A4990B300A3C3F4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -38,6 +48,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3C247D482BADBF4400488B02 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				3C247D492BADBF8D00488B02 /* FireView.swift */,
+				3C247D4B2BADBF8D00488B02 /* GhostRiderView.swift */,
+				3C247D4A2BADBF8D00488B02 /* SmokeView.swift */,
+				3C247D4C2BADBF8D00488B02 /* SnowView.swift */,
+				EE4265502BAE1C5C005193F1 /* MagicView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		EED626762A4990B300A3C3F4 = {
 			isa = PBXGroup;
 			children = (
@@ -59,6 +81,7 @@
 		EED626812A4990B300A3C3F4 /* ParticlesExample */ = {
 			isa = PBXGroup;
 			children = (
+				3C247D482BADBF4400488B02 /* View */,
 				EED626822A4990B300A3C3F4 /* ParticlesExampleApp.swift */,
 				EED626842A4990B300A3C3F4 /* ContentView.swift */,
 				EED626862A4990B500A3C3F4 /* Assets.xcassets */,
@@ -166,6 +189,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				EED626852A4990B300A3C3F4 /* ContentView.swift in Sources */,
+				3C247D4F2BADBF8D00488B02 /* GhostRiderView.swift in Sources */,
+				3C247D502BADBF8D00488B02 /* SnowView.swift in Sources */,
+				3C247D4D2BADBF8D00488B02 /* FireView.swift in Sources */,
+				EE4265512BAE1C5C005193F1 /* MagicView.swift in Sources */,
+				3C247D4E2BADBF8D00488B02 /* SmokeView.swift in Sources */,
 				EED626832A4990B300A3C3F4 /* ParticlesExampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

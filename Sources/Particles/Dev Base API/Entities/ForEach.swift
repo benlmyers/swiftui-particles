@@ -20,20 +20,23 @@ public struct ForEach<Data>: Entity where Data: RandomAccessCollection {
   
   // MARK: - Properties
   
-  public var body: Group { .init(values: data.map({ .init(body: mapping($0)) }), merges: merges) }
+  public var body: Group
   
   internal var data: Data
   internal var mapping: (Data.Element) -> any Entity
   internal var merges: Group.Merges?
+  internal var appliesModifiers: Bool
   
   // MARK: - Initalizers
   
   /// - Parameter data: The data to iterate over.
   /// - Parameter copy: The type of data to copy while iterating over elements. Used to optimize the particle system. See ``Group/CopyLevel``.
   /// - Parameter mapping: The mapping of data to Entity behavior.
-  public init<E>(_ data: Data, merges: Group.Merges? = nil, @EntityBuilder mapping: @escaping (Data.Element) -> E) where E: Entity {
+  public init<E>(_ data: Data, merges: Group.Merges? = nil, appliesModifiers: Bool = true, @EntityBuilder mapping: @escaping (Data.Element) -> E) where E: Entity {
     self.data = data
     self.mapping = mapping
     self.merges = merges
+    self.body = Group(values: data.map({ .init(body: mapping($0)) }), merges: merges, appliesModifers: appliesModifiers)
+    self.appliesModifiers = appliesModifiers
   }
 }

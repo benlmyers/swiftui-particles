@@ -8,8 +8,9 @@
 import SwiftUI
 import Foundation
 
+/// A transition modifying the scale of an entity.
 public struct ScaleTransition: Transition {
-  public func modifyRender(progress: Double, context: inout GraphicsContext) {
+  public func modifyRender(progress: Double, physics: PhysicsProxy.Context, context: inout GraphicsContext) {
     context.scaleBy(x: 1 - progress, y: 1 - progress)
   }
 }

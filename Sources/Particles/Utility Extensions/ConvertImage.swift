@@ -15,7 +15,7 @@ import AppKit
 
 internal extension View {
   #if os(iOS)
-  func asImage() -> UIImage {
+  func asImage() -> UIImage? {
     let controller = UIHostingController(rootView: self)
     let view = controller.view
     let targetSize = controller.view.intrinsicContentSize

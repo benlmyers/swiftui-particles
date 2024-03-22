@@ -16,6 +16,8 @@ internal struct ModifiedEntity<E>: Entity where E: Entity {
   private var birthRender: ((RenderProxy.Context) -> RenderProxy)?
   private var updateRender: ((RenderProxy.Context) -> RenderProxy)?
   
+  internal var _confirmedEmptyUnderlyingEmitter: Bool = false
+  
   init(
     entity: E,
     onBirthPhysics: ((PhysicsProxy.Context) -> PhysicsProxy)? = nil,
@@ -28,6 +30,7 @@ internal struct ModifiedEntity<E>: Entity where E: Entity {
     self.updatePhysics = onUpdatePhysics
     self.birthRender = onBirthRender
     self.updateRender = onUpdateRender
+    _confirmedEmptyUnderlyingEmitter = underlyingEmitter() == nil
   }
   
   func _onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {

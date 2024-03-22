@@ -26,9 +26,13 @@ public struct Group: Entity {
   internal var values: [AnyEntity]
   
   internal private(set) var merges: Merges?
+  internal private(set) var appliesModifiers: Bool = true
   
   // MARK: - Initalizers
   
+  /// Creates a group of entities.
+  /// Modifiers applied to the group will be applied to each of the entities passed in the initializer.
+  /// - Parameter entities: The entities to include in the group.
   public init<E>(@EntityBuilder entities: () -> E) where E: Entity {
     if let e = entities() as? Group {
       self = e
@@ -37,9 +41,10 @@ public struct Group: Entity {
     }
   }
   
-  internal init(values: [AnyEntity], merges: Merges? = nil) {
+  internal init(values: [AnyEntity], merges: Merges? = nil, appliesModifers: Bool = true) {
     self.values = values
     self.merges = merges
+    self.appliesModifiers = appliesModifers
   }
   
   // MARK: - Subtypes

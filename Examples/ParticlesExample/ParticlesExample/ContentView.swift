@@ -11,28 +11,32 @@ import ParticlesPresets
 
 struct ContentView: View {
   
-  @State var x: Bool = true
+  @State var explodes = false
+  @State var p = false
   
   var body: some View {
-    Button("Switch") {
-      
-      x.toggle()
-    }
-    .padding()
-    VStack {
-      ParticleSystem {
-        Emitter {
-          Particle { EmptyView() }
-        }
-        .fixPosition(.center)
-//        if x {
-//          Preset.Fire()
-//        } else {
-//          Preset.Rain()
-//        }
+    NavigationSplitView {
+      List {
+        NavigationLink("Ghost Rider", destination: GhostRiderView.init)
+        NavigationLink("Fire", destination: FireView.init)
+        NavigationLink("Snow", destination: SnowView.init)
+        NavigationLink("Smoke", destination: SmokeView.init)
+        NavigationLink("Magic", destination: MagicView.init)
       }
-      .statePersistent("1")
-      .debug()
+    } detail: {
+      VStack {
+        Text("Welcome to Particles")
+          .font(.title.bold())
+          .foregroundStyle(LinearGradient(colors: [.purple, .blue, .pink, .red, .yellow], startPoint: .leading, endPoint: .trailing))
+          .frame(width: 900, height: 900, alignment: .center)
+          .explode(if: explodes)
+          .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+              explodes = true
+            }
+          }
+        Button("P") { p.toggle() }
+      }
     }
   }
 }

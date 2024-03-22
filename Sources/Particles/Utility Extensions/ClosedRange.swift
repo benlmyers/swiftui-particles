@@ -17,6 +17,10 @@ public extension Double {
     return range.lowerBound + (range.upperBound - range.lowerBound) * drand48()
   }
   
+  static func random(in range: ClosedRange<Double>, seed: Double) -> Double {
+    random(in: range, seed: Int(seed * Double(Int.max)))
+  }
+  
   static func +/- (lhs: Double, rhs: Double) -> ClosedRange<Double> {
     return lhs - rhs ... lhs + rhs
   }
@@ -29,6 +33,10 @@ public extension Int {
     return Int(Double(range.lowerBound) + Double(range.upperBound - range.lowerBound) * drand48())
   }
   
+  static func random(in range: ClosedRange<Int>, seed: Double) -> Int {
+    random(in: range, seed: Int(seed * Double(Int.max)))
+  }
+  
   static func +/- (lhs: Int, rhs: Int) -> ClosedRange<Int> {
     return lhs - rhs ... lhs + rhs
   }
@@ -36,9 +44,13 @@ public extension Int {
 
 public extension CGFloat {
   
-  static func random(in range: ClosedRange<CGFloat>, seed: Double) -> CGFloat {
-    srand48(Int(seed * Double(Int.max)))
+  static func random(in range: ClosedRange<CGFloat>, seed: Int) -> CGFloat {
+    srand48(seed)
     return CGFloat(CGFloat(range.lowerBound) + CGFloat(range.upperBound - range.lowerBound) * drand48())
+  }
+  
+  static func random(in range: ClosedRange<CGFloat>, seed: Double) -> CGFloat {
+    random(in: range, seed: Int(seed * Double(Int.max)))
   }
   
   static func +/- (lhs: CGFloat, rhs: CGFloat) -> ClosedRange<CGFloat> {
