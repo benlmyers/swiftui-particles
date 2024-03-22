@@ -24,6 +24,7 @@ struct ContentView: View {
     } detail: {
       Text("Welcome to Particles")
         .font(.title.bold())
+        .foregroundStyle(LinearGradient(colors: [.purple, .blue, .pink, .red, .yellow], startPoint: .leading, endPoint: .trailing))
         .frame(width: 900, height: 900, alignment: .center)
         .explode(if: explodes)
         .onAppear {
