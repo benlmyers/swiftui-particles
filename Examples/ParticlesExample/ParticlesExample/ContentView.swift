@@ -22,20 +22,21 @@ struct ContentView: View {
         NavigationLink("Snow", destination: SnowView.init)
         NavigationLink("Smoke", destination: SmokeView.init)
         NavigationLink("Magic", destination: MagicView.init)
+        NavigationLink("Rain", destination: RainView.init)
+        NavigationLink("Stars", destination: StarsView.init)
       }
     } detail: {
       VStack {
         Text("Welcome to Particles")
           .font(.title.bold())
           .foregroundStyle(LinearGradient(colors: [.purple, .blue, .pink, .red, .yellow], startPoint: .leading, endPoint: .trailing))
-          .frame(width: 900, height: 900, alignment: .center)
           .explode(if: explodes)
           .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
               explodes = true
             }
           }
-        Button("P") { p.toggle() }
+        Text("Choose a preset to get started.")
       }
     }
   }

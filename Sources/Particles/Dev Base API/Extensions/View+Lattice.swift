@@ -27,7 +27,7 @@ public extension View {
   }
   
   func explode(if condition: Bool) -> some View {
-    self.opacity(condition ? 0.0 : 1.0).boundlessOverlay(atop: true, minSize: .init(width: 300.0, height: 300.0)) {
+    self.opacity(condition ? 0.0 : 1.0).boundlessOverlay(atop: true, minSize: .init(width: 800.0, height: 800.0)) {
       ZStack {
         ParticleSystem {
           Lattice(spacing: 2, view: { self }) { p in

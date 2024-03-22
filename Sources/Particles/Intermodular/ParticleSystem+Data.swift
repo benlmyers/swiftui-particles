@@ -27,6 +27,7 @@ public extension ParticleSystem {
     
     internal var initialEntity: (any Entity)?
     internal var nextEntityRegistry: EntityID = .zero
+    internal var refreshViews: Bool = false
     internal private(set) var fps: Double = .zero
     internal private(set) var nextProxyRegistry: ProxyID = .zero
     
@@ -213,7 +214,12 @@ public extension ParticleSystem {
           if let maybe = views[entityID] {
             switch maybe {
             case .merged(let mergedID): resolvedEntityID = mergedID
-            case .some(_): break
+            case .some(_): 
+              if refreshViews {
+                guard let view: AnyView = entity.viewToRegister() else { break }
+                views[entityID] = .some(view)
+              }
+              break
             }
           } else {
             guard let view: AnyView = entity.viewToRegister() else { continue }
@@ -272,7 +278,7 @@ public extension ParticleSystem {
                 )
               }
             }
-            if debug, let e = entity.underlyingEmitter() {
+            if debug, let _ = entity.underlyingEmitter() {
               context.fill(.init(ellipseIn: .init(origin: .zero, size: .init(width: 10, height: 10))), with: .color(.red))
             }
             guard let resolved = context.resolveSymbol(id: resolvedEntityID) else {
@@ -284,19 +290,8 @@ public extension ParticleSystem {
           }
         }
       }
+      refreshViews = false
     }
-    
-//    private func colorToRGBA(color: Color) -> (r: Float, g: Float, b: Float, a: Float) {
-//      if let components = color.cgColor?.components, components.count == 4 {
-//        let r = Float(components[0])
-//        let g = Float(components[1])
-//        let b = Float(components[2])
-//        let a = Float(components[3])
-//        return (r: r, g: g, b: b, a: a)
-//      }
-//      // Default RGBA values if the conversion fails
-//      return (r: 0.0, g: 0.0, b: 0.0, a: 1.0)
-//    }
     
     internal func advanceFrame() {
       if self.currentFrame > .max - 601 {

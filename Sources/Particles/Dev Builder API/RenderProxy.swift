@@ -46,6 +46,12 @@ public struct RenderProxy: Equatable {
     
     public private(set) weak var system: ParticleSystem.Data!
     
+    // MARK: - Computed Properties
+    
+    public var timeAlive: TimeInterval {
+      return (Double(system.currentFrame) - Double(physics.inception)) / Double(system.averageFrameRate)
+    }
+    
     // MARK: - Initalizers
     
     internal init(physics: PhysicsProxy, render: RenderProxy, system: ParticleSystem.Data) {

@@ -33,7 +33,7 @@ public extension Entity {
   ///   - withPoint: A closure returning the 2D point, in pixels, to set the entity upon creation.
   ///   - y: A closure returning the y-position, in pixels, to set the entity upon creation.
   /// - Returns: The modified entity.
-  func initialPosition(_ withPoint: @escaping (PhysicsProxy.Context) -> CGPoint) -> some Entity {
+  func initialPosition(with withPoint: @escaping (PhysicsProxy.Context) -> CGPoint) -> some Entity {
     ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
       let point = withPoint(context)
@@ -162,7 +162,7 @@ public extension Entity {
   /// - Parameters:
   ///   - withPoint: A closure returning the 2D point, in pixels, to set the entity's position to.
   /// - Returns: The modified entity.
-  func fixPosition(_ withPoint: @escaping (PhysicsProxy.Context) -> CGPoint) -> some Entity {
+  func fixPosition(with withPoint: @escaping (PhysicsProxy.Context) -> CGPoint) -> some Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
       let point = withPoint(context)
@@ -194,7 +194,7 @@ public extension Entity {
   /// - Parameters:
   ///   - withVelocity: A closure returning the 2D velocity, in pixels per frame, to set the entity upon creation.
   /// - Returns: The modified entity.
-  func initialVelocity(_ withVelocity: @escaping (PhysicsProxy.Context) -> CGVector) -> some Entity {
+  func initialVelocity(with withVelocity: @escaping (PhysicsProxy.Context) -> CGVector) -> some Entity {
     ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
       let v = withVelocity(context)
@@ -237,7 +237,7 @@ public extension Entity {
   /// - Parameters:
   ///   - withVelocity: A closure returning the 2D- velocity, in pixels per frame, to set the entity's velocity to.
   /// - Returns: The modified entity.
-  func fixVelocity(_ withVelocity: @escaping (PhysicsProxy.Context) -> CGVector) -> some Entity {
+  func fixVelocity(with withVelocity: @escaping (PhysicsProxy.Context) -> CGVector) -> some Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
       let v = withVelocity(context)
@@ -269,7 +269,7 @@ public extension Entity {
   /// - Parameters:
   ///   - withAcceleration: A closure returning the acceleration, in pixels per second squared, to set the entity upon creation.
   /// - Returns: The modified entity.
-  func initialAcceleration(_ withAcceleration: @escaping (PhysicsProxy.Context) -> CGVector) -> some Entity {
+  func initialAcceleration(with withAcceleration: @escaping (PhysicsProxy.Context) -> CGVector) -> some Entity {
     ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
       let a = withAcceleration(context)
@@ -312,7 +312,7 @@ public extension Entity {
   /// - Parameters:
   ///   - withAcceleration: A closure returning `CGVector` representing the value to set the entity's acceleration to.
   /// - Returns: The modified entity.
-  func fixAcceleration(_ withAcceleration: @escaping (PhysicsProxy.Context) -> CGVector) -> some Entity {
+  func fixAcceleration(with withAcceleration: @escaping (PhysicsProxy.Context) -> CGVector) -> some Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
       let a = withAcceleration(context)
@@ -336,7 +336,7 @@ public extension Entity {
   /// Sets the initial rotation of the entity using the value returned by the provided closure.
   /// - Parameter withAngle: A closure returning the initial rotation angle of the entity.
   /// - Returns: The modified entity.
-  func initialRotation(_ withAngle: @escaping (PhysicsProxy.Context) -> Angle) -> some Entity {
+  func initialRotation(with withAngle: @escaping (PhysicsProxy.Context) -> Angle) -> some Entity {
     ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
       p.rotation = withAngle(context)
@@ -367,7 +367,7 @@ public extension Entity {
   /// Sets the constant rotation of the entity using the value returned by the provided closure.
   /// - Parameter withAngle: A closure returning the constant rotation angle of the entity.
   /// - Returns: The modified entity.
-  func fixRotation(_ withAngle: @escaping (PhysicsProxy.Context) -> Angle) -> some Entity {
+  func fixRotation(with withAngle: @escaping (PhysicsProxy.Context) -> Angle) -> some Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
       p.rotation = withAngle(context)
@@ -389,7 +389,7 @@ public extension Entity {
   /// Sets the initial torque of the entity using the value returned by the provided closure.
   /// - Parameter withAngle: A closure returning the initial torque angle of the entity.
   /// - Returns: The modified entity.
-  func initialTorque(_ withAngle: @escaping (PhysicsProxy.Context) -> Angle) -> some Entity {
+  func initialTorque(with withAngle: @escaping (PhysicsProxy.Context) -> Angle) -> some Entity {
     ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
       p.torque = withAngle(context)
@@ -420,7 +420,7 @@ public extension Entity {
   /// Sets the constant torque of the entity using the value returned by the provided closure.
   /// - Parameter withAngle: A closure returning the constant torque angle of the entity.
   /// - Returns: The modified entity.
-  func fixTorque(_ withAngle: @escaping (PhysicsProxy.Context) -> Angle) -> some Entity {
+  func fixTorque(with withAngle: @escaping (PhysicsProxy.Context) -> Angle) -> some Entity {
     ModifiedEntity(entity: self, onUpdatePhysics: { context in
       var p = context.physics
       p.torque = withAngle(context)
@@ -442,7 +442,7 @@ public extension Entity {
   /// Sets the lifetime of the entity using the value returned by the provided closure.
   /// - Parameter withValue: A closure returning the lifetime of the entity, in seconds.
   /// - Returns: The modified entity.
-  func lifetime(_ withValue: @escaping (PhysicsProxy.Context) -> Double) -> some Entity {
+  func lifetime(with withValue: @escaping (PhysicsProxy.Context) -> Double) -> some Entity {
     ModifiedEntity(entity: self, onBirthPhysics: { context in
       var p = context.physics
       p.lifetime = withValue(context)

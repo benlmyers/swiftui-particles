@@ -113,12 +113,16 @@ public struct ParticleSystem: View {
   }
   
   /// Marks this particle system as **state persistent**.
-  /// State persistent particle systems to not reset their simulations when the view is re-rendered
-  public func statePersistent(_ id: String) -> ParticleSystem {
+  /// State persistent particle systems to not reset their simulations when the view is re-rendered.
+  /// - Parameter id: A `String` ID to use for the particle system. A unique ID will allow the system to persist across state updates.
+  /// - Parameter refreshesViews: Whether view refreshes at the top level should reset and re-render all particle views. Default `false`.
+  public func statePersistent(_ id: String, refreshesViews: Bool = false) -> ParticleSystem {
     var copy = self
     copy._id = id
     if !Self.data.contains(where: { $0.key == id }) {
       Self.data[id] = .init()
+    } else if refreshesViews {
+      Self.data[id]?.refreshViews = true
     }
     Self.data[id]?.initialEntity = copy._data?.initialEntity
     copy._data = nil

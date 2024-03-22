@@ -27,7 +27,7 @@ public extension Preset {
     var spawnPoint: UnitPoint
     
     public var body: some Entity {
-      Emitter(every: 0.01) {
+      Emitter(every: 0.03) {
         Particle {
           RadialGradient(
             colors: [color, .clear],
@@ -42,14 +42,15 @@ public extension Preset {
         .initialVelocity { c in
             .init(angle: .random(), magnitude: .random(in: 0.3 ... 0.5))
         }
-        .fixVelocity({ c in
+        .fixVelocity{ c in
           return .init(dx: c.physics.velocity.dx + c.timeAlive * 0.02 * sin(5 * (c.physics.seed.0 - 0.5) * c.timeAlive), dy: c.physics.velocity.dy - c.timeAlive * 0.02 * cos(5 * (c.physics.seed.1 - 0.5) * c.timeAlive))
-        })
+        }
         .blendMode(.plusLighter)
         .hueRotation(angleIn: .degrees(-10.0) ... .degrees(10.0))
         .transition(.twinkle, on: .death, duration: 2.0)
         .transition(.opacity, on: .birth, duration: 0.5)
         .lifetime(3)
+        .glow(color, radius: 4)
       }
     }
     

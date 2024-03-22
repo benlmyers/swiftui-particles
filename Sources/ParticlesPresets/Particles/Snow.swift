@@ -54,9 +54,9 @@ public extension Preset {
           return .random(in: -w ... w)
         })
         .initialVelocity(xIn: -0.1 ... 0.1, yIn: 0.02 ... 0.08)
-        .fixAcceleration({ c in
+        .fixAcceleration{ c in
           return CGVectorMake(0.0005 * sin(c.physics.seed.2 + c.system.time * 1.8), 0.001)
-        })
+        }
         .opacity(in: 0.2 ... 0.8)
         .transition(.opacity)
         .colorOverlay(.init(red: 0.7, green: 0.9, blue: 0.9))
@@ -86,9 +86,9 @@ public extension Preset {
           return .random(in: -w ... w)
         })
         .initialVelocity(xIn: -0.4 ... 0.4, yIn: 0.01 ... 0.03)
-        .fixAcceleration({ c in
+        .fixAcceleration{ c in
           return CGVectorMake(0.0004 * sin(c.physics.seed.2 + c.system.time * 1.8), 0.0007 + 0.0008 * cos(c.system.time * 1.8))
-        })
+        }
         .opacity(in: 0.2 ... 0.8)
         .scale(factorIn: 0.2 ... 1.4)
         .transition(.scale)

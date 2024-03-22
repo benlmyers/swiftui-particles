@@ -30,7 +30,7 @@ public extension Preset {
     }
     
     public var body: some Entity {
-      Emitter(interval: 1.0 / Double(parameters.intensity)) {
+      Emitter(every: 1.0 / Double(parameters.intensity)) {
         Drop(parameters: parameters)
       }
       .emitAll()
@@ -55,7 +55,7 @@ public extension Preset {
         .opacity(in: 0.5 ... 1.0)
         .transition(.opacity)
         .lifetime(parameters.rainLifetime)
-        .initialRotation(.degrees(-10.0))
+        .initialRotation(.degrees(-5.0 * parameters.windVelocity))
         .hueRotation(angleIn: .degrees(-10.0) ... .degrees(10.0))
         .blendMode(.plusLighter)
         .scale { c in

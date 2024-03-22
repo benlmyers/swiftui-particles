@@ -24,7 +24,7 @@ public extension Entity {
   /// Adjusts the opacity of the entity using the value returned by the provided closure.
   /// - Parameter withValue: A closure returning the opacity value to multiply the current opacity by.
   /// - Returns: The modified entity.
-  func opacity(_ withValue: @escaping (RenderProxy.Context) -> Double) -> some Entity {
+  func opacity(with withValue: @escaping (RenderProxy.Context) -> Double) -> some Entity {
     ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
       p.opacity = withValue(context)
@@ -57,7 +57,7 @@ public extension Entity {
   /// Applies a hue rotation to the entity using the value returned by the provided closure.
   /// - Parameter withAngle: A closure returning the angle of rotation in hue space.
   /// - Returns: The modified entity.
-  func hueRotation(_ withAngle: @escaping (RenderProxy.Context) -> Angle) -> some Entity {
+  func hueRotation(with withAngle: @escaping (RenderProxy.Context) -> Angle) -> some Entity {
     ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
       let hr = withAngle(context)
@@ -139,7 +139,7 @@ public extension Entity {
   /// Scales the entity by the size returned by the provided closure in both the x and y directions.
   /// - Parameter withSize: A closure returning the scaling factor to apply to both the x and y dimensions.
   /// - Returns: The modified entity.
-  func scale(_ withFactor: @escaping (RenderProxy.Context) -> CGFloat) -> some Entity {
+  func scale(with withFactor: @escaping (RenderProxy.Context) -> CGFloat) -> some Entity {
     ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
       let s = withFactor(context)
@@ -166,7 +166,7 @@ public extension Entity {
   /// - Parameters:
   ///   - withSize: A closure returning the scaling factors to apply to the x and y dimensions.
   /// - Returns: The modified entity.
-  func scale(_ withSize: @escaping (RenderProxy.Context) -> CGSize) -> some Entity {
+  func scale(with withSize: @escaping (RenderProxy.Context) -> CGSize) -> some Entity {
     ModifiedEntity(entity: self, onUpdateRender: { context in
       var p = context.render
       let s = withSize(context)

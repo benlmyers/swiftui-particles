@@ -14,19 +14,15 @@ struct SmokeView: View {
   @State var dirty = false
   
   var body: some View {
-    VStack {
-      HStack {
-        Button {
-          dirty.toggle()
-        } label: {
-          Text(dirty ? "Disable Dirty" : "Enable Dirty")
-        }
-      }
+    ZStack(alignment: .top) {
       ParticleSystem {
         Preset.Smoke(dirty: dirty)
       }
       .statePersistent("smoke")
-      .frame(width: 600, height: 600)
+      HStack {
+        Toggle("Dirty Smoke", isOn: $dirty)
+      }
+      .padding()
     }
   }
 }
