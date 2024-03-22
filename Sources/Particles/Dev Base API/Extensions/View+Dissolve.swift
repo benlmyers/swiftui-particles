@@ -21,7 +21,6 @@ public extension View {
                 .lifetime(3)
             }
           }
-          .debug()
         }
       }
     }
