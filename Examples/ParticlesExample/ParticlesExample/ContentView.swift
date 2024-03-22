@@ -12,27 +12,21 @@ import ParticlesPresets
 struct ContentView: View {
   
   var body: some View {
-    ZStack {
-      ParticleSystem {
-//        Preset.Snow()
-        Burst(pixelDensity: 3) {
-          v
-        } withBehavior: { p in
-          p
-            .initialVelocity(xIn: -0.2 ... 0.2, yIn: -0.2 ... 0.2)
-            .lifetime(4)
-            .transition(.twinkle, duration: 1.0)
-        } customView: {
-          Circle().frame(width: 3.0, height: 3.0)
-        }
-        .initialOffset(y: 50.0)
-      }
-      .debug()
-      ZStack(alignment: .topLeading) {
-        Color.clear
-        v.offset(y: 100.0)
+    ParticleSystem {
+      Lattice(spacing: 3) {
+        v
+      } withBehavior: { p in
+        p
+          .initialVelocity(xIn: -0.05 ... 0.05, yIn: -0.05 ... 0.05)
+          .initialOffset(y: 100.0)
+          .lifetime(4)
+          .transition(.twinkle, on: .death, duration: 1.0)
+          .initialAcceleration(y: 0.0002)
+      } customView: {
+        Circle().frame(width: 3.0, height: 3.0)
       }
     }
+    .debug()
     .frame(width: 400.0, height: 300.0)
   }
   

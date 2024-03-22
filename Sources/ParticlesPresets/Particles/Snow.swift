@@ -30,7 +30,7 @@ public extension Preset {
     }
     
     public var body: some Entity {
-      Emitter(interval: 1.0 / Double(parameters.intensity)) {
+      Emitter(every: 1.0 / Double(parameters.intensity)) {
         Flake(parameters: parameters)
         Drift(parameters: parameters)
       }

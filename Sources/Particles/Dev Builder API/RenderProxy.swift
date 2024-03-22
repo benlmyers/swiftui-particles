@@ -24,7 +24,7 @@ public struct RenderProxy: Equatable {
   
   // MARK: - Initializers
   
-  init() {
+  internal init() {
     self._opacity = 1.0
     self._hueRotation = .zero
     self._blur = .zero
@@ -48,7 +48,7 @@ public struct RenderProxy: Equatable {
     
     // MARK: - Initalizers
     
-    init(physics: PhysicsProxy, render: RenderProxy, system: ParticleSystem.Data) {
+    internal init(physics: PhysicsProxy, render: RenderProxy, system: ParticleSystem.Data) {
       self.physics = physics
       self.render = render
       self.system = system

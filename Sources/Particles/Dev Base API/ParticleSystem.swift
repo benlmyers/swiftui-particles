@@ -31,7 +31,7 @@ public struct ParticleSystem: View {
   
   // MARK: - Static Properties
   
-  static var data: [String: ParticleSystem.Data] = [:]
+  internal static var data: [String: ParticleSystem.Data] = [:]
   
   // MARK: - Stored Properties
   
@@ -93,6 +93,9 @@ public struct ParticleSystem: View {
   
   // MARK: - Initalizers
   
+  /// Creates a particle system with the passed entity/entities.
+  /// Any entities passed will have one copy created at the start of the system's simulation.
+  /// - Parameter entity: The entity or entities to create when the system begins.
   public init<E>(@EntityBuilder entity: () -> E) where E: Entity {
     let e: E = entity()
     self._data = .init()

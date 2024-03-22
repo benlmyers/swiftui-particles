@@ -27,7 +27,8 @@ public struct PhysicsProxy {
   private var _lifetime: Double
   
   // MARK: - Initalizers
-  init(currentFrame: UInt) {
+  
+  internal init(currentFrame: UInt) {
     _x = .zero
     _y = .zero
     _velX = .zero
@@ -61,7 +62,7 @@ public struct PhysicsProxy {
     
     // MARK: - Initalizers
     
-    init(physics: PhysicsProxy, system: ParticleSystem.Data) {
+    internal init(physics: PhysicsProxy, system: ParticleSystem.Data) {
       self.physics = physics
       self.system = system
     }

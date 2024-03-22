@@ -74,7 +74,6 @@ extension Entity {
   }
   
   public func _onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy {
-    marker("Physics")
     var result: PhysicsProxy
     if self is EmptyEntity {
       result = context.physics
@@ -167,13 +166,5 @@ extension Entity {
     } else {
       return body.underlyingColorOverlay()
     }
-  }
-  
-  internal func marker(_ str: String) -> Void {
-    let currentDate = Date()
-    let seconds = currentDate.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 60)
-    let milliseconds = Int(seconds * 100000)
-    let millisecondsSinceLastEvenMinute = milliseconds % 6000000
-//    print("\(str) @\(millisecondsSinceLastEvenMinute)")
   }
 }
