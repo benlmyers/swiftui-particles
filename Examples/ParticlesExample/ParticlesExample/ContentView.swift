@@ -10,8 +10,28 @@ import Particles
 import ParticlesPresets
 
 struct ContentView: View {
+  
+  @State var explodes = false
+  
   var body: some View {
-    GhostRiderView()
+    NavigationSplitView {
+      List {
+        NavigationLink("Ghost Rider", destination: GhostRiderView.init)
+        NavigationLink("Fire", destination: FireView.init)
+        NavigationLink("Snow", destination: SnowView.init)
+        NavigationLink("Smoke", destination: SmokeView.init)
+      }
+    } detail: {
+      Text("Welcome to Particles")
+        .font(.title.bold())
+        .frame(width: 900, height: 900, alignment: .center)
+        .explode(if: explodes)
+        .onAppear {
+          DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            explodes = true
+          }
+        }
+    }
   }
 }
 

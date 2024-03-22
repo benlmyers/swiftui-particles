@@ -88,7 +88,7 @@ public extension Preset {
     public init(
       color: Color = Color(red: 128/255, green: 128/255, blue: 128/255, opacity: 1),
       dirty: Bool = false,
-      spawnPoint: UnitPoint = .topLeading,
+      spawnPoint: UnitPoint = .center,
       startRadius: CGFloat =  12.0,
       endRadius: CGFloat = 35.0,
       spawnRadius: CGSize = .init(width: 40.0, height: 8.0)
