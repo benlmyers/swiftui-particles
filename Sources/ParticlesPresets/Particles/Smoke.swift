@@ -82,6 +82,7 @@ public extension Preset {
         .blendMode(dirty ? .hardLight : .normal)
         .transition(.scale, on: .death, duration: 0.5)
         .transition(.opacity, on: .birth)
+        .opacity(0.3)
       }
     }
     

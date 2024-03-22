@@ -25,6 +25,7 @@ struct SmokeView: View {
       ParticleSystem {
         Preset.Smoke(dirty: dirty)
       }
+      .statePersistent("smoke")
       .frame(width: 600, height: 600)
     }
   }
