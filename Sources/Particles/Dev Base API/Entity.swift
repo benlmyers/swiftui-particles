@@ -74,6 +74,7 @@ extension Entity {
   }
   
   public func _onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy {
+    marker("Physics")
     var result: PhysicsProxy
     if self is EmptyEntity {
       result = context.physics
@@ -105,8 +106,6 @@ extension Entity {
   }
   
   internal func viewToRegister() -> AnyView? {
-    let performanceTimer = PerformanceTimer(title: "VIEW TO REGISTER")
-    performanceTimer.calculateElapsedTime()
     if let particle = self as? Particle {
       return particle.view
     } else if self is EmptyEntity {
@@ -117,8 +116,6 @@ extension Entity {
   }
   
   internal func underlyingGroup() -> Group? {
-    let performanceTimer = PerformanceTimer(title: "UNDERLYING GROUP")
-    performanceTimer.calculateElapsedTime()
     if let group = self as? Group {
       return group
     } else if self is EmptyEntity {
@@ -132,8 +129,6 @@ extension Entity {
     if _confirmedEmptyUnderlyingEmitter {
       return nil
     }
-    let performanceTimer = PerformanceTimer(title: "UNDERLYING EMITTER")
-    performanceTimer.calculateElapsedTime()
     if let emitter = self as? Emitter {
       return emitter
     } else if self is EmptyEntity {
@@ -142,16 +137,6 @@ extension Entity {
       return body.underlyingEmitter()
     }
   }
-  
-//  internal func underlyingBurst() -> Burst? {
-//    if let burst = self as? Burst {
-//      return burst
-//    } else if self is EmptyEntity {
-//      return nil
-//    } else {
-//      return body.underlyingBurst()
-//    }
-//  }
   
   internal func underlyingTransitions() -> [(AnyTransition, TransitionBounds, Double)] {
     var result: [(AnyTransition, TransitionBounds, Double)] = []
@@ -182,5 +167,13 @@ extension Entity {
     } else {
       return body.underlyingColorOverlay()
     }
+  }
+  
+  internal func marker(_ str: String) -> Void {
+    let currentDate = Date()
+    let seconds = currentDate.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 60)
+    let milliseconds = Int(seconds * 100000)
+    let millisecondsSinceLastEvenMinute = milliseconds % 6000000
+//    print("\(str) @\(millisecondsSinceLastEvenMinute)")
   }
 }

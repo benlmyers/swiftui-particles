@@ -76,11 +76,6 @@ public struct ParticleSystem: View {
             }
           }
         }
-        .onAppear {
-          Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { t in
-            PerformanceTimer.printCallMap()
-          }
-        }
       }
     }
   }

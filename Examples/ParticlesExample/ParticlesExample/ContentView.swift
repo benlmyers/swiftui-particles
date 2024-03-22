@@ -15,7 +15,7 @@ struct ContentView: View {
     ZStack {
       ParticleSystem {
 //        Preset.Snow()
-        Burst(pixelDensity: 5) {
+        Burst(pixelDensity: 3) {
           v
         } withBehavior: { p in
           p
