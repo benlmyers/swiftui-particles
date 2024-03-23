@@ -30,14 +30,17 @@ struct ContentView: View {
         Text("Welcome to Particles")
           .font(.title.bold())
           .foregroundStyle(LinearGradient(colors: [.purple, .blue, .pink, .red, .yellow], startPoint: .leading, endPoint: .trailing))
-          .explode(if: explodes)
-          .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-              explodes = true
-            }
-          }
         Text("Choose a preset to get started.")
+        Button {
+          explodes = true
+        } label: {
+          Text("Explode!")
+            .font(.title3)
+        }
+
       }
+      .explode(spacing: 3, if: explodes)
+
     }
   }
 }

@@ -26,11 +26,13 @@ public extension View {
     }
   }
   
-  func explode(if condition: Bool) -> some View {
-    self.opacity(condition ? 0.0 : 1.0).boundlessOverlay(atop: true, minSize: .init(width: 800.0, height: 800.0)) {
+  func explode(spacing: Int = 2, if condition: Bool) -> some View {
+    self
+      .opacity(condition ? 0.0 : 1.0)
+      .boundlessOverlay(atop: true, minSize: .init(width: 800.0, height: 800.0)) {
       ZStack {
         ParticleSystem {
-          Lattice(spacing: 2, view: { self }) { p in
+          Lattice(spacing: spacing, view: { self }, withBehavior: { p in
             p
               .fixVelocity { c in
                 if condition {
@@ -41,9 +43,13 @@ public extension View {
               .initialPosition(.center).initialVelocity(xIn: -0.01 ... 0.01, yIn: -0.01 ... 0.01)
               .transition(.twinkle)
               .lifetime(3)
-          }
+          }, customView: {
+            Circle()
+              .frame(width: CGFloat(spacing), height: CGFloat(spacing))
+          })
         }
       }
+      .opacity(condition ? 1 : 0)
     }
   }
 }
