@@ -15,6 +15,8 @@ public extension Entity {
   /// - Parameter bounds: The bounds to apply the transition to.
   /// - Parameter duration: The duration, in seconds, of the transition.
   func transition(_ transition: AnyTransition, on bounds: TransitionBounds = .birthAndDeath, duration: TimeInterval = 0.5) -> some Entity {
-    return TransitionEntity(entity: self, transition: transition, bounds: bounds, duration: duration)
+    var m = ModifiedEntity(entity: self)
+    m.preferences.append(.custom(.transition(transition: transition, bounds: bounds, duration: duration)))
+    return m
   }
 }

@@ -16,12 +16,16 @@ import Foundation
 ///   }
 /// }
 /// ```
-public struct ForEach<Data>: Entity where Data: RandomAccessCollection {
+
+internal protocol _Iterable: Entity {
+}
+
+public struct ForEach<Data>: _Iterable where Data: RandomAccessCollection {
   
   // MARK: - Properties
   
-  public var body: Group
-  
+  public var body: Particles.Group
+
   internal var data: Data
   internal var mapping: (Data.Element) -> any Entity
   internal var merges: Group.Merges?
@@ -32,7 +36,12 @@ public struct ForEach<Data>: Entity where Data: RandomAccessCollection {
   /// - Parameter data: The data to iterate over.
   /// - Parameter copy: The type of data to copy while iterating over elements. Used to optimize the particle system. See ``Group/CopyLevel``.
   /// - Parameter mapping: The mapping of data to Entity behavior.
-  public init<E>(_ data: Data, merges: Group.Merges? = nil, appliesModifiers: Bool = true, @EntityBuilder mapping: @escaping (Data.Element) -> E) where E: Entity {
+  public init<E>(
+    _ data: Data,
+    merges: Group.Merges? = nil,
+    appliesModifiers: Bool = true,
+    @EntityBuilder mapping: @escaping (Data.Element) -> E
+  ) where E: Entity {
     self.data = data
     self.mapping = mapping
     self.merges = merges

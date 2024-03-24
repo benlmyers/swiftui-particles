@@ -13,6 +13,8 @@ public extension Entity {
   /// Applies a color overlay to this entity.
   /// - Parameter color: The color to overlay on to the entity.
   func colorOverlay(_ color: Color) -> some Entity {
-    return ColorOverlayEntity(entity: self, color: color)
+    var m = ModifiedEntity(entity: self)
+    m.preferences.append(.custom(.colorOverlay(color: color)))
+    return m
   }
 }

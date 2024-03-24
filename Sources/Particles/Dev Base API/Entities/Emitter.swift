@@ -7,6 +7,12 @@
 
 import Foundation
 
+internal protocol _Emitter {
+  
+  var emitInterval: TimeInterval { get set }
+  var emitChooser: ((PhysicsProxy.Context) -> Int)? { get set }
+}
+
 /// An ``Entity`` that emits other entities.
 /// To create an emitter, pass an optional spawn interval and the entities to spawn using `@EntityBuilder`:
 /// ```
@@ -18,15 +24,14 @@ import Foundation
 ///   }
 /// }
 /// ```
-public struct Emitter: Entity {
+public struct Emitter<Children>: Entity, _Emitter where Children: Entity {
   
   // MARK: - Properties
   
-  public var body: EmptyEntity { .init() }
+  public var body: Children
   
-  internal private(set) var prototype: AnyEntity
-  internal private(set) var emitInterval: TimeInterval
-  internal private(set) var emitChooser: ((PhysicsProxy.Context) -> Int)?
+  internal var emitInterval: TimeInterval
+  internal var emitChooser: ((PhysicsProxy.Context) -> Int)?
   
   // MARK: - Initalizers
   
@@ -34,9 +39,9 @@ public struct Emitter: Entity {
   /// If a group of entities is passed in `emits`, you can use ``emitAll()`` or ``emitSingle(choosing:)`` to change the entities spawned in the interval.
   /// - Parameter interval: The interval to emit entities.
   /// - Parameter emits: A closure returning the entity/entities to spawn on the interval.
-  public init<E>(every interval: TimeInterval = 1.0, @EntityBuilder emits: () -> E) where E: Entity {
+  public init(every interval: TimeInterval = 1.0, @EntityBuilder emits: () -> Children) {
     self.emitInterval = interval
-    self.prototype = .init(body: emits())
+    self.body = emits()
   }
   
   // MARK: - Methods
