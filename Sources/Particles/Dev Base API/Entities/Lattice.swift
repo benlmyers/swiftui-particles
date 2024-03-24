@@ -24,7 +24,7 @@ import CoreGraphics
 ///   Circle().frame(width: 3.0, height: 3.0)
 /// }
 /// ```
-public struct Lattice<E>: Entity where E: Entity {
+public struct Lattice<E>: _Iterable where E: Entity {
   
   // MARK: - Properties
   

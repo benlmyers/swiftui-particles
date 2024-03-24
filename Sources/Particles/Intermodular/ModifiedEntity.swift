@@ -26,16 +26,16 @@ internal struct ModifiedEntity<E>: Entity, _ModifiedEntity where E: Entity {
   ) {
     self.body = entity
     if let onBirthPhysics {
-      preferences.append(.onPhysicsBirth(onBirthPhysics))
+      preferences.insert(.onPhysicsBirth(onBirthPhysics), at: 0)
     }
     if let onUpdatePhysics {
-      preferences.append(.onPhysicsUpdate(onUpdatePhysics))
+      preferences.insert(.onPhysicsUpdate(onUpdatePhysics), at: 0)
     }
     if let onBirthRender {
-      preferences.append(.onRenderBirth(onBirthRender))
+      preferences.insert(.onRenderBirth(onBirthRender), at: 0)
     }
     if let onUpdateRender {
-      preferences.append(.onRenderUpdate(onUpdateRender))
+      preferences.insert(.onRenderUpdate(onUpdateRender), at: 0)
     }
   }
 }

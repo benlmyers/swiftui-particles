@@ -16,12 +16,16 @@ import Foundation
 ///   }
 /// }
 /// ```
-public struct ForEach<Data>: Entity where Data: RandomAccessCollection {
+
+internal protocol _Iterable: Entity {
+}
+
+public struct ForEach<Data>: _Iterable where Data: RandomAccessCollection {
   
   // MARK: - Properties
   
-  public var body: Group
-  
+  public var body: Particles.Group
+
   internal var data: Data
   internal var mapping: (Data.Element) -> any Entity
   internal var merges: Group.Merges?
