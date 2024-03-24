@@ -15,5 +15,6 @@ struct SnowView: View {
     ParticleSystem {
       Preset.Snow()
     }
+    .debug()
   }
 }

@@ -53,9 +53,9 @@ public extension Preset {
           let w = c.system.size.width * 0.5
           return .random(in: -w ... w)
         })
-        .initialVelocity(xIn: -0.1 ... 0.1, yIn: 0.02 ... 0.08)
+        .initialVelocity(xIn: -1.0 ... 1.0, yIn: 0.2 ... 0.8)
         .fixAcceleration{ c in
-          return CGVectorMake(0.0005 * sin(c.physics.seed.2 + c.system.time * 1.8), 0.001)
+          return CGVectorMake(0.005 * sin(c.physics.seed.2 + c.system.time * 1.8), 0.01)
         }
         .opacity(in: 0.2 ... 0.8)
         .transition(.opacity)
@@ -85,9 +85,9 @@ public extension Preset {
           let w = c.system.size.width * 0.5
           return .random(in: -w ... w)
         })
-        .initialVelocity(xIn: -0.4 ... 0.4, yIn: 0.01 ... 0.03)
+        .initialVelocity(xIn: -4 ... 0.4, yIn: 1.0 ... 3.0)
         .fixAcceleration{ c in
-          return CGVectorMake(0.0004 * sin(c.physics.seed.2 + c.system.time * 1.8), 0.0007 + 0.0008 * cos(c.system.time * 1.8))
+          return CGVectorMake(0.04 * sin(c.physics.seed.2 + c.system.time * 1.8), 0.007 + 0.008 * cos(c.system.time * 1.8))
         }
         .opacity(in: 0.2 ... 0.8)
         .scale(factorIn: 0.2 ... 1.4)

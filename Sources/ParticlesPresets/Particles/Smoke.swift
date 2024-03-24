@@ -33,33 +33,33 @@ public extension Preset {
     private var velocityX: ClosedRange<CGFloat> {
       switch spawnPoint {
       case .bottomLeading, .leading, .topLeading:
-        return -0.6 ... -0.3
+        return -6.0 ... -3.0
       case .topTrailing, .bottomTrailing, .trailing:
-        return 0.3 ... 0.6
+        return 3.0 ... 6.0
       default:
-        return 0 ... 0
+        return 0.0 ... 0.0
       }
     }
     
     private var velocityY: ClosedRange<CGFloat> {
       switch spawnPoint {
       case .bottomLeading, .bottomTrailing, .bottom:
-        return 0.1 ... 0.3
+        return 1.0 ... 3.0
       case .leading, .trailing:
-        return 0 ... 0
+        return 0.0 ... 0.0
       default:
-        return -0.3 ... 0.1
+        return -3.0 ... 1.0
       }
     }
 
     private var velocityAccelerationY: CGFloat {
       switch spawnPoint {
       case .bottom, .bottomLeading, .bottomTrailing:
-        return 0.002
+        return 0.02
       case .leading, .trailing:
         return 0
       default:
-        return -0.002
+        return -0.02
       }
     }
     
