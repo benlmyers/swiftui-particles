@@ -39,6 +39,11 @@ internal struct FlatEntity {
         FlatEntity.make(entity.body)
       }
     }
+    if let group = entity as? Group {
+      return group.values.flatMap { entity in
+        FlatEntity.make(entity.body)
+      }
+    }
     if let single = FlatEntity.init(single: entity) {
       return [single]
     }
