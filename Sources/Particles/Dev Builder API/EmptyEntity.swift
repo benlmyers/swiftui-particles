@@ -12,3 +12,5 @@ public struct EmptyEntity: Entity {
   public typealias Body = Never
   public var body: Never { fatalError() }
 }
+
+extension Never: Entity {}

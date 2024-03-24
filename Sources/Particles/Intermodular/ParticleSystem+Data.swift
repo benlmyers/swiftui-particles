@@ -37,7 +37,7 @@ public extension ParticleSystem {
     private var updatePhysicsTime: TimeInterval = .zero
     private var performRenderTime: TimeInterval = .zero
     
-    private var entities: [EntityID: any Entity] = [:]
+    private var entities: [EntityID: FlatEntity] = [:]
     // ID of entity -> View to render
     private var views: [EntityID: MaybeView] = .init()
     // ID of proxy -> Physics data
@@ -82,28 +82,28 @@ public extension ParticleSystem {
     // MARK: - Methods
     
     internal func emitChildren() {
-      guard currentFrame > 1 else { return }
-      let proxyIDs = physicsProxies.keys
-      for proxyID in proxyIDs {
-        guard let proxy: PhysicsProxy = physicsProxies[proxyID] else { continue }
-        guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
-        guard let entity: any Entity = entities[entityID] else { continue }
-        guard let emitter = entity.underlyingEmitter() else { continue }
-        guard let protoEntities: [EntityID] = emitEntities[entityID] else { continue }
-        if let emitted: UInt = lastEmitted[proxyID] {
-          let emitAt: UInt = emitted + UInt(emitter.emitInterval * 60.0)
-          guard currentFrame >= emitAt else { continue }
-        }
-        var finalEntities: [EntityID] = protoEntities
-        if let chooser = emitter.emitChooser, !protoEntities.isEmpty {
-          let context = PhysicsProxy.Context(physics: proxy, system: self)
-          finalEntities = [protoEntities[chooser(context) % protoEntities.count]]
-        }
-        for protoEntity in finalEntities {
-          guard let _: ProxyID = self.create(protoEntity, inherit: proxy) else { continue }
-          self.lastEmitted[proxyID] = currentFrame
-        }
-      }
+//      guard currentFrame > 1 else { return }
+//      let proxyIDs = physicsProxies.keys
+//      for proxyID in proxyIDs {
+//        guard let proxy: PhysicsProxy = physicsProxies[proxyID] else { continue }
+//        guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
+//        guard let entity: any Entity = entities[entityID] else { continue }
+//        guard let emitter = entity.underlyingEmitter() else { continue }
+//        guard let protoEntities: [EntityID] = emitEntities[entityID] else { continue }
+//        if let emitted: UInt = lastEmitted[proxyID] {
+//          let emitAt: UInt = emitted + UInt(emitter.emitInterval * 60.0)
+//          guard currentFrame >= emitAt else { continue }
+//        }
+//        var finalEntities: [EntityID] = protoEntities
+//        if let chooser = emitter.emitChooser, !protoEntities.isEmpty {
+//          let context = PhysicsProxy.Context(physics: proxy, system: self)
+//          finalEntities = [protoEntities[chooser(context) % protoEntities.count]]
+//        }
+//        for protoEntity in finalEntities {
+//          guard let _: ProxyID = self.create(protoEntity, inherit: proxy) else { continue }
+//          self.lastEmitted[proxyID] = currentFrame
+//        }
+//      }
     }
     
     internal func destroyExpiredEntities() {
@@ -140,12 +140,12 @@ public extension ParticleSystem {
             group.leave()
             return
           }
-          guard let entity: any Entity = entities[entityID] else {
+          guard let entity: FlatEntity = entities[entityID] else {
             group.leave()
             return
           }
           let context = PhysicsProxy.Context(physics: proxy, system: self)
-          let newPhysics = entity._onPhysicsUpdate(context)
+          let newPhysics = entity.onPhysicsUpdate(context)
           lock.lock()
           newPhysicsProxies[proxyID] = newPhysics
           lock.unlock()
@@ -183,12 +183,12 @@ public extension ParticleSystem {
             group.leave()
             return
           }
-          guard let entity: any Entity = entities[entityID] else {
+          guard let entity: FlatEntity = entities[entityID] else {
             group.leave()
             return
           }
           let context = RenderProxy.Context(physics: physicsProxy, render: renderProxy, system: self)
-          let newRender = entity._onRenderUpdate(context)
+          let newRender = entity.onRenderUpdate(context)
           lock.lock()
           newRenderProxies[proxyID] = newRender
           lock.unlock()
@@ -209,20 +209,20 @@ public extension ParticleSystem {
           let render: RenderProxy? = renderProxies[proxyID]
           guard let physics: PhysicsProxy = physicsProxies[proxyID] else { continue }
           guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
-          guard let entity: any Entity = entities[entityID] else { continue }
+          guard let entity: FlatEntity = entities[entityID] else { continue }
           var resolvedEntityID: EntityID = entityID
           if let maybe = views[entityID] {
             switch maybe {
             case .merged(let mergedID): resolvedEntityID = mergedID
             case .some(_): 
               if refreshViews {
-                guard let view: AnyView = entity.viewToRegister() else { break }
+                guard let view: AnyView = entity.view else { break }
                 views[entityID] = .some(view)
               }
               break
             }
           } else {
-            guard let view: AnyView = entity.viewToRegister() else { continue }
+            guard let view: AnyView = entity.view else { break }
             views[entityID] = .some(view)
           }
           guard
@@ -241,46 +241,46 @@ public extension ParticleSystem {
           context.drawLayer { context in
             context.translateBy(x: physics.position.x, y: physics.position.y)
             context.rotate(by: physics.rotation)
-            if let (color, radius) = entity.underlyingGlow() {
-              context.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
-            }
-            if let overlay: Color = entity.underlyingColorOverlay() {
-              var m: ColorMatrix = ColorMatrix()
-              m.r1 = 0
-              m.g2 = 0
-              m.b3 = 0
-              m.a4 = 1
-              m.r5 = 1
-              m.g5 = 1
-              m.b5 = 1
-              context.addFilter(.colorMultiply(overlay))
-              context.addFilter(.colorMatrix(m))
-              context.addFilter(.colorMultiply(overlay))
-            }
+//            if let (color, radius) = entity.underlying(GlowEntity.self) {
+//              context.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
+//            }
+//            if let overlay: Color = entity.underlyingColorOverlay() {
+//              var m: ColorMatrix = ColorMatrix()
+//              m.r1 = 0
+//              m.g2 = 0
+//              m.b3 = 0
+//              m.a4 = 1
+//              m.r5 = 1
+//              m.g5 = 1
+//              m.b5 = 1
+//              context.addFilter(.colorMultiply(overlay))
+//              context.addFilter(.colorMatrix(m))
+//              context.addFilter(.colorMultiply(overlay))
+//            }
             if let render {
               context.scaleBy(x: render.scale.width, y: render.scale.height)
               context.addFilter(.hueRotation(render.hueRotation))
               context.addFilter(.blur(radius: render.blur))
             }
-            let transitions = entity.underlyingTransitions()
-            if !transitions.isEmpty {
-              let c = PhysicsProxy.Context(physics: physics, system: self)
-              // (transition, bounds, duration)
-              for t in transitions {
-                let transition: AnyTransition = t.0
-                let bounds: TransitionBounds = t.1
-                let duration: Double = t.2
-                guard c.timeAlive < duration || c.timeAlive > physics.lifetime - duration else { continue }
-                transition.modifyRender(
-                  getTransitionProgress(bounds: bounds, duration: duration, context: c),
-                  c,
-                  &context
-                )
-              }
-            }
-            if debug, let _ = entity.underlyingEmitter() {
-              context.fill(.init(ellipseIn: .init(origin: .zero, size: .init(width: 10, height: 10))), with: .color(.red))
-            }
+//            let transitions = entity.underlyingTransitions()
+//            if !transitions.isEmpty {
+//              let c = PhysicsProxy.Context(physics: physics, system: self)
+//              // (transition, bounds, duration)
+//              for t in transitions {
+//                let transition: AnyTransition = t.0
+//                let bounds: TransitionBounds = t.1
+//                let duration: Double = t.2
+//                guard c.timeAlive < duration || c.timeAlive > physics.lifetime - duration else { continue }
+//                transition.modifyRender(
+//                  getTransitionProgress(bounds: bounds, duration: duration, context: c),
+//                  c,
+//                  &context
+//                )
+//              }
+//            }
+//            if debug, let _ = entity.underlyingEmitter() {
+//              context.fill(.init(ellipseIn: .init(origin: .zero, size: .init(width: 10, height: 10))), with: .color(.red))
+//            }
             guard let resolved = context.resolveSymbol(id: resolvedEntityID) else {
               return
             }
@@ -294,7 +294,7 @@ public extension ParticleSystem {
     }
     
     internal func advanceFrame() {
-      if self.currentFrame > .max - 601 {
+      if self.currentFrame > .max - 1000 {
         self.currentFrame = 2
         for k in self.lastEmitted.keys {
           self.lastEmitted[k] = 0
@@ -314,48 +314,48 @@ public extension ParticleSystem {
     internal func createSingle<E>(entity: E, spawn: Bool = true, mergingView: EntityID? = nil) -> [(EntityID, ProxyID?)] where E: Entity {
       var result: [(EntityID, ProxyID?)] = []
       var proxyID: ProxyID?
-      if let group = entity.underlyingGroup() {
-        var firstEntityID: EntityID?
-        for v in group.values {
-          guard let e = v.body as? any Entity else { continue }
-          var modified = e
-          if group.appliesModifiers {
-            modified = applyGroupModifiers(to: e, groupRoot: entity)
-          }
-          // Merge view
-          var mergingViewParameter: EntityID?
-          if let merges: Group.Merges = group.merges, merges == .views {
-            mergingViewParameter = firstEntityID
-          }
-          let new: [(EntityID, ProxyID?)] = self.createSingle(entity: modified, spawn: spawn, mergingView: mergingViewParameter)
-          // Merge entity
-          if let firstEntityID, let merges: Group.Merges = group.merges, merges == .entities
-          {
-            for n in new {
-              unregister(entityID: n.0)
-              if let proxyID = n.1 {
-                proxyEntities[proxyID] = firstEntityID
-              }
-            }
-          }
-          result.append(contentsOf: new)
-          if firstEntityID == nil {
-            firstEntityID = new.first?.0
-          }
-        }
-      } else {
-        let entityID: EntityID = self.register(entity: entity)
-        if let mergingView: EntityID {
-          self.views[entityID] = .merged(mergingView)
-        }
-        if spawn {
-          proxyID = self.create(entityID)
-        }
-        if let emitter = entity.underlyingEmitter(), let e = emitter.prototype.body as? any Entity {
-          self.emitEntities[entityID] = self.createSingle(entity: e, spawn: false).map({ $0.0 })
-        }
-        result.append((entityID, proxyID))
+//      if let group = entity.underlyingGroup() {
+//        var firstEntityID: EntityID?
+//        for v in group.values {
+//          guard let e = v.body as? any Entity else { continue }
+//          var modified = e
+//          if group.appliesModifiers {
+//            modified = applyGroupModifiers(to: e, groupRoot: entity)
+//          }
+//          // Merge view
+//          var mergingViewParameter: EntityID?
+//          if let merges: Group.Merges = group.merges, merges == .views {
+//            mergingViewParameter = firstEntityID
+//          }
+//          let new: [(EntityID, ProxyID?)] = self.createSingle(entity: modified, spawn: spawn, mergingView: mergingViewParameter)
+//          // Merge entity
+//          if let firstEntityID, let merges: Group.Merges = group.merges, merges == .entities
+//          {
+//            for n in new {
+//              unregister(entityID: n.0)
+//              if let proxyID = n.1 {
+//                proxyEntities[proxyID] = firstEntityID
+//              }
+//            }
+//          }
+//          result.append(contentsOf: new)
+//          if firstEntityID == nil {
+//            firstEntityID = new.first?.0
+//          }
+//        }
+//      } else {
+      let entityID: EntityID = self.register(entity: .init(entity))
+      if let mergingView: EntityID {
+        self.views[entityID] = .merged(mergingView)
       }
+      if spawn {
+        proxyID = self.create(entityID)
+      }
+//        if let emitter = entity.underlyingEmitter(), let e = emitter.prototype.body as? any Entity {
+//          self.emitEntities[entityID] = self.createSingle(entity: e, spawn: false).map({ $0.0 })
+//        }
+      result.append((entityID, proxyID))
+//      }
       return result
     }
     
@@ -381,36 +381,37 @@ public extension ParticleSystem {
     }
     
     private func applyGroupModifiers<E>(to entity: E, groupRoot: any Entity) -> some Entity where E: Entity {
-      let m = ModifiedEntity(entity: entity, onBirthPhysics: { c in
-        groupRoot._onPhysicsBirth(c)
-      }, onUpdatePhysics: { c in
-        groupRoot._onPhysicsUpdate(c)
-      }, onBirthRender: { c in
-        groupRoot._onRenderBirth(c)
-      }, onUpdateRender: { c in
-        groupRoot._onRenderUpdate(c)
-      })
-      return m
+//      let m = ModifiedEntity(entity: entity, onBirthPhysics: { c in
+//        groupRoot._onPhysicsBirth(c)
+//      }, onUpdatePhysics: { c in
+//        groupRoot._onPhysicsUpdate(c)
+//      }, onBirthRender: { c in
+//        groupRoot._onRenderBirth(c)
+//      }, onUpdateRender: { c in
+//        groupRoot._onRenderUpdate(c)
+//      })
+//      return m
+      return entity
     }
     
     @discardableResult
     private func create(_ id: EntityID, inherit: PhysicsProxy? = nil) -> ProxyID? {
-      guard let entity = self.entities[id] else { return nil }
+      guard let entity: FlatEntity = self.entities[id] else { return nil }
       var physics = PhysicsProxy(currentFrame: currentFrame)
       if let inherit {
         physics.position = inherit.position
         physics.rotation = inherit.rotation
         physics.velocity = inherit.velocity
       }
-      if let _ = entity.underlyingEmitter() {
-        physics.lifetime = .infinity
-      }
+//      if let _ = entity.underlyingEmitter() {
+//        physics.lifetime = .infinity
+//      }
       let context = PhysicsProxy.Context(physics: physics, system: self)
-      let newPhysics = entity._onPhysicsBirth(context)
+      let newPhysics = entity.onPhysicsBirth(context)
       self.physicsProxies[nextProxyRegistry] = newPhysics
-      if let _: AnyView = entity.viewToRegister() {
-        let newRender = entity._onRenderBirth(.init(physics: newPhysics, render: RenderProxy(), system: self))
-        let updateRender = entity._onRenderUpdate(.init(physics: newPhysics, render: RenderProxy(), system: self))
+      if let _: AnyView = entity.view {
+        let newRender = entity.onRenderBirth(.init(physics: newPhysics, render: RenderProxy(), system: self))
+        let updateRender = entity.onRenderUpdate(.init(physics: newPhysics, render: RenderProxy(), system: self))
         if newRender != RenderProxy() || updateRender != RenderProxy() {
           self.renderProxies[nextProxyRegistry] = newRender
         }
@@ -421,11 +422,8 @@ public extension ParticleSystem {
       return proxyID
     }
     
-    private func register(entity: any Entity) -> EntityID {
+    private func register(entity: FlatEntity) -> EntityID {
       self.entities[nextEntityRegistry] = entity
-      guard nextEntityRegistry < .max else {
-        fatalError("For performance purposes, you may not have more than 256 entity variants.")
-      }
       let id = nextEntityRegistry
       nextEntityRegistry += 1
       return id
