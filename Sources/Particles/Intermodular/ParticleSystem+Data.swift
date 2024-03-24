@@ -227,7 +227,7 @@ public extension ParticleSystem {
               break
             }
           } else {
-            guard let view: AnyView = (entity.root as? Particle)?.view else { break }
+            guard let view: AnyView = (entity.root as? Particle)?.view else { continue }
             views[entityID] = .some(view)
           }
           guard
