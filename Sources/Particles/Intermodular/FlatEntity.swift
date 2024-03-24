@@ -34,7 +34,7 @@ internal struct FlatEntity {
   }
   
   static func make(_ entity: Any) -> [FlatEntity] {
-    if let group = entity as? Group {
+    if let e = entity as? any Entity, let group = e.body as? Group {
       return group.values.flatMap { entity in
         FlatEntity.make(entity.body)
       }
