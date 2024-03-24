@@ -41,8 +41,8 @@ struct GhostRiderView: View {
       }
       .offset(x: motorcyclePosition)
       .onAppear {
-        withAnimation(.easeInOut(duration: 5)) {
-          motorcyclePosition = 1000
+        withAnimation(.easeInOut(duration: 3)) {
+          motorcyclePosition = 300
         }
       }
     }
