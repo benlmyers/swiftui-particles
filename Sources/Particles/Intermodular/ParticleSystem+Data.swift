@@ -264,24 +264,14 @@ public extension ParticleSystem {
                   context.addFilter(.colorMatrix(m))
                   context.addFilter(.colorMultiply(overlay))
                 } else if case .transition(let transition, let bounds, let duration) = custom {
-                  
+                  let c = PhysicsProxy.Context(physics: physics, system: self)
+                  guard c.timeAlive < duration || c.timeAlive > physics.lifetime - duration else { continue }
+                  transition.modifyRender(
+                    getTransitionProgress(bounds: bounds, duration: duration, context: c),
+                    c,
+                    &context
+                  )
                 }
-//                let transitions = entity.underlyingTransitions()
-//                if !transitions.isEmpty {
-//                  let c = PhysicsProxy.Context(physics: physics, system: self)
-//                  // (transition, bounds, duration)
-//                  for t in transitions {
-//                    let transition: AnyTransition = t.0
-//                    let bounds: TransitionBounds = t.1
-//                    let duration: Double = t.2
-//                    guard c.timeAlive < duration || c.timeAlive > physics.lifetime - duration else { continue }
-//                    transition.modifyRender(
-//                      getTransitionProgress(bounds: bounds, duration: duration, context: c),
-//                      c,
-//                      &context
-//                    )
-//                  }
-//                }
               }
             }
             if let render {
@@ -289,9 +279,10 @@ public extension ParticleSystem {
               context.addFilter(.hueRotation(render.hueRotation))
               context.addFilter(.blur(radius: render.blur))
             }
-            if debug, let _ = entity.underlyingEmitter() {
-              context.fill(.init(ellipseIn: .init(origin: .zero, size: .init(width: 10, height: 10))), with: .color(.red))
-            }
+            // Idk what this is 💀
+//            if debug, let _ = entity.underlyingEmitter() {
+//              context.fill(.init(ellipseIn: .init(origin: .zero, size: .init(width: 10, height: 10))), with: .color(.red))
+//            }
             guard let resolved = context.resolveSymbol(id: resolvedEntityID) else {
               return
             }
