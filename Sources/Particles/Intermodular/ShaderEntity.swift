@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@available(macOS 14.0, *)
+@available(macOS 14.0, iOS 17.0, *)
 internal struct ShaderEntity<E>: Entity where E: Entity {
   
   internal private(set) var shader: (PhysicsProxy.Context) -> Shader

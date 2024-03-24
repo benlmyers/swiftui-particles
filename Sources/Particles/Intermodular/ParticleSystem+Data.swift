@@ -341,26 +341,12 @@ public extension ParticleSystem {
     internal func memorySummary(advanced: Bool = true) -> String {
       var arr: [String] = []
       arr.append("\(Int(size.width)) x \(Int(size.height)) \t Frame \(currentFrame) \t \(Int(fps)) FPS")
-      arr.append("Proxies: \(physicsProxies.count) physics \t(\(String(format: "%.1f", updateTime * 1000))ms) \t\(renderProxies.count) renders \t(\(String(format: "%.1f", updateTime * 1000))ms)")
+      arr.append("Proxies: \(physicsProxies.count) physics \t(\(String(format: "%.1f", updateTime * 1000))ms)")
       arr.append("System: \(entities.count) entities \t \(views.filter({ $0.value.isSome }).count) views \t Rendering: \(String(format: "%.1f", performRenderTime * 1000))ms")
       if advanced {
         arr.append("PE=\(proxyEntities.count), LE=\(lastEmitted.count), EE=\(emitEntities.count), EG=\(entityGroups.count)")
       }
       return arr.joined(separator: "\n")
-    }
-    
-    private func applyGroupModifiers<E>(to entity: E, groupRoot: any Entity) -> some Entity where E: Entity {
-//      let m = ModifiedEntity(entity: entity, onBirthPhysics: { c in
-//        groupRoot._onPhysicsBirth(c)
-//      }, onUpdatePhysics: { c in
-//        groupRoot._onPhysicsUpdate(c)
-//      }, onBirthRender: { c in
-//        groupRoot._onRenderBirth(c)
-//      }, onUpdateRender: { c in
-//        groupRoot._onRenderUpdate(c)
-//      })
-//      return m
-      return entity
     }
     
     @discardableResult

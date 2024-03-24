@@ -78,6 +78,11 @@ public struct ParticleSystem: View {
         }
       }
     }
+    .onDisappear {
+      if let _id {
+        ParticleSystem.data.removeValue(forKey: _id)
+      }
+    }
   }
   
   private var debugView: some View {
