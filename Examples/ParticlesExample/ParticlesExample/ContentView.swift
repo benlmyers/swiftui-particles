@@ -39,8 +39,6 @@ struct ContentView: View {
         }
 
       }
-      .explode(spacing: 3, if: explodes)
-
     }
   }
 }

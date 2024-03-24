@@ -247,10 +247,6 @@ public extension ParticleSystem {
               context.addFilter(.hueRotation(render.hueRotation))
               context.addFilter(.blur(radius: render.blur))
             }
-            // Idk what this is 💀
-//            if debug, let _ = entity.underlyingEmitter() {
-//              context.fill(.init(ellipseIn: .init(origin: .zero, size: .init(width: 10, height: 10))), with: .color(.red))
-//            }
             guard let resolved = context.resolveSymbol(id: resolvedEntityID) else {
               return
             }
