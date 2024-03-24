@@ -53,14 +53,16 @@ internal struct FlatEntity {
     case custom(Custom)
     
     enum Custom {
-      
+      case glow(color: Color, radius: CGFloat)
+      case colorOverlay(color: Color)
+      case transition(transition: AnyTransition, bounds: TransitionBounds, duration: TimeInterval)
     }
   }
   
   func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
     var proxy: PhysicsProxy = context.physics
     for p in preferences {
-      if case Preference.onPhysicsBirth(let c) = p {
+      if case .onPhysicsBirth(let c) = p {
         let context = PhysicsProxy.Context(physics: proxy, system: context.system)
         proxy = c(context)
       }
@@ -71,7 +73,7 @@ internal struct FlatEntity {
   func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy {
     var proxy: PhysicsProxy = context.physics
     for p in preferences {
-      if case Preference.onPhysicsUpdate(let c) = p {
+      if case .onPhysicsUpdate(let c) = p {
         let context = PhysicsProxy.Context(physics: proxy, system: context.system)
         proxy = c(context)
       }
@@ -82,7 +84,7 @@ internal struct FlatEntity {
   func onRenderBirth(_ context: RenderProxy.Context) -> RenderProxy {
     var proxy: RenderProxy = context.render
     for p in preferences {
-      if case Preference.onRenderBirth(let c) = p {
+      if case .onRenderBirth(let c) = p {
         let context = RenderProxy.Context(physics: context.physics, render: proxy, system: context.system)
         proxy = c(context)
       }
@@ -93,7 +95,7 @@ internal struct FlatEntity {
   func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy {
     var proxy: RenderProxy = context.render
     for p in preferences {
-      if case Preference.onRenderUpdate(let c) = p {
+      if case .onRenderUpdate(let c) = p {
         let context = RenderProxy.Context(physics: context.physics, render: proxy, system: context.system)
         proxy = c(context)
       }

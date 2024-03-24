@@ -165,46 +165,46 @@ public extension ParticleSystem {
     }
     
     internal func updateRenders() {
-//      if fps < 45 {
-//        guard currentFrame % 10 == 0 else { return }
-//      }
-//      let flag = Date()
-//      let group = DispatchGroup()
-//      let queue = DispatchQueue(label: "com.benmyers.particles.renders.update", attributes: .concurrent)
-//      var newRenderProxies: [ProxyID: RenderProxy] = [:]
-//      let lock = NSLock()
-//      for (proxyID, entityID) in proxyEntities {
-//        group.enter()
-//        queue.async(group: group) { [weak self] in
-//          guard let self else {
-//            group.leave()
-//            return
-//          }
-//          guard let renderProxy: RenderProxy = renderProxies[proxyID] else {
-//            group.leave()
-//            return
-//          }
-//          guard let physicsProxy: PhysicsProxy = physicsProxies[proxyID] else {
-//            group.leave()
-//            return
-//          }
-//          guard let entity: FlatEntity = entities[entityID] else {
-//            group.leave()
-//            return
-//          }
-//          let context = RenderProxy.Context(physics: physicsProxy, render: renderProxy, system: self)
-//          let newRender = entity.onRenderUpdate(context)
-//          lock.lock()
-//          newRenderProxies[proxyID] = newRender
-//          lock.unlock()
-//          group.leave()
-//        }
-//      }
-//      group.wait()
-//      for (proxyID, newRenderProxy) in newRenderProxies {
-//        renderProxies[proxyID] = newRenderProxy
-//      }
-//      self.updateRenderTime = Date().timeIntervalSince(flag)
+      if fps < 45 {
+        guard currentFrame % 10 == 0 else { return }
+      }
+      let flag = Date()
+      let group = DispatchGroup()
+      let queue = DispatchQueue(label: "com.benmyers.particles.renders.update", attributes: .concurrent)
+      var newRenderProxies: [ProxyID: RenderProxy] = [:]
+      let lock = NSLock()
+      for (proxyID, entityID) in proxyEntities {
+        group.enter()
+        queue.async(group: group) { [weak self] in
+          guard let self else {
+            group.leave()
+            return
+          }
+          guard let renderProxy: RenderProxy = renderProxies[proxyID] else {
+            group.leave()
+            return
+          }
+          guard let physicsProxy: PhysicsProxy = physicsProxies[proxyID] else {
+            group.leave()
+            return
+          }
+          guard let entity: FlatEntity = entities[entityID] else {
+            group.leave()
+            return
+          }
+          let context = RenderProxy.Context(physics: physicsProxy, render: renderProxy, system: self)
+          let newRender = entity.onRenderUpdate(context)
+          lock.lock()
+          newRenderProxies[proxyID] = newRender
+          lock.unlock()
+          group.leave()
+        }
+      }
+      group.wait()
+      for (proxyID, newRenderProxy) in newRenderProxies {
+        renderProxies[proxyID] = newRenderProxy
+      }
+      self.updateRenderTime = Date().timeIntervalSince(flag)
     }
     
     internal func performRenders(_ context: inout GraphicsContext) {
@@ -246,46 +246,52 @@ public extension ParticleSystem {
           context.drawLayer { context in
             context.translateBy(x: physics.position.x, y: physics.position.y)
             context.rotate(by: physics.rotation)
-//            if let (color, radius) = entity.underlying(GlowEntity.self) {
-//              context.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
-//            }
-//            if let overlay: Color = entity.underlyingColorOverlay() {
-//              var m: ColorMatrix = ColorMatrix()
-//              m.r1 = 0
-//              m.g2 = 0
-//              m.b3 = 0
-//              m.a4 = 1
-//              m.r5 = 1
-//              m.g5 = 1
-//              m.b5 = 1
-//              context.addFilter(.colorMultiply(overlay))
-//              context.addFilter(.colorMatrix(m))
-//              context.addFilter(.colorMultiply(overlay))
-//            }
+            for preference in entity.preferences {
+              if case .custom(let custom) = preference {
+                if case .glow(let color, let radius) = custom {
+                  context.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
+                }
+                else if case .colorOverlay(let overlay) = custom {
+                  var m: ColorMatrix = ColorMatrix()
+                  m.r1 = 0
+                  m.g2 = 0
+                  m.b3 = 0
+                  m.a4 = 1
+                  m.r5 = 1
+                  m.g5 = 1
+                  m.b5 = 1
+                  context.addFilter(.colorMultiply(overlay))
+                  context.addFilter(.colorMatrix(m))
+                  context.addFilter(.colorMultiply(overlay))
+                } else if case .transition(let transition, let bounds, let duration) = custom {
+                  
+                }
+//                let transitions = entity.underlyingTransitions()
+//                if !transitions.isEmpty {
+//                  let c = PhysicsProxy.Context(physics: physics, system: self)
+//                  // (transition, bounds, duration)
+//                  for t in transitions {
+//                    let transition: AnyTransition = t.0
+//                    let bounds: TransitionBounds = t.1
+//                    let duration: Double = t.2
+//                    guard c.timeAlive < duration || c.timeAlive > physics.lifetime - duration else { continue }
+//                    transition.modifyRender(
+//                      getTransitionProgress(bounds: bounds, duration: duration, context: c),
+//                      c,
+//                      &context
+//                    )
+//                  }
+//                }
+              }
+            }
             if let render {
               context.scaleBy(x: render.scale.width, y: render.scale.height)
               context.addFilter(.hueRotation(render.hueRotation))
               context.addFilter(.blur(radius: render.blur))
             }
-//            let transitions = entity.underlyingTransitions()
-//            if !transitions.isEmpty {
-//              let c = PhysicsProxy.Context(physics: physics, system: self)
-//              // (transition, bounds, duration)
-//              for t in transitions {
-//                let transition: AnyTransition = t.0
-//                let bounds: TransitionBounds = t.1
-//                let duration: Double = t.2
-//                guard c.timeAlive < duration || c.timeAlive > physics.lifetime - duration else { continue }
-//                transition.modifyRender(
-//                  getTransitionProgress(bounds: bounds, duration: duration, context: c),
-//                  c,
-//                  &context
-//                )
-//              }
-//            }
-//            if debug, let _ = entity.underlyingEmitter() {
-//              context.fill(.init(ellipseIn: .init(origin: .zero, size: .init(width: 10, height: 10))), with: .color(.red))
-//            }
+            if debug, let _ = entity.underlyingEmitter() {
+              context.fill(.init(ellipseIn: .init(origin: .zero, size: .init(width: 10, height: 10))), with: .color(.red))
+            }
             guard let resolved = context.resolveSymbol(id: resolvedEntityID) else {
               return
             }

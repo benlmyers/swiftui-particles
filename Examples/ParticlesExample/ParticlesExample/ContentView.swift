@@ -19,10 +19,11 @@ struct ContentView: View {
     VStack {
       ParticleSystem {
         Emitter(every: 0.001) {
-          
           Particle {
-            Text("🤣")
+            Rectangle()
+              .frame(width: 4, height: 4)
           }
+          .colorOverlay(Color.red)
           .initialPosition(.center)
           .initialVelocity(xIn: -0.2 ... 0.2, yIn: -0.2 ... 0.2)
           .fixTorque(.degrees(0.1))
@@ -31,7 +32,6 @@ struct ContentView: View {
       }
       .debug()
     }
-  }
     
 //    NavigationSplitView {
 //      List {
@@ -57,7 +57,7 @@ struct ContentView: View {
 //        Text("Choose a preset to get started.")
 //      }
 //    }
-//  }
+  }
 }
 
 struct ContentView_Previews: PreviewProvider {
