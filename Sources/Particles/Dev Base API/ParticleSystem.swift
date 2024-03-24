@@ -134,9 +134,9 @@ public struct ParticleSystem: View {
     if let initialEntity = self.data.initialEntity, data.currentFrame > 1 {
       if self.data.nextEntityRegistry > .zero {
         self.data.nextEntityRegistry = .zero
-        self.data.createSingle(entity: initialEntity, spawn: false)
+        self.data.create(entity: initialEntity, spawn: false)
       } else {
-        self.data.createSingle(entity: initialEntity, spawn: true)
+        self.data.create(entity: initialEntity, spawn: true)
       }
       self.data.initialEntity = nil
     }

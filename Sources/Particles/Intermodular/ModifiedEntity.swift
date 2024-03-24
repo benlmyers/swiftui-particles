@@ -7,13 +7,15 @@
 
 import Foundation
 
-internal struct ModifiedEntity<E>: Entity where E: Entity {
+internal protocol _ModifiedEntity {
+  var preferences: [FlatEntity.Preference] { get set }
+}
+
+internal struct ModifiedEntity<E>: Entity, _ModifiedEntity where E: Entity {
   
   var body: E
   
-  private var preferences: [FlatEntity.Preference] = []
-  
-  internal var _confirmedEmptyUnderlyingEmitter: Bool = false
+  internal var preferences: [FlatEntity.Preference] = []
   
   init(
     entity: E,

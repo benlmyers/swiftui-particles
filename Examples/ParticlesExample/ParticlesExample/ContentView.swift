@@ -18,10 +18,16 @@ struct ContentView: View {
     
     VStack {
       ParticleSystem {
-        Particle {
-          Text("Hello")
+        Emitter(every: 0.001) {
+          
+          Particle {
+            Text("🤣")
+          }
+          .initialPosition(.center)
+          .initialVelocity(xIn: -0.2 ... 0.2, yIn: -0.2 ... 0.2)
+          .fixTorque(.degrees(0.1))
+          .lifetime(99)
         }
-        .initialPosition(.center)
       }
       .debug()
     }

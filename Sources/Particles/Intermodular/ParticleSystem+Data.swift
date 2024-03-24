@@ -82,28 +82,28 @@ public extension ParticleSystem {
     // MARK: - Methods
     
     internal func emitChildren() {
-//      guard currentFrame > 1 else { return }
-//      let proxyIDs = physicsProxies.keys
-//      for proxyID in proxyIDs {
-//        guard let proxy: PhysicsProxy = physicsProxies[proxyID] else { continue }
-//        guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
-//        guard let entity: any Entity = entities[entityID] else { continue }
-//        guard let emitter = entity.underlyingEmitter() else { continue }
-//        guard let protoEntities: [EntityID] = emitEntities[entityID] else { continue }
-//        if let emitted: UInt = lastEmitted[proxyID] {
-//          let emitAt: UInt = emitted + UInt(emitter.emitInterval * 60.0)
-//          guard currentFrame >= emitAt else { continue }
-//        }
-//        var finalEntities: [EntityID] = protoEntities
-//        if let chooser = emitter.emitChooser, !protoEntities.isEmpty {
-//          let context = PhysicsProxy.Context(physics: proxy, system: self)
-//          finalEntities = [protoEntities[chooser(context) % protoEntities.count]]
-//        }
-//        for protoEntity in finalEntities {
-//          guard let _: ProxyID = self.create(protoEntity, inherit: proxy) else { continue }
-//          self.lastEmitted[proxyID] = currentFrame
-//        }
-//      }
+      guard currentFrame > 1 else { return }
+      let proxyIDs = physicsProxies.keys
+      for proxyID in proxyIDs {
+        guard let proxy: PhysicsProxy = physicsProxies[proxyID] else { continue }
+        guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
+        guard let entity: FlatEntity = entities[entityID] else { continue }
+        guard let emitter = (entity.root as? _Emitter) else { continue }
+        guard let protoEntities: [EntityID] = emitEntities[entityID] else { continue }
+        if let emitted: UInt = lastEmitted[proxyID] {
+          let emitAt: UInt = emitted + UInt(emitter.emitInterval * 60.0)
+          guard currentFrame >= emitAt else { continue }
+        }
+        var finalEntities: [EntityID] = protoEntities
+        if let chooser = emitter.emitChooser, !protoEntities.isEmpty {
+          let context = PhysicsProxy.Context(physics: proxy, system: self)
+          finalEntities = [protoEntities[chooser(context) % protoEntities.count]]
+        }
+        for protoEntity in finalEntities {
+          guard let _: ProxyID = self.createProxy(protoEntity, inherit: proxy) else { continue }
+          self.lastEmitted[proxyID] = currentFrame
+        }
+      }
     }
     
     internal func destroyExpiredEntities() {
@@ -145,7 +145,12 @@ public extension ParticleSystem {
             return
           }
           let context = PhysicsProxy.Context(physics: proxy, system: self)
-          let newPhysics = entity.onPhysicsUpdate(context)
+          var newPhysics = entity.onPhysicsUpdate(context)
+          newPhysics.velocity.dx += newPhysics.acceleration.dx
+          newPhysics.velocity.dy += newPhysics.acceleration.dy
+          newPhysics.position.x += newPhysics.velocity.dx
+          newPhysics.position.y += newPhysics.velocity.dy
+          newPhysics.rotation.degrees += newPhysics.torque.degrees
           lock.lock()
           newPhysicsProxies[proxyID] = newPhysics
           lock.unlock()
@@ -160,46 +165,46 @@ public extension ParticleSystem {
     }
     
     internal func updateRenders() {
-      if fps < 45 {
-        guard currentFrame % 10 == 0 else { return }
-      }
-      let flag = Date()
-      let group = DispatchGroup()
-      let queue = DispatchQueue(label: "com.benmyers.particles.renders.update", attributes: .concurrent)
-      var newRenderProxies: [ProxyID: RenderProxy] = [:]
-      let lock = NSLock()
-      for (proxyID, entityID) in proxyEntities {
-        group.enter()
-        queue.async(group: group) { [weak self] in
-          guard let self else {
-            group.leave()
-            return
-          }
-          guard let renderProxy: RenderProxy = renderProxies[proxyID] else {
-            group.leave()
-            return
-          }
-          guard let physicsProxy: PhysicsProxy = physicsProxies[proxyID] else {
-            group.leave()
-            return
-          }
-          guard let entity: FlatEntity = entities[entityID] else {
-            group.leave()
-            return
-          }
-          let context = RenderProxy.Context(physics: physicsProxy, render: renderProxy, system: self)
-          let newRender = entity.onRenderUpdate(context)
-          lock.lock()
-          newRenderProxies[proxyID] = newRender
-          lock.unlock()
-          group.leave()
-        }
-      }
-      group.wait()
-      for (proxyID, newRenderProxy) in newRenderProxies {
-        renderProxies[proxyID] = newRenderProxy
-      }
-      self.updateRenderTime = Date().timeIntervalSince(flag)
+//      if fps < 45 {
+//        guard currentFrame % 10 == 0 else { return }
+//      }
+//      let flag = Date()
+//      let group = DispatchGroup()
+//      let queue = DispatchQueue(label: "com.benmyers.particles.renders.update", attributes: .concurrent)
+//      var newRenderProxies: [ProxyID: RenderProxy] = [:]
+//      let lock = NSLock()
+//      for (proxyID, entityID) in proxyEntities {
+//        group.enter()
+//        queue.async(group: group) { [weak self] in
+//          guard let self else {
+//            group.leave()
+//            return
+//          }
+//          guard let renderProxy: RenderProxy = renderProxies[proxyID] else {
+//            group.leave()
+//            return
+//          }
+//          guard let physicsProxy: PhysicsProxy = physicsProxies[proxyID] else {
+//            group.leave()
+//            return
+//          }
+//          guard let entity: FlatEntity = entities[entityID] else {
+//            group.leave()
+//            return
+//          }
+//          let context = RenderProxy.Context(physics: physicsProxy, render: renderProxy, system: self)
+//          let newRender = entity.onRenderUpdate(context)
+//          lock.lock()
+//          newRenderProxies[proxyID] = newRender
+//          lock.unlock()
+//          group.leave()
+//        }
+//      }
+//      group.wait()
+//      for (proxyID, newRenderProxy) in newRenderProxies {
+//        renderProxies[proxyID] = newRenderProxy
+//      }
+//      self.updateRenderTime = Date().timeIntervalSince(flag)
     }
     
     internal func performRenders(_ context: inout GraphicsContext) {
@@ -216,13 +221,13 @@ public extension ParticleSystem {
             case .merged(let mergedID): resolvedEntityID = mergedID
             case .some(_): 
               if refreshViews {
-                guard let view: AnyView = entity.view else { break }
+                guard let view: AnyView = (entity.root as? Particle)?.view else { break }
                 views[entityID] = .some(view)
               }
               break
             }
           } else {
-            guard let view: AnyView = entity.view else { break }
+            guard let view: AnyView = (entity.root as? Particle)?.view else { break }
             views[entityID] = .some(view)
           }
           guard
@@ -311,52 +316,55 @@ public extension ParticleSystem {
     }
     
     @discardableResult
-    internal func createSingle<E>(entity: E, spawn: Bool = true, mergingView: EntityID? = nil) -> [(EntityID, ProxyID?)] where E: Entity {
+    internal func create<E>(entity: E, spawn: Bool = true, mergingView: EntityID? = nil) -> [(EntityID, ProxyID?)] where E: Entity {
+      guard !(entity is EmptyEntity) else { return [] }
       var result: [(EntityID, ProxyID?)] = []
       var proxyID: ProxyID?
-//      if let group = entity.underlyingGroup() {
-//        var firstEntityID: EntityID?
-//        for v in group.values {
-//          guard let e = v.body as? any Entity else { continue }
-//          var modified = e
-//          if group.appliesModifiers {
-//            modified = applyGroupModifiers(to: e, groupRoot: entity)
-//          }
-//          // Merge view
-//          var mergingViewParameter: EntityID?
-//          if let merges: Group.Merges = group.merges, merges == .views {
-//            mergingViewParameter = firstEntityID
-//          }
-//          let new: [(EntityID, ProxyID?)] = self.createSingle(entity: modified, spawn: spawn, mergingView: mergingViewParameter)
-//          // Merge entity
-//          if let firstEntityID, let merges: Group.Merges = group.merges, merges == .entities
-//          {
-//            for n in new {
-//              unregister(entityID: n.0)
-//              if let proxyID = n.1 {
-//                proxyEntities[proxyID] = firstEntityID
-//              }
-//            }
-//          }
-//          result.append(contentsOf: new)
-//          if firstEntityID == nil {
-//            firstEntityID = new.first?.0
-//          }
-//        }
-//      } else {
-      let entityID: EntityID = self.register(entity: .init(entity))
-      if let mergingView: EntityID {
-        self.views[entityID] = .merged(mergingView)
+      let flatEntites: [FlatEntity] = FlatEntity.make(entity)
+      for flat in flatEntites {
+        let entityID: EntityID = self.register(entity: flat)
+        if let mergingView: EntityID {
+          self.views[entityID] = .merged(mergingView)
+        }
+        if spawn {
+          proxyID = self.createProxy(entityID)
+        }
+        if let root = flat.root, root is _Emitter {
+          self.emitEntities[entityID] = self.create(entity: root.body, spawn: false).map({ $0.0 })
+        }
+        result.append((entityID, proxyID))
       }
-      if spawn {
-        proxyID = self.create(entityID)
-      }
-//        if let emitter = entity.underlyingEmitter(), let e = emitter.prototype.body as? any Entity {
-//          self.emitEntities[entityID] = self.createSingle(entity: e, spawn: false).map({ $0.0 })
-//        }
-      result.append((entityID, proxyID))
-//      }
       return result
+      // ‡ Old groups logic
+      //      if let group = entity.underlyingGroup() {
+      //        var firstEntityID: EntityID?
+      //        for v in group.values {
+      //          guard let e = v.body as? any Entity else { continue }
+      //          var modified = e
+      //          if group.appliesModifiers {
+      //            modified = applyGroupModifiers(to: e, groupRoot: entity)
+      //          }
+      //          // Merge view
+      //          var mergingViewParameter: EntityID?
+      //          if let merges: Group.Merges = group.merges, merges == .views {
+      //            mergingViewParameter = firstEntityID
+      //          }
+      //          let new: [(EntityID, ProxyID?)] = self.createSingle(entity: modified, spawn: spawn, mergingView: mergingViewParameter)
+      //          // Merge entity
+      //          if let firstEntityID, let merges: Group.Merges = group.merges, merges == .entities
+      //          {
+      //            for n in new {
+      //              unregister(entityID: n.0)
+      //              if let proxyID = n.1 {
+      //                proxyEntities[proxyID] = firstEntityID
+      //              }
+      //            }
+      //          }
+      //          result.append(contentsOf: new)
+      //          if firstEntityID == nil {
+      //            firstEntityID = new.first?.0
+      //          }
+      //        }
     }
     
     internal func viewPairs() -> [(AnyView, EntityID)] {
@@ -395,7 +403,7 @@ public extension ParticleSystem {
     }
     
     @discardableResult
-    private func create(_ id: EntityID, inherit: PhysicsProxy? = nil) -> ProxyID? {
+    private func createProxy(_ id: EntityID, inherit: PhysicsProxy? = nil) -> ProxyID? {
       guard let entity: FlatEntity = self.entities[id] else { return nil }
       var physics = PhysicsProxy(currentFrame: currentFrame)
       if let inherit {
@@ -403,13 +411,13 @@ public extension ParticleSystem {
         physics.rotation = inherit.rotation
         physics.velocity = inherit.velocity
       }
-//      if let _ = entity.underlyingEmitter() {
-//        physics.lifetime = .infinity
-//      }
+      if entity.root is _Emitter {
+        physics.lifetime = .infinity
+      }
       let context = PhysicsProxy.Context(physics: physics, system: self)
       let newPhysics = entity.onPhysicsBirth(context)
       self.physicsProxies[nextProxyRegistry] = newPhysics
-      if let _: AnyView = entity.view {
+      if let _: AnyView = (entity.root as? Particle)?.view {
         let newRender = entity.onRenderBirth(.init(physics: newPhysics, render: RenderProxy(), system: self))
         let updateRender = entity.onRenderUpdate(.init(physics: newPhysics, render: RenderProxy(), system: self))
         if newRender != RenderProxy() || updateRender != RenderProxy() {

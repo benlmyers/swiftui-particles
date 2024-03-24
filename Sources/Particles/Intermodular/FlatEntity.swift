@@ -11,22 +11,38 @@ import Foundation
 internal struct FlatEntity {
   
   internal var preferences: [Preference] = []
-  internal var view: AnyView?
+  internal var root: (any Entity)?
   
-  init(_ entity: any Entity) {
-    var body: any Entity = entity
+  init?(single e: Any) {
+    guard var body: any Entity = e as? any Entity else { return nil }
+    guard !(e is EmptyEntity) else { return }
     while true {
-      if let particle = body as? Particle {
-        self.view = particle.view
-        return
-      } else if body is EmptyEntity {
+      if let group = body as? Group {
+        self.root = group
+      } else if let m = body as? any _ModifiedEntity {
+        self.preferences.append(contentsOf: m.preferences)
+        body = body.body
+        continue
+      } else if body is Particle || body is _Emitter {
+        self.root = body
         return
       } else {
         body = body.body
         continue
       }
-      return
     }
+  }
+  
+  static func make(_ entity: Any) -> [FlatEntity] {
+    if let group = entity as? Group {
+      return group.values.flatMap { entity in
+        FlatEntity.make(entity.body)
+      }
+    }
+    if let single = FlatEntity.init(single: entity) {
+      return [single]
+    }
+    return []
   }
   
   enum Preference {
