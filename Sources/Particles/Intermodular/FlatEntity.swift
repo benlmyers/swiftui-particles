@@ -38,16 +38,21 @@ internal struct FlatEntity {
     if let forEach = entity as? (any _Iterable) {
       return FlatEntity.make(forEach.body)
     }
-    if let group = entity as? Group {
-      let flats: [FlatEntity] = group.values.flatMap { entity in
-        FlatEntity.make(entity.body).result
-      }
-      return (flats, group.merges)
+    guard let single = FlatEntity.init(single: entity) else {
+      return ([], nil)
     }
-    if let single = FlatEntity.init(single: entity) {
+    if let group = single.root as? Group {
+      let flats: [FlatEntity] = group.values.flatMap({ (e: AnyEntity) in
+        var children: [FlatEntity] = FlatEntity.make(e.body).result
+        for i in 0 ..< children.count {
+          children[i].preferences.insert(contentsOf: single.preferences, at: 0)
+        }
+        return children
+      })
+      return (flats, group.merges)
+    } else {
       return ([single], nil)
     }
-    return ([], nil)
   }
   
   enum Preference {
