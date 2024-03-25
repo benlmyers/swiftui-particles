@@ -215,6 +215,16 @@ public extension Entity {
     }
   }
   
+  /// Sets the initial velocity of the entity in a random direction with a specified magnitude.
+  /// - Parameters:
+  ///   - magnitude: The magnitude of the initial random velocity.
+  /// - Returns: The modified entity.
+  func initialVelocity(withMagnitude magnitude: Double) -> some Entity {
+    initialVelocity { _ in
+        .init(angle: .random(), magnitude: magnitude)
+    }
+  }
+  
   /// Sets the constant velocity of the entity.
   /// - Parameters:
   ///   - x: The x-velocity, in pixels per frame, to set the entity's velocity to. Set to `nil` for no behavior.

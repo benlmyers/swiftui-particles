@@ -198,11 +198,14 @@ public extension ParticleSystem {
             guard let view: AnyView = (entity.root as? Particle)?.view else { continue }
             views[entityID] = .some(view)
           }
+          guard let resolved = context.resolveSymbol(id: resolvedEntityID) else {
+            return
+          }
           guard
-            physics.position.x > -20.0,
-            physics.position.x < size.width + 20.0,
-            physics.position.y > -20.0,
-            physics.position.y < size.height + 20.0,
+            physics.position.x > -resolved.size.width,
+            physics.position.x < size.width + resolved.size.width,
+            physics.position.y > -resolved.size.height,
+            physics.position.y < size.height + resolved.size.height,
             currentFrame > physics.inception
           else { continue }
           context.opacity = 1.0
@@ -243,14 +246,19 @@ public extension ParticleSystem {
               }
             }
             if let render {
+#if !os(watchOS)
+              if render.rotation3d != .zero {
+                var transform = CATransform3DIdentity
+                transform = CATransform3DRotate(transform, render.rotation3d.x, 1, 0, 0)
+                transform = CATransform3DRotate(transform, render.rotation3d.y, 0, 1, 0)
+                transform = CATransform3DRotate(transform, render.rotation3d.z, 0, 0, 1)
+                context.addFilter(.projectionTransform(ProjectionTransform(transform)))
+              }
+#endif
               context.scaleBy(x: render.scale.width, y: render.scale.height)
               context.addFilter(.hueRotation(render.hueRotation))
               context.addFilter(.blur(radius: render.blur))
             }
-            guard let resolved = context.resolveSymbol(id: resolvedEntityID) else {
-              return
-            }
-            
             context.draw(resolved, at: .zero)
             self.performRenderTime = Date().timeIntervalSince(flag)
           }

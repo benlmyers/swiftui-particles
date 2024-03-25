@@ -35,8 +35,8 @@ internal struct FlatEntity {
   }
   
   static func make(_ entity: Any) -> (result: [FlatEntity], merges: Group.Merges?) {
-    if let forEach = entity as? (any _Iterable) {
-      return FlatEntity.make(forEach.body)
+    if let grouped = entity as? any Transparent {
+      return FlatEntity.make(grouped.body)
     }
     guard let single = FlatEntity.init(single: entity) else {
       return ([], nil)

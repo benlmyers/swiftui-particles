@@ -9,8 +9,10 @@ import SwiftUI
 
 public extension View {
   
+  /// Dissolves the view into several tiny particles when `condition` is set to `true`.
+  /// - parameter condition: The condition to check against. If `true`, the view will dissolve into particles.
   func dissolve(if condition: Bool) -> some View {
-    self.opacity(condition ? 0.0 : 1.0).boundlessOverlay(atop: true, minSize: .init(width: 300.0, height: 300.0)) {
+    self.opacity(condition ? 0.0 : 1.0).boundlessOverlay(atop: true) {
       ZStack {
         if condition {
           ParticleSystem {
@@ -21,13 +23,15 @@ public extension View {
     }
   }
   
-  func explode(if condition: Bool, spacing: Int = 2) -> some View {
+  /// Bursts the view into several tiny particles when `condition` is set to `true`.
+  /// - parameter condition: The condition to check against. If `true`, the view will dissolve into particles.
+  func burst(if condition: Bool) -> some View {
     self
       .opacity(condition ? 0.0 : 1.0)
-      .boundlessOverlay(atop: true, minSize: .init(width: 800.0, height: 800.0)) {
+      .boundlessOverlay(atop: true) {
       ZStack {
         ParticleSystem {
-          Lattice(spacing: spacing, view: { self })
+          Lattice(view: { self })
             .fixVelocity { c in
               if condition {
                 return CGVector(angle: Angle.degrees(Double.random(in: 0.0 ... 360.0, seed: c.physics.seed.0)), magnitude: .random(in: 0.2 ... 0.5))

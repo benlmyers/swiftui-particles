@@ -24,7 +24,7 @@ import CoreGraphics
 ///   Circle().frame(width: 3.0, height: 3.0)
 /// }
 /// ```
-public struct Lattice: _Iterable {
+public struct Lattice: Entity, Transparent {
   
   // MARK: - Properties
   
@@ -77,7 +77,7 @@ public struct Lattice: _Iterable {
   // MARK: - Body Entity
   
   public var body: some Entity {
-    ForEach(spawns, merges: .views, appliesModifiers: false) { spawn in
+    ForEach(spawns, merges: .views) { spawn in
       Particle(anyView: customView)
         .initialOffset(x: spawn.0.x - viewSize.width * anchor.x, y: spawn.0.y - viewSize.height * anchor.y)
         .colorOverlay(spawn.1)

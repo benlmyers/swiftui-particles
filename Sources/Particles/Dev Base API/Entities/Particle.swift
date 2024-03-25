@@ -14,7 +14,7 @@ import SwiftUI
 ///   Particle {
 ///     Text("Any view can be a particle")
 ///   }
-///   .initialPosition(x: 100.0, y: 100.0)
+///   .initialPosition(.center)
 /// }
 /// ```
 public struct Particle: Entity {

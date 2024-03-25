@@ -21,6 +21,7 @@ public struct RenderProxy: Equatable {
   private var _scaleX: CGFloat
   private var _scaleY: CGFloat
   private var _blendMode: Int32
+  private var _rotation3d: SIMD3<Double>
   
   // MARK: - Initializers
   
@@ -31,6 +32,7 @@ public struct RenderProxy: Equatable {
     self._scaleX = 1
     self._scaleY = 1
     self._blendMode = GraphicsContext.BlendMode.normal.rawValue
+    self._rotation3d = .zero
   }
   
   // MARK: - Subtypes
@@ -98,5 +100,11 @@ public extension RenderProxy {
     .init(rawValue: _blendMode)
   } set {
     _blendMode = newValue.rawValue
+  }}
+  
+  var rotation3d: SIMD3<Double> { get {
+    _rotation3d
+  } set {
+    _rotation3d = newValue
   }}
 }

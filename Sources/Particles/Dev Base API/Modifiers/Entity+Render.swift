@@ -163,8 +163,7 @@ public extension Entity {
   }
   
   /// Scales the entity in the x and y directions by the sizes returned by the provided closures.
-  /// - Parameters:
-  ///   - withSize: A closure returning the scaling factors to apply to the x and y dimensions.
+  /// - Parameter withSize: A closure returning the scaling factors to apply to the x and y dimensions.
   /// - Returns: The modified entity.
   func scale(with withSize: @escaping (RenderProxy.Context) -> CGSize) -> some Entity {
     ModifiedEntity(entity: self, onUpdateRender: { context in
@@ -172,6 +171,20 @@ public extension Entity {
       let s = withSize(context)
       p.scale.width = s.width
       p.scale.height = s.height
+      return p
+    })
+  }
+  
+  /// Applies a 3D rotation effect to the entity.
+  /// - Parameter x: The x-rotation.
+  /// - Parameter y: The y-rotation.
+  /// - Parameter z: The z-rotation.
+  func rotation3D(x: Angle, y: Angle, z: Angle) -> some Entity {
+    ModifiedEntity(entity: self, onBirthRender: { context in
+      var p = context.render
+      p.rotation3d.x = x.radians
+      p.rotation3d.y = y.radians
+      p.rotation3d.z = z.radians
       return p
     })
   }

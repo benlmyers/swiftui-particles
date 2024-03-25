@@ -17,7 +17,7 @@ import Foundation
 ///   var body: some Entity {
 ///     Particle { Text("☀️") }
 ///       .hueRotation(.degrees(45.0))
-///       .scale({ _ in .random(in: 1.0 ... 3.0) })
+///       .scale { _ in .random(in: 1.0 ... 3.0) }
 ///   }
 /// }
 /// ```

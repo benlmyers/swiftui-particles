@@ -37,14 +37,6 @@ public struct EntityBuilder {
 //  public static func buildIf<T>(_ content: T) -> EmptyEntity where T: Entity {
 //    return .init()
 //  }
-
-//  public static func buildEither<T>(first: T) -> _ConditionalContent where T: Entity {
-//    return .init(t: first)
-//  }
-//
-//  public static func buildEither<F>(second: F) -> _ConditionalContent where F: Entity {
-//    return .init(f: second)
-//  }
   
   public static func buildEither<T>(first: T) -> Group where T: Entity {
     return .init(values: [.init(body: first), .init(body: EmptyEntity())])
@@ -52,25 +44,5 @@ public struct EntityBuilder {
 
   public static func buildEither<F>(second: F) -> Group where F: Entity {
     return .init(values: [.init(body: EmptyEntity()), .init(body: second)])
-  }
-  
-//
-//  public static func buildLimitedAvailability<E>(_ component: E) -> E? where E: Entity {
-//    return component
-//  }
-}
-
-public struct _ConditionalContent: Entity {
-  public var body: EmptyEntity { .init() }
-  var content: C
-  enum C {
-    case t(AnyEntity)
-    case f(AnyEntity)
-  }
-  init<T>(t: T) where T: Entity {
-    self.content = .t(.init(body: t))
-  }
-  init<F>(f: F) where F: Entity {
-    self.content = .f(.init(body: f))
   }
 }

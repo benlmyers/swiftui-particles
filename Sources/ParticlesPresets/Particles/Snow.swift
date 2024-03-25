@@ -60,7 +60,7 @@ public extension Preset {
         .opacity(in: 0.2 ... 0.8)
         .transition(.opacity)
         .colorOverlay(.init(red: 0.7, green: 0.9, blue: 0.9))
-        .initialTorque(angleIn: .degrees(-0.2) ... .degrees(0.2))
+        .initialTorque(angleIn: .degrees(-2.0) ... .degrees(2.0))
         .hueRotation(angleIn: .degrees(-30.0) ... .degrees(30.0))
         .blendMode(.plusLighter)
         .blur(in: 0.0 ... 2.0)

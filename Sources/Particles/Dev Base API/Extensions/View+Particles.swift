@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-fileprivate let minSize: CGSize = .init(width: 500, height: 500)
-
 public extension View {
   
   /// Applies a particle system to this view.
@@ -21,7 +19,6 @@ public extension View {
   ) -> some View where E: Entity {
     self.boundlessOverlay(
       atop: atop,
-      minSize: minSize,
       offset: offset)
     {
       ParticleSystem(entity: entities)
@@ -31,11 +28,11 @@ public extension View {
   /// Applies a particle emitter to this view.
   /// - Parameter interval: How often to emit the passed entities.
   /// - Parameter atop: Whether particles are laid atop the view. Pass `false` to lay particles under the view.
-  /// - Parameter simultaneously: Whether to spawn passed entities simultaneously. If not, they are spawned sequentially.
+  /// - Parameter simultaneously: Whether to spawn passed entities simultaneously. If not, they are spawned sequentially in a cycle.
   /// - Parameter entities: The entities to spawn.
   func emits<E>(every interval: TimeInterval = 1.0, atop: Bool = true, simultaneously: Bool = false, @EntityBuilder entities: () -> E) -> some View where E: Entity {
     if simultaneously {
-      return self.boundlessOverlay(atop: atop, minSize: minSize) {
+      return self.boundlessOverlay(atop: atop) {
         ParticleSystem {
           Emitter(every: interval, emits: entities)
             .emitAll()
@@ -43,7 +40,7 @@ public extension View {
         }
       }
     } else {
-      return self.boundlessOverlay(atop: atop, minSize: minSize) {
+      return self.boundlessOverlay(atop: atop) {
         ParticleSystem {
           Emitter(every: interval, emits: entities)
             .emitSingle()

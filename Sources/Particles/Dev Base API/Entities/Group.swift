@@ -26,7 +26,6 @@ public struct Group: Entity {
   internal var values: [AnyEntity]
   
   internal private(set) var merges: Merges?
-  internal private(set) var appliesModifiers: Bool = true
   
   // MARK: - Initalizers
   
@@ -41,10 +40,9 @@ public struct Group: Entity {
     }
   }
   
-  internal init(values: [AnyEntity], merges: Merges? = nil, appliesModifers: Bool = true) {
+  internal init(values: [AnyEntity], merges: Merges? = nil) {
     self.values = values
     self.merges = merges
-    self.appliesModifiers = appliesModifers
   }
   
   // MARK: - Subtypes

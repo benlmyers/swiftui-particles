@@ -22,7 +22,7 @@ struct StarsView: View {
       .statePersistent("stars", refreshesViews: true)
       HStack {
         Slider(value: $size, in: 1 ... 50, label: { Text("Size (\(String(format: "%.1f", size)))") })
-        Slider(value: $intensity, in: 1 ... 100, label: { Text("Intensity \(Int(intensity))") })
+        Slider(value: $intensity, in: 1 ... 100, label: { Text("Intensity (\(Int(intensity)))") })
       }
       .padding()
     }
