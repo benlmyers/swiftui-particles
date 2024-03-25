@@ -15,11 +15,13 @@ internal extension View {
   func boundlessOverlay<V>(
     atop: Bool = true,
     offset: CGPoint = .zero,
+    minSize: CGSize = .init(width: 300.0, height: 300.0),
     @ViewBuilder overlay: () -> V
   ) -> some View where V: View {
     BoundlessOverlayWrapper(
       atop: atop,
       offset: offset,
+      minSize: minSize,
       content: { self },
       overlay: overlay
     )
@@ -33,6 +35,7 @@ fileprivate struct BoundlessOverlayWrapper<Content, Overlay>: View where Content
   var content: Content
   var overlay: Overlay
   var offset: CGPoint
+  var minSize: CGSize
   var atop: Bool
   
   var body: some View {
@@ -57,18 +60,20 @@ fileprivate struct BoundlessOverlayWrapper<Content, Overlay>: View where Content
   
   var o: some View {
     overlay
-      .frame(minWidth: 100, minHeight: 100)
+      .frame(minWidth: minSize.width, minHeight: minSize.height)
       .offset(x: offset.x, y: offset.y)
   }
   
   init(
     atop: Bool = true,
     offset: CGPoint = .zero,
+    minSize: CGSize = .init(width: 300.0, height: 300.0),
     @ViewBuilder content: () -> Content,
     @ViewBuilder overlay: () -> Overlay
   ) {
     self.content = content()
     self.overlay = overlay()
+    self.minSize = minSize
     self.offset = offset
     self.atop = atop
   }

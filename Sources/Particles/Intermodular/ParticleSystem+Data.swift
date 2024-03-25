@@ -236,7 +236,12 @@ public extension ParticleSystem {
                   context.addFilter(.colorMultiply(overlay))
                 } else if case .transition(let transition, let bounds, let duration) = custom {
                   let c = PhysicsProxy.Context(physics: physics, system: self)
-                  guard c.timeAlive < duration || c.timeAlive > physics.lifetime - duration else { continue }
+                  if bounds == .birth || bounds == .birthAndDeath {
+                    guard c.timeAlive < duration else { continue }
+                  }
+                  if bounds == .death || bounds == .birthAndDeath {
+                    guard c.timeAlive > physics.lifetime - duration else { continue }
+                  }
                   transition.modifyRender(
                     getTransitionProgress(bounds: bounds, duration: duration, context: c),
                     c,

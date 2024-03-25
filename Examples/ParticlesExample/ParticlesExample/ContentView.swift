@@ -27,28 +27,15 @@ struct ContentView: View {
       }
     } detail: {
       VStack {
-        
-        
         ParticleSystem {
-          ForEach([1, 2, 3]) { i in
-            Particle {
-              Text("\(i)")
-            }
-          }
-          Particle {
-            Text("H")
-          }
-          Lattice {
-            Circle().frame(width: 100, height: 100)
+          ForEach([1, 3, 4], merges: .views) { i in
+            Particle { Text("\(i)") }.initialVelocity(withMagnitude: 1)
           }
         }
         .debug()
-        
-        HStack {
-          Text("Welcome to Particles")
-            .font(.title.bold())
-            .foregroundStyle(LinearGradient(colors: [.purple, .blue, .pink, .red, .yellow], startPoint: .leading, endPoint: .trailing))
-        }
+        Text("Welcome to Particles")
+          .font(.title.bold())
+          .foregroundStyle(LinearGradient(colors: [.purple, .blue, .pink, .red, .yellow], startPoint: .leading, endPoint: .trailing))
         Text("Choose a preset to get started.")
         Button {
           explodes = true
@@ -57,7 +44,7 @@ struct ContentView: View {
             .font(.title3)
         }
       }
-//      .dissolve(if: explodes)
+      .dissolve(if: explodes)
     }
   }
 }
