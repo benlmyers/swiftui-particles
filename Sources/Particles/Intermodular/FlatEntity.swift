@@ -10,23 +10,24 @@ import Foundation
 
 internal struct FlatEntity {
   
-  internal var preferences: [Preference] = []
+  internal var preferences: [Preference]
   internal var root: (any Entity)?
   
   init?(single e: Any) {
     guard var body: any Entity = e as? any Entity else { return nil }
-    guard !(e is EmptyEntity) else { return }
+    guard !(e is EmptyEntity) else { return nil }
+    self.preferences = []
     while true {
       if let group = body as? Group {
         self.root = group
-        return
+        break
       } else if let m = body as? any _ModifiedEntity {
         self.preferences.insert(contentsOf: m.preferences, at: 0)
         body = body.body
         continue
       } else if body is Particle || body is _Emitter {
         self.root = body
-        return
+        break
       } else {
         body = body.body
         continue

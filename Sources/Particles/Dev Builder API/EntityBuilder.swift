@@ -34,9 +34,15 @@ public struct EntityBuilder {
     Group(values: [.init(body: c1), .init(body: c2), .init(body: c3), .init(body: c4)])
   }
   
-//  public static func buildIf<T>(_ content: T) -> EmptyEntity where T: Entity {
-//    return .init()
-//  }
+  public static func buildIf<T>(_ content: T?) -> some Entity where T: Entity {
+    Group {
+      if let content {
+        content
+      } else {
+        EmptyEntity()
+      }
+    }
+  }
   
   public static func buildEither<T>(first: T) -> Group where T: Entity {
     return .init(values: [.init(body: first), .init(body: EmptyEntity())])

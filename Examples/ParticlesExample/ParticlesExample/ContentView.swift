@@ -27,9 +27,28 @@ struct ContentView: View {
       }
     } detail: {
       VStack {
-        Text("Welcome to Particles")
-          .font(.title.bold())
-          .foregroundStyle(LinearGradient(colors: [.purple, .blue, .pink, .red, .yellow], startPoint: .leading, endPoint: .trailing))
+        
+        
+        ParticleSystem {
+          ForEach([1, 2, 3]) { i in
+            Particle {
+              Text("\(i)")
+            }
+          }
+          Particle {
+            Text("H")
+          }
+          Lattice {
+            Circle().frame(width: 100, height: 100)
+          }
+        }
+        .debug()
+        
+        HStack {
+          Text("Welcome to Particles")
+            .font(.title.bold())
+            .foregroundStyle(LinearGradient(colors: [.purple, .blue, .pink, .red, .yellow], startPoint: .leading, endPoint: .trailing))
+        }
         Text("Choose a preset to get started.")
         Button {
           explodes = true
@@ -37,8 +56,8 @@ struct ContentView: View {
           Text("Explode!")
             .font(.title3)
         }
-
       }
+//      .dissolve(if: explodes)
     }
   }
 }

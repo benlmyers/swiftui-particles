@@ -57,7 +57,7 @@ fileprivate struct BoundlessOverlayWrapper<Content, Overlay>: View where Content
   
   var o: some View {
     overlay
-      .frame(minWidth: 1000, minHeight: screenSize.height)
+      .frame(minWidth: 100, minHeight: 100)
       .offset(x: offset.x, y: offset.y)
   }
   
