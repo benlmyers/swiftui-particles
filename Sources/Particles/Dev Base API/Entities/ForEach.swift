@@ -17,8 +17,7 @@ import Foundation
 /// }
 /// ```
 
-internal protocol _Iterable: Entity {
-}
+internal protocol _Iterable: Entity {}
 
 public struct ForEach<Data>: _Iterable where Data: RandomAccessCollection {
   

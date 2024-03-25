@@ -277,55 +277,37 @@ public extension ParticleSystem {
     }
     
     @discardableResult
-    internal func create<E>(entity: E, spawn: Bool = true, mergingView: EntityID? = nil) -> [(EntityID, ProxyID?)] where E: Entity {
+    internal func create<E>(entity: E, spawn: Bool = true) -> [(EntityID, ProxyID?)] where E: Entity {
       guard !(entity is EmptyEntity) else { return [] }
       var result: [(EntityID, ProxyID?)] = []
-      var proxyID: ProxyID?
-      let flatEntites: [FlatEntity] = FlatEntity.make(entity)
+      let (flatEntites, merges) = FlatEntity.make(entity)
+      var firstID: EntityID?
       for flat in flatEntites {
+        var proxyID: ProxyID?
         let entityID: EntityID = self.register(entity: flat)
-        if let mergingView: EntityID {
-          self.views[entityID] = .merged(mergingView)
-        }
         if spawn {
           proxyID = self.createProxy(entityID)
         }
         if let root = flat.root, root is _Emitter {
           self.emitEntities[entityID] = self.create(entity: root.body, spawn: false).map({ $0.0 })
         }
+        if let merges: Group.Merges, let firstID: EntityID {
+          switch merges {
+          case .views:
+            self.views[entityID] = .merged(firstID)
+          case .entities:
+            unregister(entityID: entityID)
+            if let proxyID {
+              proxyEntities[proxyID] = firstID
+            }
+          }
+        }
+        if firstID == nil {
+          firstID = entityID
+        }
         result.append((entityID, proxyID))
       }
       return result
-      // ‡ Old groups logic
-      //      if let group = entity.underlyingGroup() {
-      //        var firstEntityID: EntityID?
-      //        for v in group.values {
-      //          guard let e = v.body as? any Entity else { continue }
-      //          var modified = e
-      //          if group.appliesModifiers {
-      //            modified = applyGroupModifiers(to: e, groupRoot: entity)
-      //          }
-      //          // Merge view
-      //          var mergingViewParameter: EntityID?
-      //          if let merges: Group.Merges = group.merges, merges == .views {
-      //            mergingViewParameter = firstEntityID
-      //          }
-      //          let new: [(EntityID, ProxyID?)] = self.createSingle(entity: modified, spawn: spawn, mergingView: mergingViewParameter)
-      //          // Merge entity
-      //          if let firstEntityID, let merges: Group.Merges = group.merges, merges == .entities
-      //          {
-      //            for n in new {
-      //              unregister(entityID: n.0)
-      //              if let proxyID = n.1 {
-      //                proxyEntities[proxyID] = firstEntityID
-      //              }
-      //            }
-      //          }
-      //          result.append(contentsOf: new)
-      //          if firstEntityID == nil {
-      //            firstEntityID = new.first?.0
-      //          }
-      //        }
     }
     
     internal func viewPairs() -> [(AnyView, EntityID)] {

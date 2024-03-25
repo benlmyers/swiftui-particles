@@ -34,19 +34,20 @@ internal struct FlatEntity {
     }
   }
   
-  static func make(_ entity: Any) -> [FlatEntity] {
+  static func make(_ entity: Any) -> (result: [FlatEntity], merges: Group.Merges?) {
     if let forEach = entity as? (any _Iterable) {
       return FlatEntity.make(forEach.body)
     }
     if let group = entity as? Group {
-      return group.values.flatMap { entity in
-        FlatEntity.make(entity.body)
+      let flats: [FlatEntity] = group.values.flatMap { entity in
+        FlatEntity.make(entity.body).result
       }
+      return (flats, group.merges)
     }
     if let single = FlatEntity.init(single: entity) {
-      return [single]
+      return ([single], nil)
     }
-    return []
+    return ([], nil)
   }
   
   enum Preference {
