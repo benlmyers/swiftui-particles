@@ -24,12 +24,11 @@ import CoreGraphics
 ///   Circle().frame(width: 3.0, height: 3.0)
 /// }
 /// ```
-public struct Lattice<E>: _Iterable where E: Entity {
+public struct Lattice: _Iterable {
   
   // MARK: - Properties
   
-  private var customView: AnyView
-  private var withBehavior: (Particle) -> E
+  private var customView: AnyView = AnyView(Circle().frame(width: 2.0, height: 2.0))
   private var spawns: [(CGPoint, Color)]
   private var viewSize: CGSize
   private var anchor: UnitPoint
@@ -42,13 +41,11 @@ public struct Lattice<E>: _Iterable where E: Entity {
   /// - Parameter view: The view that is used as a source layer to choose where to spawn various colored particles.
   /// - Parameter withBehavior: A closure that allows you to define the behavior of each spawned entity using Entity Modifiers on the closure parameter.
   /// - Parameter customView: A custom view to use the the spawned particle. By default this is a circle. Keep in mind that the color appearance of each custom view will be overridden by the color in the source layer, `view`.
-  public init<Base, ParticleView>(
+  public init<Base>(
     spacing: Int = 3,
     anchor: UnitPoint = .center,
-    @ViewBuilder view: () -> Base,
-    withBehavior: @escaping (Particle) -> E,
-    @ViewBuilder customView: () -> ParticleView = { Circle().frame(width: 2.0, height: 2.0) }
-  ) where Base: View, ParticleView: View {
+    @ViewBuilder view: () -> Base
+  ) where Base: View {
     guard let viewImage = view().asImage()?.cgImage, let imgData = viewImage.dataProvider?.data else {
       fatalError("Particles could not convert view to image correctly. (Burst)")
     }
@@ -75,19 +72,15 @@ public struct Lattice<E>: _Iterable where E: Entity {
     }
     self.spawns = spawns
     self.anchor = anchor
-    self.customView = .init(customView())
-    self.withBehavior = withBehavior
   }
   
   // MARK: - Body Entity
   
   public var body: some Entity {
     ForEach(spawns, merges: .views, appliesModifiers: false) { spawn in
-      withBehavior(
-        Particle(anyView: customView)
-      )
-      .initialOffset(x: spawn.0.x - viewSize.width * anchor.x, y: spawn.0.y - viewSize.height * anchor.y)
-      .colorOverlay(spawn.1)
+      Particle(anyView: customView)
+        .initialOffset(x: spawn.0.x - viewSize.width * anchor.x, y: spawn.0.y - viewSize.height * anchor.y)
+        .colorOverlay(spawn.1)
     }
   }
 }

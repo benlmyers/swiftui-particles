@@ -14,39 +14,29 @@ public extension View {
       ZStack {
         if condition {
           ParticleSystem {
-            Lattice(spacing: 1, view: { self }) { p in
-              p
-                .initialPosition(.center).initialVelocity(xIn: -0.01 ... 0.01, yIn: -0.01 ... 0.01)
-                .transition(.twinkle)
-                .lifetime(3)
-            }
+            Lattice(view: { self })
           }
         }
       }
     }
   }
   
-  func explode(spacing: Int = 2, if condition: Bool) -> some View {
+  func explode(if condition: Bool, spacing: Int = 2) -> some View {
     self
       .opacity(condition ? 0.0 : 1.0)
       .boundlessOverlay(atop: true, minSize: .init(width: 800.0, height: 800.0)) {
       ZStack {
         ParticleSystem {
-          Lattice(spacing: spacing, view: { self }, withBehavior: { p in
-            p
-              .fixVelocity { c in
-                if condition {
-                  return CGVector(angle: Angle.degrees(Double.random(in: 0.0 ... 360.0, seed: c.physics.seed.0)), magnitude: .random(in: 0.2 ... 0.5))
-                }
-                return .zero
+          Lattice(spacing: spacing, view: { self })
+            .fixVelocity { c in
+              if condition {
+                return CGVector(angle: Angle.degrees(Double.random(in: 0.0 ... 360.0, seed: c.physics.seed.0)), magnitude: .random(in: 0.2 ... 0.5))
               }
-              .initialPosition(.center).initialVelocity(xIn: -0.01 ... 0.01, yIn: -0.01 ... 0.01)
-              .transition(.twinkle)
-              .lifetime(3)
-          }, customView: {
-            Circle()
-              .frame(width: CGFloat(spacing), height: CGFloat(spacing))
-          })
+              return .zero
+            }
+            .initialPosition(.center).initialVelocity(xIn: -0.01 ... 0.01, yIn: -0.01 ... 0.01)
+            .transition(.twinkle)
+            .lifetime(3)
         }
       }
       .opacity(condition ? 1 : 0)
