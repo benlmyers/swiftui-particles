@@ -13,7 +13,7 @@ public extension Preset {
   
   struct Fire: Entity, PresetEntry {
     
-    var metadata: PresetMetadata {
+    public var metadata: PresetMetadata {
       .init(
         name: "Fire",
         target: "ParticlesPresets",

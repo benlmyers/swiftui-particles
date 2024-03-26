@@ -13,7 +13,7 @@ public extension Preset {
   
   struct Magic: Entity, PresetEntry {
     
-    var metadata: PresetMetadata {
+    public var metadata: PresetMetadata {
       .init(
         name: "Magic",
         target: "ParticlesPresets",

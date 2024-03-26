@@ -176,6 +176,7 @@ public extension ParticleSystem {
     }
     
     internal func performRenders(_ context: GraphicsContext) {
+      let flag = Date()
       for proxyID in physicsProxies.keys {
         context.drawLayer { context in
           let render: RenderProxy? = renderProxies[proxyID]
@@ -264,7 +265,7 @@ public extension ParticleSystem {
               }
             }
             context.draw(resolved, at: .zero)
-//            self.performRenderTime = Date().timeIntervalSince(flag)
+            self.performRenderTime = Date().timeIntervalSince(flag)
           }
         }
       }
@@ -332,7 +333,7 @@ public extension ParticleSystem {
       return result
     }
     
-    internal func memorySummary(advanced: Bool = true) -> String {
+    internal func performanceSummary(advanced: Bool = false) -> String {
       var arr: [String] = []
       arr.append("\(Int(size.width)) x \(Int(size.height)) \t Frame \(currentFrame) \t \(Int(fps)) FPS")
       arr.append("Proxies: \(physicsProxies.count) physics \t(\(String(format: "%.1f", updateTime * 1000))ms)")

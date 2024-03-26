@@ -87,7 +87,7 @@ public struct ParticleSystem: View {
   
   private var debugView: some View {
     VStack(alignment: .leading, spacing: 2.0) {
-      Text(data.memorySummary())
+      Text(data.performanceSummary())
         .lineLimit(99)
         .fixedSize(horizontal: false, vertical: false)
         .multilineTextAlignment(.leading)
