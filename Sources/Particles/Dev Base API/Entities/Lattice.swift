@@ -38,12 +38,12 @@ public struct Lattice: Entity, Transparent {
   /// Creates a new Lattice particle group, which creates a grid of colored particles atop the opaque pixels of a view.
   /// - Parameter spacing: Distance between each particle in the lattice.
   /// - Parameter anchor: Whether to spawn the lattice of particles relative to the view.
+  /// - Parameter size: Size of the circle's that lattice will spawn.
   /// - Parameter view: The view that is used as a source layer to choose where to spawn various colored particles.
-  /// - Parameter withBehavior: A closure that allows you to define the behavior of each spawned entity using Entity Modifiers on the closure parameter.
-  /// - Parameter customView: A custom view to use the the spawned particle. By default this is a circle. Keep in mind that the color appearance of each custom view will be overridden by the color in the source layer, `view`.
   public init<Base>(
     spacing: Int = 3,
     anchor: UnitPoint = .center,
+    size: CGSize = .init(width: 2.0, height: 2.0),
     @ViewBuilder view: () -> Base
   ) where Base: View {
     guard let viewImage = view().asImage()?.cgImage, let imgData = viewImage.dataProvider?.data else {
@@ -72,12 +72,13 @@ public struct Lattice: Entity, Transparent {
     }
     self.spawns = spawns
     self.anchor = anchor
+    self.customView = AnyView(Circle().frame(width: size.width, height: size.height))
   }
   
   // MARK: - Body Entity
   
   public var body: some Entity {
-    ForEach(spawns, merges: .views) { spawn in
+    ForEach(spawns) { spawn in
       Particle(anyView: customView)
         .initialOffset(x: spawn.0.x - viewSize.width * anchor.x, y: spawn.0.y - viewSize.height * anchor.y)
         .colorOverlay(spawn.1)
