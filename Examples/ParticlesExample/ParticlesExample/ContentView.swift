@@ -54,7 +54,7 @@ struct ContentView: View {
   
   var thumbnailView: some View {
     ParticleSystem {
-      Lattice(spacing: 4, size: CGSize(width: 4, height: 4)) {
+      Lattice(spacing: 3) {
         Text("Particles")
           .font(.system(size: 90))
           .foregroundStyle(Color.green)
