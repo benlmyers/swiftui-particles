@@ -22,7 +22,7 @@ internal struct FlatEntity {
         self.root = group
         break
       } else if let m = body as? any _ModifiedEntity {
-        self.preferences.insert(contentsOf: m.preferences, at: 0)
+        self.preferences.append(contentsOf: m.preferences)
         body = body.body
         continue
       } else if body is Particle || body is _Emitter {

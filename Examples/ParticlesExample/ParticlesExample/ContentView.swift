@@ -29,7 +29,9 @@ struct ContentView: View {
       VStack {
         ParticleSystem {
           ForEach([1, 3, 4], merges: .views) { i in
-            Particle { Text("\(i)") }.initialVelocity(withMagnitude: 1)
+            Particle { Text("\(i)") }
+              .initialVelocity(withMagnitude: 1)
+              .initialPosition(.center)
           }
         }
         .debug()
