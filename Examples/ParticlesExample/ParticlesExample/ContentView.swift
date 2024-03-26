@@ -59,9 +59,7 @@ struct ContentView: View {
           .font(.system(size: 90))
           .foregroundStyle(Color.green)
       }
-      .initialPosition(.center)
       .lifetime(99)
-      
       ForEach(0..<40) { i in
         Particle {
           Circle()
@@ -80,9 +78,8 @@ struct ContentView: View {
         }
       }
       .lifetime(99)
-      .initialPosition(.center)
     }
-    
+    .debug()
   }
 
 }

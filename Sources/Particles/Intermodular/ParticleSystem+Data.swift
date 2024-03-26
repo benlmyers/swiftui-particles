@@ -175,19 +175,18 @@ public extension ParticleSystem {
       self.updateTime = Date().timeIntervalSince(flag)
     }
     
-    internal func performRenders(_ context: inout GraphicsContext) {
-      let flag = Date()
-      context.drawLayer { context in
-        for proxyID in physicsProxies.keys {
+    internal func performRenders(_ context: GraphicsContext) {
+      for proxyID in physicsProxies.keys {
+        context.drawLayer { context in
           let render: RenderProxy? = renderProxies[proxyID]
-          guard let physics: PhysicsProxy = physicsProxies[proxyID] else { continue }
-          guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
-          guard let entity: FlatEntity = entities[entityID] else { continue }
+          guard let physics: PhysicsProxy = physicsProxies[proxyID] else { return }
+          guard let entityID: EntityID = proxyEntities[proxyID] else { return }
+          guard let entity: FlatEntity = entities[entityID] else { return }
           var resolvedEntityID: EntityID = entityID
           if let maybe = views[entityID] {
             switch maybe {
             case .merged(let mergedID): resolvedEntityID = mergedID
-            case .some(_): 
+            case .some(_):
               if refreshViews {
                 guard let view: AnyView = (entity.root as? Particle)?.view else { break }
                 views[entityID] = .some(view)
@@ -195,7 +194,7 @@ public extension ParticleSystem {
               break
             }
           } else {
-            guard let view: AnyView = (entity.root as? Particle)?.view else { continue }
+            guard let view: AnyView = (entity.root as? Particle)?.view else { return }
             views[entityID] = .some(view)
           }
           guard let resolved = context.resolveSymbol(id: resolvedEntityID) else {
@@ -207,7 +206,7 @@ public extension ParticleSystem {
             physics.position.y > -resolved.size.height,
             physics.position.y < size.height + resolved.size.height,
             currentFrame > physics.inception
-          else { continue }
+          else { return }
           context.opacity = 1.0
           context.blendMode = .normal
           if let render {
@@ -265,7 +264,7 @@ public extension ParticleSystem {
               context.addFilter(.blur(radius: render.blur))
             }
             context.draw(resolved, at: .zero)
-            self.performRenderTime = Date().timeIntervalSince(flag)
+//            self.performRenderTime = Date().timeIntervalSince(flag)
           }
         }
       }

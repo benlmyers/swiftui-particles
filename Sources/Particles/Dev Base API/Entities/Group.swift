@@ -71,9 +71,11 @@ public struct Group: Entity {
   ///
   /// However, this comes at a cost: If ``ParticleSystem/debug()`` is enabled, you can see that 3 views and 3 entities are registered.
   ///
-  /// Use `merges: .views` to only register the **first view** encountered.
-  /// Likewise, use `merges: .entities` to only register the **first entity** behavior encountered. Then, the system will iterate over the data array and create different initial ``PhysicsProxy`` and ``RenderProxy`` "clones".
-  /// Note that ``entities`` automatically also merges ``views``.
+  /// It only makes sense to use `merges: .entities`
+  ///
+  /// - Use `merges: .views` to only register the **first view** encountered.
+  /// - Likewise, use `merges: .entities` to only register the **first entity** behavior encountered. Then, the system will iterate over the data array and create different initial ``PhysicsProxy`` and ``RenderProxy`` "clones".
+  /// - Note that ``entities`` automatically also merges ``views``.
   ///
   /// Use of ``Merges`` is recommended, as it always speeds up rendering time.
   public enum Merges {

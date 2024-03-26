@@ -16,7 +16,12 @@ internal struct FlatEntity {
   init?(single e: Any) {
     guard var body: any Entity = e as? any Entity else { return nil }
     guard !(e is EmptyEntity) else { return nil }
-    self.preferences = []
+    self.preferences = [.onPhysicsBirth({ c in
+      var p = c.physics
+      let s = c.system.size
+      p.position = .init(x: 0.5 * s.width, y: 0.5 * s.height)
+      return p
+    })]
     while true {
       if let group = body as? Group {
         self.root = group

@@ -78,7 +78,7 @@ public struct Lattice: Entity, Transparent {
   // MARK: - Body Entity
   
   public var body: some Entity {
-    ForEach(spawns) { spawn in
+    ForEach(spawns, merges: .views) { spawn in
       Particle(anyView: customView)
         .initialOffset(x: spawn.0.x - viewSize.width * anchor.x, y: spawn.0.y - viewSize.height * anchor.y)
         .colorOverlay(spawn.1)

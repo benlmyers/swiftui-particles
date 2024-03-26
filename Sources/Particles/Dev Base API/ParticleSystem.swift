@@ -145,7 +145,7 @@ public struct ParticleSystem: View {
       }
       self.data.initialEntity = nil
     }
-    data.performRenders(&context)
+    data.performRenders(context)
     data.updatePhysicsAndRenders()
     data.destroyExpiredEntities()
     data.advanceFrame()
