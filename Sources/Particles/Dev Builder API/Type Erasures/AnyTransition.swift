@@ -11,7 +11,7 @@ import Foundation
 /// A type-erased ``Transition`` struct.
 public struct AnyTransition {
   
-  internal private(set) var modifyRender: (Double, PhysicsProxy.Context, inout GraphicsContext) -> Void
+  internal private(set) var modifyRender: (Double, Proxy.Context, inout GraphicsContext) -> Void
   
   public init<T>(_ transition: T) where T: Particles.Transition {
     self.modifyRender = transition.modifyRender

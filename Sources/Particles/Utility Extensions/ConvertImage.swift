@@ -56,7 +56,7 @@ internal extension View {
 internal extension UIImage {
   convenience init(view: UIView) {
     UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, 0.0)
-    view.layer.render(in: UIGraphicsGetCurrentContext()!)
+    view.layer.proxy(in: UIGraphicsGetCurrentContext()!)
     let image = UIGraphicsGetImageFromCurrentImageContext()
     UIGraphicsEndImageContext()
     self.init(cgImage: image!.cgImage!)

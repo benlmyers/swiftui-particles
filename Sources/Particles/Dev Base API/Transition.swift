@@ -17,7 +17,7 @@ public protocol Transition {
   /// - Parameter progress: Upon birth, progress goes `1.0 -> 0.0`. Upon death, progress goes `0.0 -> 1.0`.
   /// - Parameter physics: Physics context provided for use in the transition.
   /// - Parameter context: The `GraphicsContext` that is to be modified.
-  func modifyRender(progress: Double, physics: PhysicsProxy.Context, context: inout GraphicsContext)
+  func modifyRender(progress: Double, physics: Proxy.Context, context: inout GraphicsContext)
 }
 
 /// Bounds for a transition.

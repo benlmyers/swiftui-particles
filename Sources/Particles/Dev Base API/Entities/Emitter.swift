@@ -25,7 +25,7 @@ public struct Emitter<Children>: Entity, _Emitter where Children: Entity {
   public var body: Children
   
   internal var emitInterval: TimeInterval
-  internal var emitChooser: ((PhysicsProxy.Context) -> Int)?
+  internal var emitChooser: ((Proxy.Context) -> Int)?
   
   // MARK: - Initalizers
   
@@ -43,7 +43,7 @@ public struct Emitter<Children>: Entity, _Emitter where Children: Entity {
   /// Modifies the ``Emitter`` to emit only one entity at a time.
   /// - Parameter choice: A closure that decides the index of the entity to spawn when the ``Emitter`` can spawn a new entity. By default, it cycles through passed entities.
   /// - Returns: The modified emitter
-  public func emitSingle(choosing choice: @escaping (PhysicsProxy.Context) -> Int = { c in Int(c.system?.proxiesSpawned ?? 0)}) -> Emitter {
+  public func emitSingle(choosing choice: @escaping (Proxy.Context) -> Int = { c in Int(c.system?.proxiesSpawned ?? 0)}) -> Emitter {
     var copy = self
     copy.emitChooser = choice
     return copy
@@ -67,5 +67,5 @@ public struct Emitter<Children>: Entity, _Emitter where Children: Entity {
 
 internal protocol _Emitter {
   var emitInterval: TimeInterval { get set }
-  var emitChooser: ((PhysicsProxy.Context) -> Int)? { get set }
+  var emitChooser: ((Proxy.Context) -> Int)? { get set }
 }

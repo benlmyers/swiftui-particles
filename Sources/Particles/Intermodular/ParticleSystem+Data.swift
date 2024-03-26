@@ -40,9 +40,7 @@ public extension ParticleSystem {
     // ID of entity -> View to render
     private var views: [EntityID: MaybeView] = .init()
     // ID of proxy -> Physics data
-    private var physicsProxies: [ProxyID: PhysicsProxy] = [:]
-    // ID of proxy -> Render data
-    private var renderProxies: [ProxyID: RenderProxy] = [:]
+    private var proxies: [ProxyID: Proxy] = [:]
     // ID of proxy -> ID of entity containing data behaviors
     private var proxyEntities: [ProxyID: EntityID] = [:]
     // ID of emitter proxy -> Frame such proxy last emitted a child
@@ -61,7 +59,7 @@ public extension ParticleSystem {
     
     /// The total number of proxies alive.
     public var proxiesAlive: Int {
-      return physicsProxies.count
+      return proxies.count
     }
     
     /// The total number of proxies spawned in the simulation.
@@ -82,9 +80,9 @@ public extension ParticleSystem {
     
     internal func emitChildren() {
       guard currentFrame > 1 else { return }
-      let proxyIDs = physicsProxies.keys
+      let proxyIDs = proxies.keys
       for proxyID in proxyIDs {
-        guard let proxy: PhysicsProxy = physicsProxies[proxyID] else { continue }
+        guard let proxy: Proxy = proxies[proxyID] else { continue }
         guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
         guard let entity: FlatEntity = entities[entityID] else { continue }
         guard let emitter = (entity.root as? _Emitter) else { continue }
@@ -95,7 +93,7 @@ public extension ParticleSystem {
         }
         var finalEntities: [EntityID] = protoEntities
         if let chooser = emitter.emitChooser, !protoEntities.isEmpty {
-          let context = PhysicsProxy.Context(physics: proxy, system: self)
+          let context = Proxy.Context(proxy: proxy, system: self)
           finalEntities = [protoEntities[chooser(context) % protoEntities.count]]
         }
         for protoEntity in finalEntities {
@@ -106,16 +104,16 @@ public extension ParticleSystem {
     }
     
     internal func destroyExpiredEntities() {
-      let proxyIDs = physicsProxies.keys
+      let proxyIDs = proxies.keys
       for proxyID in proxyIDs {
-        guard let proxy: PhysicsProxy = physicsProxies[proxyID] else { continue }
+        guard let proxy: Proxy = proxies[proxyID] else { continue }
         var deathFrame: Int = .max
         if proxy.lifetime < .infinity {
           deathFrame = Int(Double(proxy.inception) + proxy.lifetime * 60.0)
         }
         if Int(currentFrame) >= deathFrame {
-          physicsProxies.removeValue(forKey: proxyID)
-          renderProxies.removeValue(forKey: proxyID)
+          proxies.removeValue(forKey: proxyID)
+          proxies.removeValue(forKey: proxyID)
           proxyEntities.removeValue(forKey: proxyID)
           continue
         }
@@ -125,9 +123,8 @@ public extension ParticleSystem {
     internal func updatePhysicsAndRenders() {
       let flag = Date()
       let group = DispatchGroup()
-      let queue = DispatchQueue(label: "com.benmyers.particles.physics.update", qos: .userInteractive, attributes: .concurrent)
-      var newPhysicsProxies: [ProxyID: PhysicsProxy] = [:]
-      var newRenderProxies: [ProxyID: RenderProxy] = [:]
+      let queue = DispatchQueue(label: "com.benmyers.particles.proxy.update", qos: .userInteractive, attributes: .concurrent)
+      var newProxies: [ProxyID: Proxy] = [:]
       let lock = NSLock()
       for (proxyID, entityID) in proxyEntities {
         group.enter()
@@ -136,7 +133,7 @@ public extension ParticleSystem {
             group.leave()
             return
           }
-          guard let physicsProxy: PhysicsProxy = physicsProxies[proxyID] else {
+          guard let proxy: Proxy = proxies[proxyID] else {
             group.leave()
             return
           }
@@ -144,43 +141,32 @@ public extension ParticleSystem {
             group.leave()
             return
           }
-          let context = PhysicsProxy.Context(physics: physicsProxy, system: self)
-          var newPhysics: PhysicsProxy = entity.onPhysicsUpdate(context)
-          var newRender: RenderProxy?
-          newPhysics.velocity.dx += newPhysics.acceleration.dx
-          newPhysics.velocity.dy += newPhysics.acceleration.dy
-          newPhysics.position.x += newPhysics.velocity.dx
-          newPhysics.position.y += newPhysics.velocity.dy
-          newPhysics.rotation.degrees += newPhysics.torque.degrees
-          if let renderProxy: RenderProxy = renderProxies[proxyID] {
-            let context = RenderProxy.Context(physics: newPhysics, render: renderProxy, system: self)
-            newRender = entity.onRenderUpdate(context)
-          }
+          let context = Proxy.Context(proxy: proxy, system: self)
+          var new: Proxy = entity.onUpdate(context)
+          new.velocity.dx += new.acceleration.dx
+          new.velocity.dy += new.acceleration.dy
+          new.position.x += new.velocity.dx
+          new.position.y += new.velocity.dy
+          new.rotation.degrees += new.torque.degrees
           lock.lock()
-          newPhysicsProxies[proxyID] = newPhysics
-          if let newRender {
-            newRenderProxies[proxyID] = newRender
-          }
+          newProxies[proxyID] = new
           lock.unlock()
           group.leave()
         }
       }
       group.wait()
-      for (proxyID, newPhysicsProxy) in newPhysicsProxies {
-        physicsProxies[proxyID] = newPhysicsProxy
-      }
-      for (proxyID, newRenderProxy) in newRenderProxies {
-        renderProxies[proxyID] = newRenderProxy
+      for (proxyID, newProxy) in newProxies {
+        proxies[proxyID] = newProxy
       }
       self.updateTime = Date().timeIntervalSince(flag)
     }
     
     internal func performRenders(_ context: GraphicsContext) {
       let flag = Date()
-      for proxyID in physicsProxies.keys {
+      for proxyID in proxies.keys {
         context.drawLayer { context in
-          let render: RenderProxy? = renderProxies[proxyID]
-          guard let physics: PhysicsProxy = physicsProxies[proxyID] else { return }
+          let render: Proxy? = proxies[proxyID]
+          guard let physics: Proxy = proxies[proxyID] else { return }
           guard let entityID: EntityID = proxyEntities[proxyID] else { return }
           guard let entity: FlatEntity = entities[entityID] else { return }
           var resolvedEntityID: EntityID = entityID
@@ -249,7 +235,7 @@ public extension ParticleSystem {
                   context.addFilter(.colorMatrix(m))
                   context.addFilter(.colorMultiply(overlay))
                 } else if case .transition(let transition, let bounds, let duration) = custom {
-                  let c = PhysicsProxy.Context(physics: physics, system: self)
+                  let c = Proxy.Context(proxy: physics, system: self)
                   if bounds == .birth || bounds == .birthAndDeath {
                     guard c.timeAlive < duration else { continue }
                   }
@@ -336,7 +322,7 @@ public extension ParticleSystem {
     internal func performanceSummary(advanced: Bool = false) -> String {
       var arr: [String] = []
       arr.append("\(Int(size.width)) x \(Int(size.height)) \t Frame \(currentFrame) \t \(Int(fps)) FPS")
-      arr.append("Proxies: \(physicsProxies.count) physics \t(\(String(format: "%.1f", updateTime * 1000))ms)")
+      arr.append("Proxies: \(proxies.count) physics \t(\(String(format: "%.1f", updateTime * 1000))ms)")
       arr.append("System: \(entities.count) entities \t \(views.filter({ $0.value.isSome }).count) views \t Rendering: \(String(format: "%.1f", performRenderTime * 1000))ms")
       if advanced {
         arr.append("PE=\(proxyEntities.count), LE=\(lastEmitted.count), EE=\(emitEntities.count), EG=\(entityGroups.count)")
@@ -345,9 +331,9 @@ public extension ParticleSystem {
     }
     
     @discardableResult
-    private func createProxy(_ id: EntityID, inherit: PhysicsProxy? = nil) -> ProxyID? {
+    private func createProxy(_ id: EntityID, inherit: Proxy? = nil) -> ProxyID? {
       guard let entity: FlatEntity = self.entities[id] else { return nil }
-      var physics = PhysicsProxy(currentFrame: currentFrame)
+      var physics = Proxy(currentFrame: currentFrame)
       if let inherit {
         physics.position = inherit.position
         physics.rotation = inherit.rotation
@@ -356,16 +342,9 @@ public extension ParticleSystem {
       if entity.root is _Emitter {
         physics.lifetime = .infinity
       }
-      let context = PhysicsProxy.Context(physics: physics, system: self)
-      let newPhysics = entity.onPhysicsBirth(context)
-      self.physicsProxies[nextProxyRegistry] = newPhysics
-      if let _: AnyView = (entity.root as? Particle)?.view {
-        let newRender = entity.onRenderBirth(.init(physics: newPhysics, render: RenderProxy(), system: self))
-        let updateRender = entity.onRenderUpdate(.init(physics: newPhysics, render: RenderProxy(), system: self))
-        if newRender != RenderProxy() || updateRender != RenderProxy() {
-          self.renderProxies[nextProxyRegistry] = newRender
-        }
-      }
+      let context = Proxy.Context(proxy: physics, system: self)
+      let new = entity.onBirth(context)
+      self.proxies[nextProxyRegistry] = new
       self.proxyEntities[nextProxyRegistry] = id
       let proxyID = nextProxyRegistry
       nextProxyRegistry += 1
@@ -383,14 +362,14 @@ public extension ParticleSystem {
       self.entities.removeValue(forKey: entityID)
     }
     
-    private func getTransitionProgress(bounds: TransitionBounds, duration: TimeInterval, context: PhysicsProxy.Context) -> Double {
+    private func getTransitionProgress(bounds: TransitionBounds, duration: TimeInterval, context: Proxy.Context) -> Double {
       switch bounds {
       case .birth:
         return 1 - min(max(context.timeAlive / duration, 0.0), 1.0)
       case .death:
-        return min(max((context.timeAlive - context.physics.lifetime + duration) / duration, 0.0), 1.0)
+        return min(max((context.timeAlive - context.proxy.lifetime + duration) / duration, 0.0), 1.0)
       case .birthAndDeath:
-        if context.timeAlive < context.physics.lifetime / 2.0 {
+        if context.timeAlive < context.proxy.lifetime / 2.0 {
           return getTransitionProgress(bounds: .birth, duration: duration, context: context)
         } else {
           return getTransitionProgress(bounds: .death, duration: duration, context: context)

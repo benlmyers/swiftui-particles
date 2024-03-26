@@ -74,7 +74,7 @@ public struct Group: Entity {
   /// It only makes sense to use `merges: .entities`
   ///
   /// - Use `merges: .views` to only register the **first view** encountered.
-  /// - Likewise, use `merges: .entities` to only register the **first entity** behavior encountered. Then, the system will iterate over the data array and create different initial ``PhysicsProxy`` and ``RenderProxy`` "clones".
+  /// - Likewise, use `merges: .entities` to only register the **first entity** behavior encountered. Then, the system will iterate over the data array and create different initial ``Proxy`` and ``Proxy`` "clones".
   /// - Note that ``entities`` automatically also merges ``views``.
   ///
   /// Use of ``Merges`` is recommended, as it always speeds up rendering time.

@@ -19,23 +19,15 @@ internal struct ModifiedEntity<E>: Entity, _ModifiedEntity where E: Entity {
   
   init(
     entity: E,
-    onBirthPhysics: ((PhysicsProxy.Context) -> PhysicsProxy)? = nil,
-    onUpdatePhysics: ((PhysicsProxy.Context) -> PhysicsProxy)? = nil,
-    onBirthRender: ((RenderProxy.Context) -> RenderProxy)? = nil,
-    onUpdateRender: ((RenderProxy.Context) -> RenderProxy)? = nil
+    onBirth: ((Proxy.Context) -> Proxy)? = nil,
+    onUpdate: ((Proxy.Context) -> Proxy)? = nil
   ) {
     self.body = entity
-    if let onBirthPhysics {
-      preferences.insert(.onPhysicsBirth(onBirthPhysics), at: 0)
+    if let onBirth {
+      preferences.insert(.onBirth(onBirth), at: 0)
     }
-    if let onUpdatePhysics {
-      preferences.insert(.onPhysicsUpdate(onUpdatePhysics), at: 0)
-    }
-    if let onBirthRender {
-      preferences.insert(.onRenderBirth(onBirthRender), at: 0)
-    }
-    if let onUpdateRender {
-      preferences.insert(.onRenderUpdate(onUpdateRender), at: 0)
+    if let onUpdate {
+      preferences.insert(.onUpdate(onUpdate), at: 0)
     }
   }
 }

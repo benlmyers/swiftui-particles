@@ -43,7 +43,7 @@ public extension Preset {
             .init(angle: .random(), magnitude: .random(in: 0.3 ... 0.5))
         }
         .fixVelocity{ c in
-          return .init(dx: c.physics.velocity.dx + c.timeAlive * 0.02 * sin(5 * (c.physics.seed.0 - 0.5) * c.timeAlive), dy: c.physics.velocity.dy - c.timeAlive * 0.02 * cos(5 * (c.physics.seed.1 - 0.5) * c.timeAlive))
+          return .init(dx: c.proxy.velocity.dx + c.timeAlive * 0.02 * sin(5 * (c.proxy.seed.0 - 0.5) * c.timeAlive), dy: c.proxy.velocity.dy - c.timeAlive * 0.02 * cos(5 * (c.proxy.seed.1 - 0.5) * c.timeAlive))
         }
         .blendMode(.plusLighter)
         .hueRotation(angleIn: .degrees(-10.0) ... .degrees(10.0))

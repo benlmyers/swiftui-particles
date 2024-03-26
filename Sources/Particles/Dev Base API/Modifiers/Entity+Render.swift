@@ -14,8 +14,8 @@ public extension Entity {
   /// - Parameter value: The opacity value to multiply the current opacity by.
   /// - Returns: The modified entity.
   func opacity(_ value: Double) -> some Entity {
-    ModifiedEntity(entity: self, onBirthRender: { context in
-      var p = context.render
+    ModifiedEntity(entity: self, onBirth: { context in
+      var p = context.proxy
       p.opacity *= value
       return p
     })
@@ -24,9 +24,9 @@ public extension Entity {
   /// Adjusts the opacity of the entity using the value returned by the provided closure.
   /// - Parameter withValue: A closure returning the opacity value to multiply the current opacity by.
   /// - Returns: The modified entity.
-  func opacity(with withValue: @escaping (RenderProxy.Context) -> Double) -> some Entity {
-    ModifiedEntity(entity: self, onUpdateRender: { context in
-      var p = context.render
+  func opacity(with withValue: @escaping (Proxy.Context) -> Double) -> some Entity {
+    ModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.proxy
       p.opacity = withValue(context)
       return p
     })
@@ -36,8 +36,8 @@ public extension Entity {
   /// - Parameter value: The range to randomly choose an opacity value to multiply the current opacity by.
   /// - Returns: The modified entity.
   func opacity(in range: ClosedRange<Double>) -> some Entity {
-    ModifiedEntity(entity: self, onBirthRender: { context in
-      var p = context.render
+    ModifiedEntity(entity: self, onBirth: { context in
+      var p = context.proxy
       p.opacity = .random(in: range)
       return p
     })
@@ -47,8 +47,8 @@ public extension Entity {
   /// - Parameter angle: The angle of rotation in hue space.
   /// - Returns: The modified entity.
   func hueRotation(_ angle: Angle) -> some Entity {
-    ModifiedEntity(entity: self, onBirthRender: { context in
-      var p = context.render
+    ModifiedEntity(entity: self, onBirth: { context in
+      var p = context.proxy
       p.hueRotation = angle
       return p
     })
@@ -57,9 +57,9 @@ public extension Entity {
   /// Applies a hue rotation to the entity using the value returned by the provided closure.
   /// - Parameter withAngle: A closure returning the angle of rotation in hue space.
   /// - Returns: The modified entity.
-  func hueRotation(with withAngle: @escaping (RenderProxy.Context) -> Angle) -> some Entity {
-    ModifiedEntity(entity: self, onUpdateRender: { context in
-      var p = context.render
+  func hueRotation(with withAngle: @escaping (Proxy.Context) -> Angle) -> some Entity {
+    ModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.proxy
       let hr = withAngle(context)
       p.hueRotation = hr
       return p
@@ -70,8 +70,8 @@ public extension Entity {
   /// - Parameter angle: The angle of rotation in hue space.
   /// - Returns: The modified entity.
   func hueRotation(angleIn: ClosedRange<Angle>) -> some Entity {
-    ModifiedEntity(entity: self, onBirthRender: { context in
-      var p = context.render
+    ModifiedEntity(entity: self, onBirth: { context in
+      var p = context.proxy
       let hr = Angle.random(degreesIn: min(angleIn.lowerBound.degrees, angleIn.upperBound.degrees) ... max(angleIn.upperBound.degrees, angleIn.lowerBound.degrees))
       p.hueRotation = hr
       return p
@@ -82,8 +82,8 @@ public extension Entity {
   /// - Parameter size: The size of the blur radius in pixels.
   /// - Returns: The modified entity.
   func blur(_ size: CGFloat) -> some Entity {
-    ModifiedEntity(entity: self, onBirthRender: { context in
-      var p = context.render
+    ModifiedEntity(entity: self, onBirth: { context in
+      var p = context.proxy
       p.blur = size
       return p
     })
@@ -93,8 +93,8 @@ public extension Entity {
   /// - Parameter size: The range of the size of the blur radius in pixels.
   /// - Returns: The modified entity.
   func blur(in range: ClosedRange<CGFloat>) -> some Entity {
-    ModifiedEntity(entity: self, onBirthRender: { context in
-      var p = context.render
+    ModifiedEntity(entity: self, onBirth: { context in
+      var p = context.proxy
       p.blur = .random(in: range)
       return p
     })
@@ -104,8 +104,8 @@ public extension Entity {
   /// - Parameter mode: The blending mode to use.
   /// - Returns: The modified entity.
   func blendMode(_ mode: GraphicsContext.BlendMode) -> some Entity {
-    ModifiedEntity(entity: self, onBirthRender: { context in
-      var p = context.render
+    ModifiedEntity(entity: self, onBirth: { context in
+      var p = context.proxy
       p.blendMode = mode
       return p
     })
@@ -117,8 +117,8 @@ public extension Entity {
   ///   - y: The scaling factor to apply to the y dimension. Set to `nil` for no behavior.
   /// - Returns: The modified entity.
   func scale(x: CGFloat? = nil, y: CGFloat? = nil) -> some Entity {
-    ModifiedEntity(entity: self, onBirthRender: { context in
-      var p = context.render
+    ModifiedEntity(entity: self, onBirth: { context in
+      var p = context.proxy
       if let x = x {
         p.scale.width *= x
       }
@@ -139,9 +139,9 @@ public extension Entity {
   /// Scales the entity by the size returned by the provided closure in both the x and y directions.
   /// - Parameter withSize: A closure returning the scaling factor to apply to both the x and y dimensions.
   /// - Returns: The modified entity.
-  func scale(with withFactor: @escaping (RenderProxy.Context) -> CGFloat) -> some Entity {
-    ModifiedEntity(entity: self, onUpdateRender: { context in
-      var p = context.render
+  func scale(with withFactor: @escaping (Proxy.Context) -> CGFloat) -> some Entity {
+    ModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.proxy
       let s = withFactor(context)
       p.scale.width = s
       p.scale.height = s
@@ -153,8 +153,8 @@ public extension Entity {
   /// - Parameter range: A range to randomly scale the entity by.
   /// - Returns: The modified entity.
   func scale(factorIn range: ClosedRange<CGFloat>) -> some Entity {
-    ModifiedEntity(entity: self, onBirthRender: { context in
-      var p = context.render
+    ModifiedEntity(entity: self, onBirth: { context in
+      var p = context.proxy
       let s: CGFloat = CGFloat.random(in: range)
       p.scale.width *= s
       p.scale.height *= s
@@ -165,9 +165,9 @@ public extension Entity {
   /// Scales the entity in the x and y directions by the sizes returned by the provided closures.
   /// - Parameter withSize: A closure returning the scaling factors to apply to the x and y dimensions.
   /// - Returns: The modified entity.
-  func scale(with withSize: @escaping (RenderProxy.Context) -> CGSize) -> some Entity {
-    ModifiedEntity(entity: self, onUpdateRender: { context in
-      var p = context.render
+  func scale(with withSize: @escaping (Proxy.Context) -> CGSize) -> some Entity {
+    ModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.proxy
       let s = withSize(context)
       p.scale.width = s.width
       p.scale.height = s.height
@@ -180,8 +180,8 @@ public extension Entity {
   /// - Parameter y: The y-rotation.
   /// - Parameter z: The z-rotation.
   func rotation3D(x: Angle, y: Angle, z: Angle) -> some Entity {
-    ModifiedEntity(entity: self, onBirthRender: { context in
-      var p = context.render
+    ModifiedEntity(entity: self, onBirth: { context in
+      var p = context.proxy
       p.rotation3d.x = x.radians
       p.rotation3d.y = y.radians
       p.rotation3d.z = z.radians

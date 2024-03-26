@@ -16,8 +16,8 @@ internal struct FlatEntity {
   init?(single e: Any) {
     guard var body: any Entity = e as? any Entity else { return nil }
     guard !(e is EmptyEntity) else { return nil }
-    self.preferences = [.onPhysicsBirth({ c in
-      var p = c.physics
+    self.preferences = [.onBirth({ c in
+      var p = c.proxy
       let s = c.system.size
       p.position = .init(x: 0.5 * s.width, y: 0.5 * s.height)
       return p
@@ -62,10 +62,8 @@ internal struct FlatEntity {
   }
   
   enum Preference {
-    case onPhysicsBirth((PhysicsProxy.Context) -> PhysicsProxy)
-    case onPhysicsUpdate((PhysicsProxy.Context) -> PhysicsProxy)
-    case onRenderBirth((RenderProxy.Context) -> RenderProxy)
-    case onRenderUpdate((RenderProxy.Context) -> RenderProxy)
+    case onBirth((Proxy.Context) -> Proxy)
+    case onUpdate((Proxy.Context) -> Proxy)
     case custom(Custom)
     
     enum Custom {
@@ -75,44 +73,22 @@ internal struct FlatEntity {
     }
   }
   
-  func onPhysicsBirth(_ context: PhysicsProxy.Context) -> PhysicsProxy {
-    var proxy: PhysicsProxy = context.physics
+  func onBirth(_ context: Proxy.Context) -> Proxy {
+    var proxy: Proxy = context.proxy
     for p in preferences {
-      if case .onPhysicsBirth(let c) = p {
-        let context = PhysicsProxy.Context(physics: proxy, system: context.system)
+      if case .onBirth(let c) = p {
+        let context = Proxy.Context(proxy: proxy, system: context.system)
         proxy = c(context)
       }
     }
     return proxy
   }
   
-  func onPhysicsUpdate(_ context: PhysicsProxy.Context) -> PhysicsProxy {
-    var proxy: PhysicsProxy = context.physics
+  func onUpdate(_ context: Proxy.Context) -> Proxy {
+    var proxy: Proxy = context.proxy
     for p in preferences {
-      if case .onPhysicsUpdate(let c) = p {
-        let context = PhysicsProxy.Context(physics: proxy, system: context.system)
-        proxy = c(context)
-      }
-    }
-    return proxy
-  }
-  
-  func onRenderBirth(_ context: RenderProxy.Context) -> RenderProxy {
-    var proxy: RenderProxy = context.render
-    for p in preferences {
-      if case .onRenderBirth(let c) = p {
-        let context = RenderProxy.Context(physics: context.physics, render: proxy, system: context.system)
-        proxy = c(context)
-      }
-    }
-    return proxy
-  }
-  
-  func onRenderUpdate(_ context: RenderProxy.Context) -> RenderProxy {
-    var proxy: RenderProxy = context.render
-    for p in preferences {
-      if case .onRenderUpdate(let c) = p {
-        let context = RenderProxy.Context(physics: context.physics, render: proxy, system: context.system)
+      if case .onUpdate(let c) = p {
+        let context = Proxy.Context(proxy: proxy, system: context.system)
         proxy = c(context)
       }
     }

@@ -34,7 +34,7 @@ public extension View {
           Lattice(view: { self })
             .fixVelocity { c in
               if condition {
-                return CGVector(angle: Angle.degrees(Double.random(in: 0.0 ... 360.0, seed: c.physics.seed.0)), magnitude: .random(in: 0.2 ... 0.5))
+                return CGVector(angle: Angle.degrees(Double.random(in: 0.0 ... 360.0, seed: c.proxy.seed.0)), magnitude: .random(in: 0.2 ... 0.5))
               }
               return .zero
             }

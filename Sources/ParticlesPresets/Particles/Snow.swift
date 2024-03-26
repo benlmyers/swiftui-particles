@@ -55,7 +55,7 @@ public extension Preset {
         })
         .initialVelocity(xIn: -1.0 ... 1.0, yIn: 0.2 ... 0.8)
         .fixAcceleration{ c in
-          return CGVectorMake(0.005 * sin(c.physics.seed.2 + c.system.time * 1.8), 0.01)
+          return CGVectorMake(0.005 * sin(c.proxy.seed.2 + c.system.time * 1.8), 0.01)
         }
         .opacity(in: 0.2 ... 0.8)
         .transition(.opacity)
@@ -65,8 +65,8 @@ public extension Preset {
         .blendMode(.plusLighter)
         .blur(in: 0.0 ... 2.0)
         .scale { c in
-          let s = CGFloat.random(in: 0.3 ... 1.0, seed: c.physics.seed.0)
-          return CGSize(width: s /** cos(0.1 * c.system.time + c.physics.seed.1)*/, height: s)
+          let s = CGFloat.random(in: 0.3 ... 1.0, seed: c.proxy.seed.0)
+          return CGSize(width: s /** cos(0.1 * c.system.time + c.proxy.seed.1)*/, height: s)
         }
       }
     }
@@ -87,7 +87,7 @@ public extension Preset {
         })
         .initialVelocity(xIn: -4 ... 0.4, yIn: 1.0 ... 3.0)
         .fixAcceleration{ c in
-          return CGVectorMake(0.04 * sin(c.physics.seed.2 + c.system.time * 1.8), 0.007 + 0.008 * cos(c.system.time * 1.8))
+          return CGVectorMake(0.04 * sin(c.proxy.seed.2 + c.system.time * 1.8), 0.007 + 0.008 * cos(c.system.time * 1.8))
         }
         .opacity(in: 0.2 ... 0.8)
         .scale(factorIn: 0.2 ... 1.4)

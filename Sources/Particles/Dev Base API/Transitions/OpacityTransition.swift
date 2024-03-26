@@ -10,7 +10,7 @@ import Foundation
 
 /// A transition modifying the opacity of an entity.
 public struct OpacityTransition: Transition {
-  public func modifyRender(progress: Double, physics: PhysicsProxy.Context, context: inout GraphicsContext) {
+  public func modifyRender(progress: Double, physics: Proxy.Context, context: inout GraphicsContext) {
     context.opacity = 1 - progress
   }
 }

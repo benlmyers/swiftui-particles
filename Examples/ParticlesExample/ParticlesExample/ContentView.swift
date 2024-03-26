@@ -40,12 +40,12 @@ struct ContentView: View {
           .foregroundStyle(Color.green)
       }
       .hueRotation(with: { c in
-        return .degrees(c.physics.position.x + 60 * (c.timeAlive + c.physics.seed.0))
+        return .degrees(c.proxy.position.x + 60 * (c.timeAlive + c.proxy.seed.0))
       })
       .scale(1.5)
       .lifetime(99)
       .fixVelocity { c in
-          .init(dx: 0.2 * cos(6 * (c.timeAlive + c.physics.seed.0)), dy: 0.2 * sin(6 * (c.timeAlive + c.physics.seed.1)))
+          .init(dx: 0.2 * cos(6 * (c.timeAlive + c.proxy.seed.0)), dy: 0.2 * sin(6 * (c.timeAlive + c.proxy.seed.1)))
       }
       Emitter(every: 0.01) {
         Particle {
@@ -58,12 +58,12 @@ struct ContentView: View {
         .initialOffset(y: -150.0)
         .transition(.twinkle, on: .death, duration: 4.0)
         .fixVelocity { c in
-          let t: Double = c.timeAlive * ((2.0 + 0.5 * c.physics.seed.0) /*+ c.physics.seed.1 * 2 * .pi*/)
-          return CGVector(dx: 25 * cos(t + 0.1 * c.physics.seed.2), dy: 25 * sin(t - 0.4))
+          let t: Double = c.timeAlive * ((2.0 + 0.5 * c.proxy.seed.0) /*+ c.proxy.seed.1 * 2 * .pi*/)
+          return CGVector(dx: 25 * cos(t + 0.1 * c.proxy.seed.2), dy: 25 * sin(t - 0.4))
         }
       }
     }
-    .debug()
+//    .debug()
   }
 
 }

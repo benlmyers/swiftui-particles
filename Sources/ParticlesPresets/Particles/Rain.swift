@@ -59,8 +59,8 @@ public extension Preset {
         .hueRotation(angleIn: .degrees(-10.0) ... .degrees(10.0))
         .blendMode(.plusLighter)
         .scale { c in
-          let s = CGFloat.random(in: 0.3 ... 1.0, seed: c.physics.seed.0)
-          return CGSize(width: s /** cos(0.1 * c.system.time + c.physics.seed.1)*/, height: s)
+          let s = CGFloat.random(in: 0.3 ... 1.0, seed: c.proxy.seed.0)
+          return CGSize(width: s /** cos(0.1 * c.system.time + c.proxy.seed.1)*/, height: s)
         }
       }
     }

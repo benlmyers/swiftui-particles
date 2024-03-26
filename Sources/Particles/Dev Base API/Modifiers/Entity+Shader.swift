@@ -20,7 +20,7 @@ public extension Entity {
   
   /// Applies a shader to this entity.
   /// - Parameter withShader: The shader to apply to this entity using the contextual callback.
-  func shader(with withShader: @escaping (PhysicsProxy.Context) -> Shader) -> some Entity {
+  func shader(with withShader: @escaping (Proxy.Context) -> Shader) -> some Entity {
     return ShaderEntity(entity: self, shader: withShader)
   }
 }
