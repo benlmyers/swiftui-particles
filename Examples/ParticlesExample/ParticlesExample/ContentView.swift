@@ -54,30 +54,36 @@ struct ContentView: View {
   
   var thumbnailView: some View {
     ParticleSystem {
-      Lattice(spacing: 3) {
+      Lattice(spacing: 4) {
         Text("Particles")
+          .fontWeight(.black)
           .font(.system(size: 90))
           .foregroundStyle(Color.green)
       }
+      .hueRotation(with: { c in
+        return .degrees(c.physics.position.x + 60 * (c.timeAlive + c.physics.seed.0))
+      })
+      .scale(1.5)
       .lifetime(99)
-      ForEach(0..<40) { i in
+      .fixVelocity { c in
+          .init(dx: 0.2 * cos(6 * (c.timeAlive + c.physics.seed.0)), dy: 0.2 * sin(6 * (c.timeAlive + c.physics.seed.1)))
+      }
+      Emitter(every: 0.01) {
         Particle {
           Circle()
-            .frame(width: 8, height: 8)
+            .frame(width: 5, height: 5)
+            .foregroundStyle(.red)
         }
-        .colorOverlay(colors[i % colors.count])
-        .fixVelocity { context in
-          let angle = Double(i) * (2 * Double.pi) / 40
-          let speed = max(0.3, 2.5 / (max(context.timeAlive, 1)))
-          let dx = speed * cos(angle)
-          let dy = speed * sin(angle)
-          if context.timeAlive > 3.0 {
-            return .init(dx: 0, dy: 0)
-          }
-          return .init(dx: dx, dy: dy)
+        .hueRotation(angleIn: .zero ... .degrees(360))
+        .glow(.white)
+        .transition(.opacity, on: .birth, duration: 1.0)
+        .initialOffset(y: -150.0)
+        .transition(.twinkle, on: .death, duration: 4.0)
+        .fixVelocity { c in
+          let t: Double = c.timeAlive * ((2.0 + 0.5 * c.physics.seed.0) /*+ c.physics.seed.1 * 2 * .pi*/)
+          return CGVector(dx: 25 * cos(t + 0.1 * c.physics.seed.2), dy: 25 * sin(t - 0.4))
         }
       }
-      .lifetime(99)
     }
     .debug()
   }

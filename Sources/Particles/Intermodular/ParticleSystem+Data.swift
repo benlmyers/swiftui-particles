@@ -216,6 +216,20 @@ public extension ParticleSystem {
           context.drawLayer { context in
             context.translateBy(x: physics.position.x, y: physics.position.y)
             context.rotate(by: physics.rotation)
+            if let render {
+#if !os(watchOS)
+              if render.rotation3d != .zero {
+                var transform = CATransform3DIdentity
+                transform = CATransform3DRotate(transform, render.rotation3d.x, 1, 0, 0)
+                transform = CATransform3DRotate(transform, render.rotation3d.y, 0, 1, 0)
+                transform = CATransform3DRotate(transform, render.rotation3d.z, 0, 0, 1)
+                context.addFilter(.projectionTransform(ProjectionTransform(transform)))
+              }
+#endif
+              context.scaleBy(x: render.scale.width, y: render.scale.height)
+              context.addFilter(.hueRotation(render.hueRotation))
+              context.addFilter(.blur(radius: render.blur))
+            }
             for preference in entity.preferences {
               if case .custom(let custom) = preference {
                 if case .glow(let color, let radius) = custom {
@@ -248,20 +262,6 @@ public extension ParticleSystem {
                   )
                 }
               }
-            }
-            if let render {
-#if !os(watchOS)
-              if render.rotation3d != .zero {
-                var transform = CATransform3DIdentity
-                transform = CATransform3DRotate(transform, render.rotation3d.x, 1, 0, 0)
-                transform = CATransform3DRotate(transform, render.rotation3d.y, 0, 1, 0)
-                transform = CATransform3DRotate(transform, render.rotation3d.z, 0, 0, 1)
-                context.addFilter(.projectionTransform(ProjectionTransform(transform)))
-              }
-#endif
-              context.scaleBy(x: render.scale.width, y: render.scale.height)
-              context.addFilter(.hueRotation(render.hueRotation))
-              context.addFilter(.blur(radius: render.blur))
             }
             context.draw(resolved, at: .zero)
 //            self.performRenderTime = Date().timeIntervalSince(flag)
