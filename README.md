@@ -52,6 +52,16 @@ ParticleSystem {
 }
 ```
 
+## Contents
+
+1. [Quickstart](#quickstart) - install the repository
+2. [Entities](#entities) - such as [`Particle`](#particle), [`Emitter`](#emitter), and [`ForEach`](#foreach)
+3. [Defining Entities](#defining-entities) - create custom `Entity` structs to use in particle systems
+4. [Modifiers](#modifiers) - change the behavior of particles (see [list](#list-of-entity-modifiers))
+5. [State Persistence](#state-persistence) - persist `ParticleSystem` simulation through state updates
+6. [Presets](#presets) - browse a curated library of preset entities
+7. [Performance](#performance) - debugging, frame rate tips, and benchmarks
+
 ## Quickstart
 
 To get started, first add Particles as a Swift Package Dependency in your Xcode project:
@@ -60,13 +70,13 @@ To get started, first add Particles as a Swift Package Dependency in your Xcode 
 https://github.com/benlmyers/swiftui-particles
 ```
 
-- To begin with pre-made particles, import `ParticlesPresets`:
+- To begin with pre-made particles, like Fire or Rain, add and import the `ParticlesPresets` library:
 
 ```swift
 import ParticlesPresets
 ```
 
-- Or, to build your own particle systems, import `Particles`:
+- Or, to build your own particle systems, add and import the `Particles` library:
 
 ```swift
 import Particles
@@ -206,9 +216,11 @@ ParticleSystem {
 }
 ```
 
-Like SwiftUI modifiers, entity modifiers are applied outwards first, inwards last. Some modifiers affect the initial behavior of an entity, while others affect the behavior on each frame. For instance, since `.initialPosition(...)` *ses* a particle's position, applying this modifier before `.initialOffset(...)` will cause the offset to not be applied. `.initialOffset(...)` must be written *inside*.
+Like SwiftUI modifiers, most*\** entity modifiers are applied outside first, inside last. Some modifiers affect the initial behavior of an entity, while others affect the behavior on each frame. For instance, since `.initialPosition(...)` *ses* a particle's position, applying this modifier before `.initialOffset(...)` will cause the offset to not be applied. `.initialOffset(...)` must be written *inside*.
 
-### List of Modifiers
+*(\*) Some rendering operations, like `.colorOverlay(...)` or `.hueRotation(...)`, follow a static ordering despite modifier ordering.*
+
+### List of Entity Modifiers
 
 - Lifetime
   - `.lifetime(...)`
@@ -226,18 +238,25 @@ Like SwiftUI modifiers, entity modifiers are applied outwards first, inwards las
   - `.fixRotation(...)`
   - `.initialTorque(...)`
   - `.fixTorque(...)`
-  - `.rotation3D(...)`
+  - `.rotation3D(x:y:z:)`
 - Effects
   - `.opacity(...)`
+  - `.blendMode(_:)`
+  - `.colorOverlay(...)`
   - `.hueRotation(...)`
   - `.blur(...)`
-  - `.blendMode(...)`
   - `.scale(...)`
-  - `.colorOverlay(...)`
   - `.glow(...)`
   - `.shader(...)`
 - Transitions
-  - `.transition(...)`
+  - `.transition(_:on:duration:)`
+  
+### Other Modifiers
+
+- `ParticleSystem.debug()` - enables *Debug Mode* for the particle system, showing performance metrics.
+- `Emitter.emitSingle(choosing:)` - 
+
+When importing `Particles`, you also have access to some additional view modifiers:
   
 ## State Persistence
 
@@ -270,3 +289,13 @@ State refreshing works on all levels of the particle system, even in views insid
 ## Presets
 
 Several presets are available.
+
+## Performance
+
+### Debug Mode
+
+You can debug a `ParticleSystem` to view 
+
+### Improve Frame Rate
+
+### Benchmarks
