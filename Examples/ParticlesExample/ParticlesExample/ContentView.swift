@@ -11,10 +11,6 @@ import ParticlesPresets
 
 struct ContentView: View {
   
-  @State var explodes = false
-  @State var p = false
-  
-  @State var colors: [Color] = [.blue, .red, .pink, .purple, .orange, .white, .cyan, .indigo, .teal, .mint, .green]
   var body: some View {
     NavigationSplitView {
       List {
@@ -63,7 +59,7 @@ struct ContentView: View {
         }
       }
     }
-//    .debug()
+    .debug()
   }
 
 }

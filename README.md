@@ -206,7 +206,7 @@ ParticleSystem {
 }
 ```
 
-Like SwiftUI modifiers, entity modifiers are applied inwards first. Some modifiers affect the initial behavior of an entity, while others affect the behavior on each frame.
+Like SwiftUI modifiers, entity modifiers are applied outwards first, inwards last. Some modifiers affect the initial behavior of an entity, while others affect the behavior on each frame. For instance, since `.initialPosition(...)` *ses* a particle's position, applying this modifier before `.initialOffset(...)` will cause the offset to not be applied. `.initialOffset(...)` must be written *inside*.
 
 ### List of Modifiers
 
@@ -238,6 +238,34 @@ Like SwiftUI modifiers, entity modifiers are applied inwards first. Some modifie
   - `.shader(...)`
 - Transitions
   - `.transition(...)`
+  
+## State Persistence
+
+`ParticleSystem` has the ability to persist its simulation through `View` state refreshes. To enable this functionality, provide a string tag to the `ParticleSystem`:
+
+```swift
+struct MyView: View {
+  @State var foo: Bool = false
+  var body: some View {
+    VStack {
+      Button("Foo") { foo.toggle() }
+      ParticleSystem {
+        Emitter {
+          if foo {
+            Particle(view: { Text("😀") }).initialVelocity(withMagnitude: 1.0)
+          } else {
+            Particle(view: { Image(systemName: "star") }).initialVelocity(withMagnitude: 1.0)
+          }
+        }
+      }
+      .statePersistent("myEmitter")
+    }
+  }
+}
+
+```
+
+State refreshing works on all levels of the particle system, even in views inside `Particle { ... }`. You can also use `if`/`else` within `ParticleSystem`, `Emitter`, `Group`, and any other entity built with `EntityBuilder`. 
 
 ## Presets
 

@@ -36,6 +36,7 @@ public extension ParticleSystem {
     private var updateTime: TimeInterval = .zero
     private var performRenderTime: TimeInterval = .zero
     
+    // ID of entity -> Flattened entity
     private var entities: [EntityID: FlatEntity] = [:]
     // ID of entity -> View to render
     private var views: [EntityID: MaybeView] = .init()
@@ -120,7 +121,7 @@ public extension ParticleSystem {
       }
     }
     
-    internal func updatePhysicsAndRenders() {
+    internal func updateProxies() {
       let flag = Date()
       let group = DispatchGroup()
       let queue = DispatchQueue(label: "com.benmyers.particles.proxy.update", qos: .userInteractive, attributes: .concurrent)
@@ -162,99 +163,106 @@ public extension ParticleSystem {
     }
     
     internal func performRenders(_ context: GraphicsContext) {
+      
       let flag = Date()
+      
       for proxyID in proxies.keys {
-        context.drawLayer { context in
-          let render: Proxy? = proxies[proxyID]
-          guard let physics: Proxy = proxies[proxyID] else { return }
-          guard let entityID: EntityID = proxyEntities[proxyID] else { return }
-          guard let entity: FlatEntity = entities[entityID] else { return }
-          var resolvedEntityID: EntityID = entityID
-          if let maybe = views[entityID] {
-            switch maybe {
-            case .merged(let mergedID): resolvedEntityID = mergedID
-            case .some(_):
-              if refreshViews {
-                guard let view: AnyView = (entity.root as? Particle)?.view else { break }
-                views[entityID] = .some(view)
-              }
-              break
+        // Initial checks
+        guard
+          let proxy: Proxy = proxies[proxyID],
+          let entityID: EntityID = proxyEntities[proxyID],
+          let entity: FlatEntity = entities[entityID]
+        else {
+          continue
+        }
+        // Resolve the view
+        var resolvedEntityID: EntityID = entityID
+        if let maybe = views[entityID] {
+          switch maybe {
+          case .merged(let mergedID): resolvedEntityID = mergedID
+          case .some(_):
+            if refreshViews {
+              guard let view: AnyView = (entity.root as? Particle)?.view else { break }
+              views[entityID] = .some(view)
             }
-          } else {
-            guard let view: AnyView = (entity.root as? Particle)?.view else { return }
-            views[entityID] = .some(view)
+            break
           }
-          guard let resolved = context.resolveSymbol(id: resolvedEntityID) else {
-            return
+        } else {
+          guard let view: AnyView = (entity.root as? Particle)?.view else {
+            continue
           }
-          guard
-            physics.position.x > -resolved.size.width,
-            physics.position.x < size.width + resolved.size.width,
-            physics.position.y > -resolved.size.height,
-            physics.position.y < size.height + resolved.size.height,
-            currentFrame > physics.inception
-          else { return }
-          context.opacity = 1.0
-          context.blendMode = .normal
-          if let render {
-            context.blendMode = render.blendMode
-            context.opacity = render.opacity
-          }
-          context.drawLayer { context in
-            context.translateBy(x: physics.position.x, y: physics.position.y)
-            context.rotate(by: physics.rotation)
-            if let render {
+          views[entityID] = .some(view)
+        }
+        guard let resolved: GraphicsContext.ResolvedSymbol = context.resolveSymbol(id: resolvedEntityID) else {
+          continue
+        }
+        // Ensure position in system bounds
+        guard
+          proxy.position.x > -resolved.size.width,
+          proxy.position.x < self.size.width + resolved.size.width,
+          proxy.position.y > -resolved.size.height,
+          proxy.position.y < self.size.height + resolved.size.height,
+          self.currentFrame > proxy.inception
+        else {
+          continue
+        }
+        var cc: GraphicsContext = context
+        // Apply proxy
+        cc.opacity = proxy.opacity
+        cc.blendMode = proxy.blendMode
+        cc.drawLayer { cc in
+          cc.translateBy(x: proxy.position.x, y: proxy.position.y)
+          cc.rotate(by: proxy.rotation)
 #if !os(watchOS)
-              if render.rotation3d != .zero {
-                var transform = CATransform3DIdentity
-                transform = CATransform3DRotate(transform, render.rotation3d.x, 1, 0, 0)
-                transform = CATransform3DRotate(transform, render.rotation3d.y, 0, 1, 0)
-                transform = CATransform3DRotate(transform, render.rotation3d.z, 0, 0, 1)
-                context.addFilter(.projectionTransform(ProjectionTransform(transform)))
-              }
-#endif
-              context.scaleBy(x: render.scale.width, y: render.scale.height)
-              context.addFilter(.hueRotation(render.hueRotation))
-              context.addFilter(.blur(radius: render.blur))
-            }
-            for preference in entity.preferences {
-              if case .custom(let custom) = preference {
-                if case .glow(let color, let radius) = custom {
-                  context.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
-                }
-                else if case .colorOverlay(let overlay) = custom {
-                  var m: ColorMatrix = ColorMatrix()
-                  m.r1 = 0
-                  m.g2 = 0
-                  m.b3 = 0
-                  m.a4 = 1
-                  m.r5 = 1
-                  m.g5 = 1
-                  m.b5 = 1
-                  context.addFilter(.colorMultiply(overlay))
-                  context.addFilter(.colorMatrix(m))
-                  context.addFilter(.colorMultiply(overlay))
-                } else if case .transition(let transition, let bounds, let duration) = custom {
-                  let c = Proxy.Context(proxy: physics, system: self)
-                  if bounds == .birth || bounds == .birthAndDeath {
-                    guard c.timeAlive < duration else { continue }
-                  }
-                  if bounds == .death || bounds == .birthAndDeath {
-                    guard c.timeAlive > physics.lifetime - duration else { continue }
-                  }
-                  transition.modifyRender(
-                    getTransitionProgress(bounds: bounds, duration: duration, context: c),
-                    c,
-                    &context
-                  )
-                }
-              }
-            }
-            context.draw(resolved, at: .zero)
-            self.performRenderTime = Date().timeIntervalSince(flag)
+          if proxy.rotation3d != .zero {
+            var transform = CATransform3DIdentity
+            transform = CATransform3DRotate(transform, proxy.rotation3d.x, 1, 0, 0)
+            transform = CATransform3DRotate(transform, proxy.rotation3d.y, 0, 1, 0)
+            transform = CATransform3DRotate(transform, proxy.rotation3d.z, 0, 0, 1)
+            cc.addFilter(.projectionTransform(ProjectionTransform(transform)))
           }
+#endif
+          cc.scaleBy(x: proxy.scale.width, y: proxy.scale.height)
+          cc.addFilter(.hueRotation(proxy.hueRotation))
+          cc.addFilter(.blur(radius: proxy.blur))
+          
+          for preference in entity.preferences {
+            if case .custom(let custom) = preference {
+              if case .glow(let color, let radius) = custom {
+                cc.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
+              }
+              else if case .colorOverlay(let overlay) = custom {
+                var m: ColorMatrix = ColorMatrix()
+                m.r1 = 0
+                m.g2 = 0
+                m.b3 = 0
+                m.a4 = 1
+                m.r5 = 1
+                m.g5 = 1
+                m.b5 = 1
+                cc.addFilter(.colorMultiply(overlay))
+                cc.addFilter(.colorMatrix(m))
+                cc.addFilter(.colorMultiply(overlay))
+              } else if case .transition(let transition, let bounds, let duration) = custom {
+                let c = Proxy.Context(proxy: proxy, system: self)
+                if bounds == .birth || bounds == .birthAndDeath {
+                  guard c.timeAlive < duration else { continue }
+                }
+                if bounds == .death || bounds == .birthAndDeath {
+                  guard c.timeAlive > proxy.lifetime - duration else { continue }
+                }
+                transition.modifyRender(
+                  getTransitionProgress(bounds: bounds, duration: duration, context: c),
+                  c,
+                  &cc
+                )
+              }
+            }
+          }
+          cc.draw(resolved, at: .zero)
         }
       }
+      
       refreshViews = false
     }
     
