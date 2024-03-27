@@ -287,9 +287,9 @@ public extension ParticleSystem {
     internal func create<E>(entity: E, spawn: Bool = true) -> [(EntityID, ProxyID?)] where E: Entity {
       guard !(entity is EmptyEntity) else { return [] }
       var result: [(EntityID, ProxyID?)] = []
-      let (flatEntites, merges) = FlatEntity.make(entity)
+      let make = FlatEntity.make(entity)
       var firstID: EntityID?
-      for flat in flatEntites {
+      for (flat, merges) in make {
         var proxyID: ProxyID?
         let entityID: EntityID = self.register(entity: flat)
         if spawn {

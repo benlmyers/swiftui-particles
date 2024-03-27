@@ -40,24 +40,24 @@ internal struct FlatEntity {
     }
   }
   
-  static func make(_ entity: Any) -> (result: [FlatEntity], merges: Group.Merges?) {
+  static func make(_ entity: Any, merges: Group.Merges? = nil) -> [(result: FlatEntity, merges: Group.Merges?)] {
     if let grouped = entity as? any Transparent {
       return FlatEntity.make(grouped.body)
     }
     guard let single = FlatEntity.init(single: entity) else {
-      return ([], nil)
+      return []
     }
     if let group = single.root as? Group {
-      let flats: [FlatEntity] = group.values.flatMap({ (e: AnyEntity) in
-        var children: [FlatEntity] = FlatEntity.make(e.body).result
+      let flats: [(FlatEntity, Group.Merges?)] = group.values.flatMap({ (e: AnyEntity) in
+        var children: [(FlatEntity, Group.Merges?)] = FlatEntity.make(e.body, merges: group.merges)
         for i in 0 ..< children.count {
-          children[i].preferences.insert(contentsOf: single.preferences, at: 0)
+          children[i].0.preferences.insert(contentsOf: single.preferences, at: 0)
         }
         return children
       })
-      return (flats, group.merges)
+      return flats
     } else {
-      return ([single], nil)
+      return [(single, merges)]
     }
   }
   
