@@ -51,6 +51,8 @@ public extension ParticleSystem {
     // ID of entity contained in Group -> Group entity top-level ID
     private var entityGroups: [EntityID: EntityID] = [:]
     
+    private var advanceProxies: [ProxyID: Proxy] = [:]
+    
     // MARK: - Computed Properties
     
     /// The amount of time, in seconds, that has elapsed since the ``ParticleSystem`` was created.
@@ -79,7 +81,43 @@ public extension ParticleSystem {
     
     // MARK: - Methods
     
-    internal func emitChildren() {
+    internal func update(context: GraphicsContext, size: CGSize) {
+      self.size = size
+      if let initialEntity = self.initialEntity, self.currentFrame > 1 {
+        if self.nextEntityRegistry > .zero {
+          self.nextEntityRegistry = .zero
+          self.create(entity: initialEntity, spawn: false)
+        } else {
+          self.create(entity: initialEntity, spawn: true)
+        }
+        self.initialEntity = nil
+      }
+      let group = DispatchGroup()
+      let queue = DispatchQueue(label: "com.benmyers.particles.update", qos: .userInteractive, attributes: .concurrent)
+      var updateResult: ([ProxyID: Proxy], [ProxyID])?
+      group.enter()
+      queue.async(group: group) {
+        
+        updateResult = self.updateProxies()
+        group.leave()
+      }
+      self.performRenders(context)
+      group.wait()
+      if let (newProxies, expiredProxies) = updateResult {
+        for (proxyID, newProxy) in newProxies {
+          proxies[proxyID] = newProxy
+        }
+        for proxyID in expiredProxies {
+          proxies.removeValue(forKey: proxyID)
+          proxies.removeValue(forKey: proxyID)
+          proxyEntities.removeValue(forKey: proxyID)
+        }
+      }
+      advanceFrame()
+      emitChildren()
+    }
+    
+    private func emitChildren() {
       guard currentFrame > 1 else { return }
       let proxyIDs = proxies.keys
       for proxyID in proxyIDs {
@@ -104,28 +142,12 @@ public extension ParticleSystem {
       }
     }
     
-    internal func destroyExpiredEntities() {
-      let proxyIDs = proxies.keys
-      for proxyID in proxyIDs {
-        guard let proxy: Proxy = proxies[proxyID] else { continue }
-        var deathFrame: Int = .max
-        if proxy.lifetime < .infinity {
-          deathFrame = Int(Double(proxy.inception) + proxy.lifetime * 60.0)
-        }
-        if Int(currentFrame) >= deathFrame {
-          proxies.removeValue(forKey: proxyID)
-          proxies.removeValue(forKey: proxyID)
-          proxyEntities.removeValue(forKey: proxyID)
-          continue
-        }
-      }
-    }
-    
-    internal func updateProxies() {
+    private func updateProxies() -> (new: [ProxyID: Proxy], expired: [ProxyID]) {
       let flag = Date()
       let group = DispatchGroup()
-      let queue = DispatchQueue(label: "com.benmyers.particles.proxy.update", qos: .userInteractive, attributes: .concurrent)
+      let queue = DispatchQueue(label: "com.benmyers.particles.update.proxy", qos: .userInteractive, attributes: .concurrent)
       var newProxies: [ProxyID: Proxy] = [:]
+      var expiredProxies: [ProxyID] = []
       let lock = NSLock()
       for (proxyID, entityID) in proxyEntities {
         group.enter()
@@ -139,6 +161,15 @@ public extension ParticleSystem {
             return
           }
           guard let entity: FlatEntity = entities[entityID] else {
+            group.leave()
+            return
+          }
+          var deathFrame: Int = .max
+          if proxy.lifetime < .infinity {
+            deathFrame = Int(Double(proxy.inception) + proxy.lifetime * 60.0)
+          }
+          if Int(currentFrame) >= deathFrame {
+            expiredProxies.append(proxyID)
             group.leave()
             return
           }
@@ -156,16 +187,12 @@ public extension ParticleSystem {
         }
       }
       group.wait()
-      for (proxyID, newProxy) in newProxies {
-        proxies[proxyID] = newProxy
-      }
       self.updateTime = Date().timeIntervalSince(flag)
+      return (newProxies, expiredProxies)
     }
     
-    internal func performRenders(_ context: GraphicsContext) {
-      
+    private func performRenders(_ context: GraphicsContext) {
       let flag = Date()
-      
       for proxyID in proxies.keys {
         // Initial checks
         guard
@@ -262,11 +289,11 @@ public extension ParticleSystem {
           cc.draw(resolved, at: .zero)
         }
       }
-      
+      self.performRenderTime = Date().timeIntervalSince(flag)
       refreshViews = false
     }
     
-    internal func advanceFrame() {
+    private func advanceFrame() {
       if self.currentFrame > .max - 1000 {
         self.currentFrame = 2
         for k in self.lastEmitted.keys {
@@ -284,7 +311,7 @@ public extension ParticleSystem {
     }
     
     @discardableResult
-    internal func create<E>(entity: E, spawn: Bool = true) -> [(EntityID, ProxyID?)] where E: Entity {
+    private func create<E>(entity: E, spawn: Bool = true) -> [(EntityID, ProxyID?)] where E: Entity {
       guard !(entity is EmptyEntity) else { return [] }
       var result: [(EntityID, ProxyID?)] = []
       let make = FlatEntity.make(entity)
@@ -329,9 +356,9 @@ public extension ParticleSystem {
     
     internal func performanceSummary(advanced: Bool = false) -> String {
       var arr: [String] = []
-      arr.append("\(Int(size.width)) x \(Int(size.height)) \t Frame \(currentFrame) \t \(Int(fps)) FPS")
-      arr.append("Proxies: \(proxies.count) physics \t(\(String(format: "%.1f", updateTime * 1000))ms)")
-      arr.append("System: \(entities.count) entities \t \(views.filter({ $0.value.isSome }).count) views \t Rendering: \(String(format: "%.1f", performRenderTime * 1000))ms")
+      arr.append("\(Int(size.width)) x \(Int(size.height)) \t\(String(format: "%.1f", fps)) FPS")
+      arr.append("Proxies: \(proxies.count)\tEntities: \(entities.count) \tViews: \(views.filter({ $0.value.isSome }).count)")
+      arr.append("Update: \(String(format: "%.1f", updateTime * 1000))ms \tRender: \(String(format: "%.1f", performRenderTime * 1000))ms")
       if advanced {
         arr.append("PE=\(proxyEntities.count), LE=\(lastEmitted.count), EE=\(emitEntities.count), EG=\(entityGroups.count)")
       }

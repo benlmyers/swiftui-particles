@@ -135,20 +135,6 @@ public struct ParticleSystem: View {
   }
   
   private func renderer(_ context: inout GraphicsContext, size: CGSize) {
-    self.data.size = size
-    if let initialEntity = self.data.initialEntity, data.currentFrame > 1 {
-      if self.data.nextEntityRegistry > .zero {
-        self.data.nextEntityRegistry = .zero
-        self.data.create(entity: initialEntity, spawn: false)
-      } else {
-        self.data.create(entity: initialEntity, spawn: true)
-      }
-      self.data.initialEntity = nil
-    }
-    data.performRenders(context)
-    data.updateProxies()
-    data.destroyExpiredEntities()
-    data.advanceFrame()
-    data.emitChildren()
+    self.data.update(context: context, size: size)
   }
 }
