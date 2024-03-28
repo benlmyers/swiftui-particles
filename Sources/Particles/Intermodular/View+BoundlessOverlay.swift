@@ -15,7 +15,7 @@ internal extension View {
   func boundlessOverlay<V>(
     atop: Bool = true,
     offset: CGPoint = .zero,
-    minSize: CGSize = .init(width: 300.0, height: 300.0),
+    minSize: CGSize = .init(width: 800.0, height: 800.0),
     @ViewBuilder overlay: () -> V
   ) -> some View where V: View {
     BoundlessOverlayWrapper(

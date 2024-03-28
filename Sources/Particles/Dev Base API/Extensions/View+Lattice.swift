@@ -12,7 +12,7 @@ public extension View {
   /// Dissolves the view into several tiny particles when `condition` is set to `true`.
   /// - parameter condition: The condition to check against. If `true`, the view will dissolve into particles.
   func dissolve(if condition: Bool) -> some View {
-    self.opacity(condition ? 0.5 : 1.0).boundlessOverlay(atop: true) {
+    self.opacity(condition ? 0 : 1.0).boundlessOverlay(atop: true) {
       ZStack {
         if condition {
           ParticleSystem {

@@ -10,7 +10,7 @@ import Particles
 import ParticlesPresets
 
 struct ContentView: View {
-  
+  @State var purchased = false
   var body: some View {
     NavigationSplitView {
       List {
@@ -25,6 +25,20 @@ struct ContentView: View {
     } detail: {
       thumbnailView
     }
+//    VStack {
+//      Text(purchased ? "Thank you!" : "")
+//        .emits(every: 0.1, if: purchased, offset: CGPoint(x: 0, y: -20)) {
+//          Particle { Text("❤️") }
+//            .fixAcceleration(y: 0.05)
+//            .initialVelocity(xIn: -2.0 ... 2.0, yIn: -2.0 ... -1.5)
+//            .transition(.scale)
+//        }
+//      Button("Purchase") {
+//        purchased = true
+//      }
+//      .dissolve(if: purchased)
+//    }
+//    .frame(height: 300)
   }
   
   var thumbnailView: some View {

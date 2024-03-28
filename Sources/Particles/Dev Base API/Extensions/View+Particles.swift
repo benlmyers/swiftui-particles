@@ -29,11 +29,19 @@ public extension View {
   /// - Parameter interval: How often to emit the passed entities.
   /// - Parameter condition: Used to conditionally emit entities.
   /// - Parameter atop: Whether particles are laid atop the view. Pass `false` to lay particles under the view.
+  /// - Parameter offset: The offset size of the emitter.
   /// - Parameter simultaneously: Whether to spawn passed entities simultaneously. If not, they are spawned sequentially in a cycle.
   /// - Parameter entities: The entities to spawn.
-  func emits<E>(every interval: TimeInterval = 1.0, if condition: Bool = true, atop: Bool = true, simultaneously: Bool = false, @EntityBuilder entities: () -> E) -> some View where E: Entity {
+  func emits<E>(
+    every interval: TimeInterval = 1.0,
+    if condition: Bool = true,
+    atop: Bool = true,
+    offset: CGPoint = .zero,
+    simultaneously: Bool = false,
+    @EntityBuilder entities: () -> E
+  ) -> some View where E: Entity {
     if simultaneously {
-      return self.boundlessOverlay(atop: atop) {
+      return self.boundlessOverlay(atop: atop, offset: offset) {
         ParticleSystem {
           if condition {
             Emitter(every: interval, emits: entities)
@@ -43,11 +51,13 @@ public extension View {
         }
       }
     } else {
-      return self.boundlessOverlay(atop: atop) {
+      return self.boundlessOverlay(atop: atop, offset: offset) {
         ParticleSystem {
-          Emitter(every: interval, emits: entities)
-            .emitSingle()
-            .initialPosition(.center)
+          if condition {
+            Emitter(every: interval, emits: entities)
+              .emitSingle()
+              .initialPosition(.center)
+          }
         }
       }
     }
