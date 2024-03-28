@@ -1,6 +1,6 @@
 # Particles 🎉
 
-## Native, declarative, and beautiful.
+## Native, declarative, and fast.
 
 Create particle systems in a flash using a simple but powerful syntax.
 
@@ -162,11 +162,11 @@ ForEach(myLargeCollection, merges: .views) { item in
 }
 ```
 
-Here, only the first view is registered, and the rest of the entities receive the same view.
+Here, only the first view is registered, and the rest of the entities receive the same view. To learn more about `merges: .entities`, see [Performance](#performance).
 
 ### Lattice
 
-A `Lattice` creates a grid of particles that 'mimic' a view with their colors. You can customize the behavior of each particle in the Lattice by applying modifiers to it.
+A `Lattice` creates a grid of particles that covers and samples the colors of a `View`. You can customize the behavior of each particle in the `Lattice` by applying modifiers.
 
 ```swift
 ParticleSystem {
@@ -216,9 +216,9 @@ ParticleSystem {
 }
 ```
 
-Like SwiftUI modifiers, most*\** entity modifiers are applied outside first, inside last. Some modifiers affect the initial behavior of an entity, while others affect the behavior on each frame. For instance, since `.initialPosition(...)` *ses* a particle's position, applying this modifier before `.initialOffset(...)` will cause the offset to not be applied. `.initialOffset(...)` must be written *inside*.
+Like SwiftUI modifiers, *most*\* entity modifiers are applied outside first, inside last. Some modifiers affect the initial behavior of an entity, while others affect the behavior on each frame. For instance, since `.initialPosition(...)` *sets* a particle's position, applying this modifier **above** `.initialOffset(...)` will cause the offset to not be applied. `.initialOffset(...)`, which *changes* the position, must be written *inside*.
 
-*(\*) Some rendering operations, like `.colorOverlay(...)` or `.hueRotation(...)`, follow a static ordering despite modifier ordering.*
+\* *Some rendering operations, like `.colorOverlay(...)` or `.hueRotation(...)`, follow a static ordering despite modifier ordering.*
 
 ### List of Entity Modifiers
 
@@ -253,10 +253,19 @@ Like SwiftUI modifiers, most*\** entity modifiers are applied outside first, ins
   
 ### Other Modifiers
 
-- `ParticleSystem.debug()` - enables *Debug Mode* for the particle system, showing performance metrics.
-- `Emitter.emitSingle(choosing:)` - 
+- `ParticleSystem.debug()` - enables *[Debug Mode](#debug-mode)* for the particle system, showing performance metrics
+- `ParticleSystem.statePersistent(_:refreshesViews:)` - enables *[State Persistence](#state-persistence)* for the particle system
+- `Emitter.emitSingle(choosing:)` - instructs `Emitter` to emit one particle at a time
+- `Emitter.emitAll()` - instructs `Emitter` to emit all passed particles at once
+- `Emitter.maxSpawn(count:)` - stops emitting entities after `count` are emitted
+- `Lattice.customView(view:)` - customizes the view of `Lattice` particles
 
-When importing `Particles`, you also have access to some additional view modifiers:
+When importing `Particles`, you also have access to some useful view modifiers:
+
+- `View.particleSystem(atop:offset:entities:)` - creates a particle system centered at the modified view
+- `View.emits(every:if:atop:simultaneously:entities:)` - emits specific entities on an interval from the center of the modified view
+- `View.dissolve(if:)` - dissolves the view (using `Lattice`) if `condition` is true
+- `View.burst(if)` - bursts the view if `condition` is true
   
 ## State Persistence
 
@@ -294,8 +303,11 @@ Several presets are available.
 
 ### Debug Mode
 
-You can debug a `ParticleSystem` to view 
+You can debug a `ParticleSystem` to view performance statistics.
 
 ### Improve Frame Rate
+
+- Use `ForEach(merges: .views)` if the view passed to `Particle` is the same across ForEach's data mapping.
+- Use `ForEach(merges: .entities)` if mapped entities only variate in their initial properties. `merges: .entities` tells `ForEach` (aka `Group`) to endow each created `Proxy` with properties determined by the mapped `Entity` **only upon birth**. After the proxy is born with its initial properties, like position, rotation, or hue rotation, it's entity rules are merged to the **first data mapping's** upon update.
 
 ### Benchmarks

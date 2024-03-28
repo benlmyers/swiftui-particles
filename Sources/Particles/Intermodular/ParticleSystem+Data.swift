@@ -12,6 +12,8 @@ import CoreGraphics
 
 public extension ParticleSystem {
   
+  /// The primary data-holder of the `ParticleSystem` simulation.
+  /// Contains most logic for updating the system simulation.
   class Data {
     
     // MARK: - Stored Properties
@@ -48,10 +50,6 @@ public extension ParticleSystem {
     private var lastEmitted: [ProxyID: UInt] = [:]
     // ID of emitter entity -> Entity IDs to create children with
     private var emitEntities: [EntityID: [EntityID]] = [:]
-    // ID of entity contained in Group -> Group entity top-level ID
-    private var entityGroups: [EntityID: EntityID] = [:]
-    
-    private var advanceProxies: [ProxyID: Proxy] = [:]
     
     // MARK: - Computed Properties
     
@@ -115,6 +113,27 @@ public extension ParticleSystem {
       }
       advanceFrame()
       emitChildren()
+    }
+    
+    internal func viewPairs() -> [(AnyView, EntityID)] {
+      var result: [(AnyView, EntityID)] = []
+      for (id, maybe) in views {
+        if case MaybeView.some(let view) = maybe {
+          result.append((view, id))
+        }
+      }
+      return result
+    }
+    
+    internal func performanceSummary(advanced: Bool = true) -> String {
+      var arr: [String] = []
+      arr.append("\(Int(size.width)) x \(Int(size.height)) \t\(String(format: "%.1f", fps)) FPS")
+      arr.append("Proxies: \(proxies.count)\tEntities: \(entities.count) \tViews: \(views.filter({ $0.value.isSome }).count)")
+      arr.append("Update: \(String(format: "%.1f", updateTime * 1000))ms \tRender: \(String(format: "%.1f", performRenderTime * 1000))ms")
+      if advanced {
+        arr.append("PE=\(proxyEntities.count) \tLE=\(lastEmitted.count) \tEE=\(emitEntities.count)")
+      }
+      return arr.joined(separator: "\n")
     }
     
     private func emitChildren() {
@@ -234,7 +253,7 @@ public extension ParticleSystem {
           continue
         }
         var cc: GraphicsContext = context
-        // Apply proxy
+        // Render the proxy
         cc.opacity = proxy.opacity
         cc.blendMode = proxy.blendMode
         cc.drawLayer { cc in
@@ -252,11 +271,15 @@ public extension ParticleSystem {
           cc.scaleBy(x: proxy.scale.width, y: proxy.scale.height)
           cc.addFilter(.hueRotation(proxy.hueRotation))
           cc.addFilter(.blur(radius: proxy.blur))
-          
+          var blurOverlayRadius: CGFloat = .zero
           for preference in entity.preferences {
             if case .custom(let custom) = preference {
               if case .glow(let color, let radius) = custom {
-                cc.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
+                if let color {
+                  cc.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
+                } else {
+                  blurOverlayRadius = radius
+                }
               }
               else if case .colorOverlay(let overlay) = custom {
                 var m: ColorMatrix = ColorMatrix()
@@ -287,6 +310,10 @@ public extension ParticleSystem {
             }
           }
           cc.draw(resolved, at: .zero)
+          if blurOverlayRadius > .zero {
+            cc.addFilter(.blur(radius: blurOverlayRadius))
+            cc.draw(resolved, at: .zero)
+          }
         }
       }
       self.performRenderTime = Date().timeIntervalSince(flag)
@@ -342,27 +369,6 @@ public extension ParticleSystem {
         result.append((entityID, proxyID))
       }
       return result
-    }
-    
-    internal func viewPairs() -> [(AnyView, EntityID)] {
-      var result: [(AnyView, EntityID)] = []
-      for (id, maybe) in views {
-        if case MaybeView.some(let view) = maybe {
-          result.append((view, id))
-        }
-      }
-      return result
-    }
-    
-    internal func performanceSummary(advanced: Bool = false) -> String {
-      var arr: [String] = []
-      arr.append("\(Int(size.width)) x \(Int(size.height)) \t\(String(format: "%.1f", fps)) FPS")
-      arr.append("Proxies: \(proxies.count)\tEntities: \(entities.count) \tViews: \(views.filter({ $0.value.isSome }).count)")
-      arr.append("Update: \(String(format: "%.1f", updateTime * 1000))ms \tRender: \(String(format: "%.1f", performRenderTime * 1000))ms")
-      if advanced {
-        arr.append("PE=\(proxyEntities.count), LE=\(lastEmitted.count), EE=\(emitEntities.count), EG=\(entityGroups.count)")
-      }
-      return arr.joined(separator: "\n")
     }
     
     @discardableResult

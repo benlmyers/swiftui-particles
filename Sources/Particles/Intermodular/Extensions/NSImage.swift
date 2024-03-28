@@ -8,7 +8,7 @@
 #if os(macOS)
 import AppKit
 
-extension NSImage {
+internal extension NSImage {
   var cgImage: CGImage? {
     return cgImage(forProposedRect: nil,
                    context: nil,
