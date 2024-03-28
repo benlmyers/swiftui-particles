@@ -274,9 +274,12 @@ public extension ParticleSystem {
           var blurOverlayRadius: CGFloat = .zero
           for preference in entity.preferences {
             if case .custom(let custom) = preference {
-              if case .glow(let color, let radius) = custom {
+              if case .glow(let color, let option, let radius) = custom {
                 if let color {
                   cc.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
+                }
+                else if let option {
+                  cc.addFilter(.shadow(color: Color(hue: proxy.hueRotation.degrees / 360.0, saturation: 1, brightness: 1), radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
                 } else {
                   blurOverlayRadius = radius
                 }
