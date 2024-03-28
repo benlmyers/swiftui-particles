@@ -9,13 +9,14 @@ import Particles
 
 var body: some View {
   ParticleSystem {
-    Emitter(every: 0.5) {
+    Emitter(every: 0.05) {
       Particle {
         Text("✨")
       }
       .initialPosition(.center)
-      .initialVelocity(xIn: -1.0 ... 1.0, yIn: -1.0 ... 1.0)
-      .glow(.yellow)
+      .initialVelocity(xIn: -1...1, yIn: -1...1)
+      .hueRotation(angleIn: .degrees(0) ... .degrees(360))
+      .glow(.white)
     }
   }
 }
@@ -113,11 +114,11 @@ Particle {
 An `Emitter` fires new entities on a regular interval.
 
 ```swift
-Emitter(every: 2.0) { // Fires every 2 seconds
+Emitter(every: 0.01) { // Fires every 0.1 seconds
   Particle {
     Text("😀")
   }
-  .initialAcceleration(y: 0.5)
+  .initialAcceleration(xIn: -1...1, yIn: -1...1) // A random value between -1 and 1 for each particle
   .initialTorque(.degrees(1.0))
 }
 ```
@@ -171,9 +172,12 @@ A `Lattice` creates a grid of particles that covers and samples the colors of a 
 ```swift
 ParticleSystem {
   Lattice {
-    Image(systemName: "star.fill").resizable().frame(width: 100.0, height: 100.0)
+    Image(systemName: "star.fill")
+      .resizable()
+      .frame(width: 100.0, height: 100.0)
+      .foregroundStyle(Color.red)
   }
-  .scale(in: 0.5 ... 1.5)
+  .scale(1.5)
   .initialVelocity(xIn: -1.0 ... 1.0, yIn: -1.0 ... 1.0)
 }
 ```
