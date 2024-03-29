@@ -13,16 +13,6 @@ public extension Preset {
   
   struct Rain: Entity, PresetEntry {
     
-    public var metadata: PresetMetadata {
-      .init(
-        name: "Rain",
-        target: "ParticlesPresets",
-        description: "Create cool SwiftUI views with a rain effect.",
-        author: "benlmyers",
-        version: 1
-      )
-    }
-    
     private var parameters: Parameters
     
     public init(lifetime: TimeInterval = 1.0, intensity: Int = 20, wind: CGFloat = 0.5) {

@@ -13,16 +13,6 @@ public extension Preset {
   
   struct Smoke: Entity, PresetEntry {
     
-    public var metadata: PresetMetadata {
-      .init(
-        name: "Smoke",
-        target: "ParticlesPresets",
-        description: "Infuse your SwiftUI views with swirling smoke effects.",
-        author: "grandsir",
-        version: 1
-      )
-    }
-    
     var color: Color
     var startRadius: CGFloat =  8.0
     var endRadius: CGFloat = 30.0

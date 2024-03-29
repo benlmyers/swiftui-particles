@@ -12,17 +12,7 @@ import Foundation
 public extension Preset {
   
   struct Stars: Entity, PresetEntry {
-    
-    public var metadata: PresetMetadata {
-      .init(
-        name: "Stars",
-        target: "ParticlesPresets",
-        description: "Create a beautiful night sky inside a SwiftUI view.",
-        author: "benlmyers",
-        version: 1
-      )
-    }
-    
+        
     private var parameters: Parameters
     
     public init(size: CGFloat = 30.0, lifetime: TimeInterval = 5.0, intensity: Int = 20, twinkle: Bool = true) {

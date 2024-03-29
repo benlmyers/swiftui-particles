@@ -13,16 +13,6 @@ public extension Preset {
   
   struct Fire: Entity, PresetEntry {
     
-    public var metadata: PresetMetadata {
-      .init(
-        name: "Fire",
-        target: "ParticlesPresets",
-        description: "Heat up your SwiftUI views with fire particles.",
-        author: "benlmyers",
-        version: 1
-      )
-    }
-    
     var color: Color
     var spawnPoint: UnitPoint
     var spawnRadius: CGSize

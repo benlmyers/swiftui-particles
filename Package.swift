@@ -1,6 +1,4 @@
 // swift-tools-version: 5.6
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-
 import PackageDescription
 
 let package = Package(
@@ -8,21 +6,13 @@ let package = Package(
   platforms: [.iOS(.v15), .macOS(.v12), .watchOS(.v8)],
   products: [
     .library(name: "ParticlesPresets", targets: ["ParticlesPresets"]),
-//    .library(name: "ParticlesCore", targets: ["ParticlesCore"]),
     .library(name: "Particles", targets: ["Particles"])
   ],
-  dependencies: [
-    // .package(url: /* package url */, from: "1.0.0"),
-  ],
+  dependencies: [],
   targets: [
-//    .target(
-//      name: "ParticlesCore",
-//      dependencies: []
-//    ),
     .target(
       name: "Particles"
     ),
-//      dependencies: ["ParticlesCore"])
     .target(
       name: "ParticlesPresets",
       dependencies: ["Particles"],
