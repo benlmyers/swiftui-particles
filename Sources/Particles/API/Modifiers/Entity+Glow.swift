@@ -11,22 +11,11 @@ import Foundation
 public extension Entity {
   
   /// Applies a color overlay to this entity.
-  /// - Parameter color: The color to overlay on to the entity.
-  func glow(_ color: Color, radius: CGFloat = 15.0) -> some Entity {
+  /// - Parameter
+  /// - Parameter color: The color to overlay on to the entity. Pass `nil` to use the color of the particle itself.
+  func glow(_ color: Color? = nil, radius: CGFloat = 15.0) -> some Entity {
     var m = ModifiedEntity(entity: self)
-    m.preferences.append(.custom(.glow(color: color, option: nil, radius: radius)))
+    m.preferences.append(.custom(.glow(color: color, radius: radius)))
     return m
   }
-  
-  /// Applies a color overlay to this entity.
-  /// - Parameter color: The color to overlay on to the entity.
-  func glow(_ option: GlowOption, radius: CGFloat = 15.0) -> some Entity {
-    var m = ModifiedEntity(entity: self)
-    m.preferences.append(.custom(.glow(color: nil, option: option, radius: radius)))
-    return m
-  }
-}
-
-public enum GlowOption {
-  case identity
 }
