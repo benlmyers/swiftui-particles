@@ -188,7 +188,9 @@ public extension ParticleSystem {
             deathFrame = Int(Double(proxy.inception) + proxy.lifetime * 60.0)
           }
           if Int(currentFrame) >= deathFrame {
+            lock.lock()
             expiredProxies.append(proxyID)
+            lock.unlock()
             group.leave()
             return
           }

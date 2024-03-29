@@ -13,7 +13,7 @@ public extension Preset {
   
   struct Fire: Entity, PresetEntry {
     
-    var color: Color
+    @PresetParameter var color: Color
     var spawnPoint: UnitPoint
     var spawnRadius: CGSize
     var flameSize: CGFloat = 10.0

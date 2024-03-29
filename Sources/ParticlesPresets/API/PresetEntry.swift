@@ -17,7 +17,7 @@ import Foundation
 public protocol PresetEntry: Entity {
   
   /// The parameters of this entry.
-  var parameters: [PresetParameter] { get }
+  var parameters: [any _PresetParameter] { get }
 }
 
 public extension PresetEntry {
@@ -25,17 +25,19 @@ public extension PresetEntry {
   // MARK: - Properties
   
   /// Converts the preset into a `View` that can be used in SwiftUI.
-  var view: some View {
+  public var view: some View {
     ParticleSystem(entity: { self })
   }
   
   // MARK: - Conformance
   
-  var parameters: [PresetParameter] {
-    var properties: [PresetParameter] = []
+  var parameters: [any _PresetParameter] {
+    var properties: [any _PresetParameter] = []
     let mirror = Mirror(reflecting: self)
     for case let (label?, value) in mirror.children {
-      if let property = value as? PresetParameter {
+      if var property = value as? any _PresetParameter {
+        var cr = (value as? CustomReflectable).debugDescription
+        property.setMirrorMetadata(label, cr)
         properties.append(property)
       }
     }

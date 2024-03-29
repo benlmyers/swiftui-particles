@@ -12,4 +12,17 @@ import Foundation
 /// To define new presets, see ``Preset/Entry``.
 ///
 /// - seealso: ``ParticlesPresets/Preset/Fire``
-public struct Preset {}
+public struct Preset {
+  
+  /// Every preset available, as an array of entities.
+  public static var allDefaults: [(String, any PresetEntry)] {
+    [
+      ("Fire", Fire()),
+      ("Magic", Magic()),
+      ("Rain", Rain()),
+      ("Smoke", Smoke()),
+      ("Snow", Snow()),
+      ("Stars", Stars())
+    ]
+  }
+}

@@ -17,7 +17,7 @@ internal extension PresetEntry {
         ForEach(parameters, id: \.name) { parameter in
           HStack {
             Text(parameter.name)
-            parameter.view
+            AnyView(parameter.view)
           }
         }
       }
