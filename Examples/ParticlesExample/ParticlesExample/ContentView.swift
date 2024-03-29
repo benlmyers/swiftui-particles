@@ -16,7 +16,7 @@ struct ContentView: View {
       List {
         Text("Presets").font(.headline).foregroundStyle(.secondary)
         ForEach(Preset.allDefaults, id: \.0) { preset in
-          NavigationLink(String(describing: type(of: preset.1)).capitalized, destination: AnyView(preset.1.view))
+          NavigationLink(String(describing: type(of: preset.1)).capitalized, destination: AnyView(preset.1.demo))
         }
       }
     } detail: {

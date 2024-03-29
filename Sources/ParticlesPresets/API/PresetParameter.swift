@@ -23,10 +23,12 @@ public struct PresetParameter<V>: _PresetParameter {
   /// The documenation for this parameter. Auto-generated.
   public var documentation: String?
   
+  public var onUpdate: (V) -> Void = { _ in }
+  
   // MARK: - Methods
   
   public mutating func setMirrorMetadata(_ name: String, _ documentation: String?) {
-    self.name = name
+    self.name = name.dropFirst().capitalized
     self.documentation = documentation
   }
   
