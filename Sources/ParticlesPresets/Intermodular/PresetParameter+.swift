@@ -13,7 +13,7 @@ public protocol _PresetParameter {
   var wrappedValue: V { get set }
   var name: String { get set }
   var documentation: String? { get set }
-  var onUpdate: (V) -> Void { get set }
+//  var onUpdate: (V) -> Void { get set }
   mutating func setMirrorMetadata(_ name: String, _ documentation: String?)
 }
 
@@ -38,18 +38,26 @@ extension Color: _PresetParameterSingleValue {
 }
 
 fileprivate struct _ColorView: View {
-  @State private var color: Color = .white
+  @State var color: Color
   var parameter: any _PresetParameter
   var body: some View {
     ColorPicker(parameter.name, selection: $color)
-      .onChange(of: color) { c in
-        (parameter as? PresetParameter<Color>)?.onUpdate(c)
-      }
+      .preference(key: _ContainerPreferenceKey<Color>.self, value: color)
   }
   init(parameter: any _PresetParameter) {
     self.parameter = parameter
+    self.color = .white
     if let colorParameter = parameter as? PresetParameter<Color> {
       self.color = colorParameter.wrappedValue
+    }
+  }
+}
+
+public struct _ContainerPreferenceKey<V>: PreferenceKey {
+  static public var defaultValue: V? { nil }
+  static public func reduce(value: inout V?, nextValue: () -> V?) {
+    if let nextValue = nextValue() {
+      value = nextValue
     }
   }
 }

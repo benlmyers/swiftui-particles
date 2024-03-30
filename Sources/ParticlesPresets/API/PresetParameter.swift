@@ -23,7 +23,7 @@ public struct PresetParameter<V>: _PresetParameter {
   /// The documenation for this parameter. Auto-generated.
   public var documentation: String?
   
-  public var onUpdate: (V) -> Void = { _ in }
+//  public var onUpdate: (V) -> Void = { _ in }
   
   // MARK: - Methods
   
