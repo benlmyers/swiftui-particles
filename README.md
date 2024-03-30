@@ -5,11 +5,15 @@
 </p>
 
 > [!IMPORTANT]  
-> Particles v2.0 is in **Pre-Release**. If you plan on including Particles in your project, please read this [additional information](#pre-release).
+> Particles v2.0 is in **Pre-Release** and it is in active development. If you plan on including Particles in your project, please read this [additional information](#pre-release).
 
 ## Native, declarative, and fast.
 
 Create particle systems in a flash using a simple but powerful syntax.
+
+<p align="left">
+<img width=600 height=300 src="./Assets/Hue.gif">
+</p>
 
 ```swift
 import Particles
@@ -120,6 +124,9 @@ Particle {
 ### Emitter
 
 An `Emitter` fires new entities on a regular interval.
+<p align="left">
+<img width=400 height=200 src="./Assets/Emitter.gif">
+</p>
 
 ```swift
 Emitter(every: 0.01) { // Fires every 0.1 seconds
@@ -134,6 +141,10 @@ Emitter(every: 0.01) { // Fires every 0.1 seconds
 ### Group
 
 A `Group` holds multiple entities. Like SwiftUI, modifiers applied to a Group will be applied to all entities inside the Group.
+
+<p align="left">
+<img width=400 height=200 src="./Assets/Glow.png">
+</p>
 
 ```swift
 ParticleSystem {
@@ -162,6 +173,12 @@ ParticleSystem {
 
 Above, four view is registered; one for each particle. You can improve the performance of `ForEach` by merging views, or in rarer cases, entity declarations:
 
+#### Merging Views
+
+<p align="left">
+<img width=400 height=200 src="./Assets/ForEach.png">
+</p>
+
 ```swift
 ForEach(myLargeCollection, merges: .views) { item in
   Particle {
@@ -171,11 +188,15 @@ ForEach(myLargeCollection, merges: .views) { item in
 }
 ```
 
-Here, only the first view is registered, and the rest of the entities receive the same view. To learn more about `merges: .entities`, see [Performance](#performance).
+Here, only the first view is registered, and the rest of the entities receive the same view. To learn more about `merges: .views`, see [Performance](#performance).
 
 ### Lattice
 
 A `Lattice` creates a grid of particles that covers and samples the colors of a `View`. You can customize the behavior of each particle in the `Lattice` by applying modifiers.
+
+<p align="left">
+<img width=400 height=200 src="./Assets/Lattice.gif">
+</p>
 
 ```swift
 ParticleSystem {
