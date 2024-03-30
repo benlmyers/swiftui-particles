@@ -9,12 +9,13 @@ import SwiftUI
 import Foundation
 
 public protocol _PresetParameter {
+  associatedtype P: PresetEntry
   associatedtype V
   var wrappedValue: V { get set }
+  var keyPath: KeyPath<P, V>? { get set }
   var name: String { get set }
-  var documentation: String? { get set }
 //  var onUpdate: (V) -> Void { get set }
-  mutating func setMirrorMetadata(_ name: String, _ documentation: String?)
+  mutating func setMirrorMetadata(_ name: String, _ path: KeyPath<P, V>)
 }
 
 internal extension _PresetParameter {

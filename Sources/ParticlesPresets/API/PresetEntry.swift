@@ -42,8 +42,9 @@ public extension PresetEntry {
     let mirror = Mirror(reflecting: self)
     for case let (label?, value) in mirror.children {
       if var property = value as? any _PresetParameter {
-        let cr = (value as? CustomReflectable).debugDescription
-        property.setMirrorMetadata(label, cr)
+        
+//        let cr = (value as? CustomReflectable).debugDescription
+        property.setMirrorMetadata(label)
         properties.append(property)
       }
     }
@@ -62,9 +63,11 @@ fileprivate struct DemoView<Preset>: View where Preset: PresetEntry {
       VStack(alignment: .leading) {
         ForEach(entry.parameters, id: \.name) { parameter in
           AnyView(parameter.view)
-            .onAppear {
-//              parameter.o = { v in refresh.toggle() }
-            }
+            .onPreferenceChange(_ContainerPreferenceKey<_>.self, perform: { k in
+              guard let parameter: any _PresetParameter = entry.parameters.first(where: { $0.name == parameter.name }) else { return }
+//              parameter.keyPath
+//              entry[keyPath: PartialKeyPath<V>] = 0
+            })
         }
       }
       .padding()

@@ -9,7 +9,7 @@ import SwiftUI
 import Foundation
 
 @propertyWrapper
-public struct PresetParameter<V>: _PresetParameter {
+public struct PresetParameter<P, V>: _PresetParameter where P: PresetEntry, V: Equatable {
   
   // MARK: - Properties
   
@@ -20,16 +20,16 @@ public struct PresetParameter<V>: _PresetParameter {
   
   /// The name of this parameter. Auto-generated.
   public var name: String = ""
-  /// The documenation for this parameter. Auto-generated.
-  public var documentation: String?
+  
+  public var keyPath: KeyPath<P, V>?
   
 //  public var onUpdate: (V) -> Void = { _ in }
   
   // MARK: - Methods
   
-  public mutating func setMirrorMetadata(_ name: String, _ documentation: String?) {
+  public mutating func setMirrorMetadata(_ name: String, _ path: KeyPath<P, V>) {
     self.name = name.dropFirst().capitalized
-    self.documentation = documentation
+    self.keyPath = path
   }
   
   // MARK: - Initalizers
