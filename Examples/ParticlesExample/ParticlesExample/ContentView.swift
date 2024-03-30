@@ -14,13 +14,10 @@ struct ContentView: View {
   var body: some View {
     NavigationSplitView {
       List {
-        NavigationLink("Ghost Rider", destination: GhostRiderView.init)
-        NavigationLink("Fire", destination: FireView.init)
-        NavigationLink("Snow", destination: SnowView.init)
-        NavigationLink("Smoke", destination: SmokeView.init)
-        NavigationLink("Magic", destination: MagicView.init)
-        NavigationLink("Rain", destination: RainView.init)
-        NavigationLink("Stars", destination: StarsView.init)
+        Text("Presets").font(.headline).foregroundStyle(.secondary)
+        ForEach(Preset.allDefaults, id: \.0) { preset in
+          NavigationLink(String(describing: type(of: preset.1)).capitalized, destination: AnyView(preset.1.demo))
+        }
       }
     } detail: {
       thumbnailView
@@ -47,12 +44,12 @@ struct ContentView: View {
         Text("Particles")
           .fontWeight(.black)
           .font(.system(size: 90))
-          .foregroundStyle(Color.white)
+          .foregroundStyle(Color.red)
       }
       .hueRotation(with: { c in
         return .degrees(c.proxy.position.x + 60 * (c.timeAlive + c.proxy.seed.0))
       })
-      .glow(.identity, radius: 4)
+      .glow(radius: 4)
       .scale(1.5)
       .lifetime(99)
       .fixVelocity { c in
@@ -65,7 +62,7 @@ struct ContentView: View {
             .foregroundStyle(.red)
         }
         .hueRotation(angleIn: .zero ... .degrees(360))
-        .glow(.identity, radius: 5)
+        .glow(radius: 5)
         .transition(.opacity, on: .birth, duration: 1.0)
         .initialOffset(y: -150.0)
         .transition(.twinkle, on: .death, duration: 4.0)

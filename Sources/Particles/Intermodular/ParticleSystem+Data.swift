@@ -188,7 +188,9 @@ public extension ParticleSystem {
             deathFrame = Int(Double(proxy.inception) + proxy.lifetime * 60.0)
           }
           if Int(currentFrame) >= deathFrame {
+            lock.lock()
             expiredProxies.append(proxyID)
+            lock.unlock()
             group.leave()
             return
           }
@@ -274,12 +276,9 @@ public extension ParticleSystem {
           var blurOverlayRadius: CGFloat = .zero
           for preference in entity.preferences {
             if case .custom(let custom) = preference {
-              if case .glow(let color, let option, let radius) = custom {
+              if case .glow(let color, let radius) = custom {
                 if let color {
                   cc.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
-                }
-                else if let option {
-                  cc.addFilter(.shadow(color: Color(hue: proxy.hueRotation.degrees / 360.0, saturation: 1, brightness: 1), radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
                 } else {
                   blurOverlayRadius = radius
                 }
@@ -313,9 +312,11 @@ public extension ParticleSystem {
             }
           }
           cc.draw(resolved, at: .zero)
-          if blurOverlayRadius > .zero {
-            cc.addFilter(.blur(radius: blurOverlayRadius))
-            cc.draw(resolved, at: .zero)
+          cc.drawLayer { ccx in
+            if blurOverlayRadius > .zero {
+              ccx.addFilter(.blur(radius: blurOverlayRadius))
+              ccx.draw(resolved, at: .zero)
+            }
           }
         }
       }

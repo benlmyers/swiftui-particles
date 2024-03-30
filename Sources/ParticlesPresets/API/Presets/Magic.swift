@@ -13,16 +13,6 @@ public extension Preset {
   
   struct Magic: Entity, PresetEntry {
     
-    public var metadata: PresetMetadata {
-      .init(
-        name: "Magic",
-        target: "ParticlesPresets",
-        description: "Stir up some magic in your SwiftUI views.",
-        author: "benlmyers",
-        version: 1
-      )
-    }
-    
     var color: Color
     var spawnPoint: UnitPoint
     

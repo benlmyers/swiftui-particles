@@ -8,7 +8,7 @@
 import SwiftUI
 import Foundation
 
-extension Image {
+internal extension Image {
   init(packageResource name: String, ofType type: String) {
 #if canImport(UIKit)
     guard let path = Bundle.main.path(forResource: name, ofType: type),

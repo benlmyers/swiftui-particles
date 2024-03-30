@@ -67,7 +67,7 @@ internal struct FlatEntity {
     case custom(Custom)
     
     enum Custom {
-      case glow(color: Color?, option: GlowOption?, radius: CGFloat)
+      case glow(color: Color?, radius: CGFloat)
       case colorOverlay(color: Color)
       case transition(transition: AnyTransition, bounds: TransitionBounds, duration: TimeInterval)
     }

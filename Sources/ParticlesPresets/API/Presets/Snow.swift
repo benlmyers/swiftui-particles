@@ -12,17 +12,7 @@ import Foundation
 public extension Preset {
   
   struct Snow: Entity, PresetEntry {
-    
-    public var metadata: PresetMetadata {
-      .init(
-        name: "Snow",
-        target: "ParticlesPresets",
-        description: "Create cool SwiftUI views with a snow effect.",
-        author: "benlmyers",
-        version: 1
-      )
-    }
-    
+
     private var parameters: Parameters
     
     public init(size: CGFloat = 30.0, lifetime: TimeInterval = 5.0, intensity: Int = 20) {
