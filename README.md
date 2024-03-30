@@ -1,5 +1,9 @@
 # Particles 🎉
 
+<p align="center">
+<img src="./Assets/particles.gif">
+</p>
+
 > [!IMPORTANT]  
 > Particles v2.0 is in **Pre-Release**. If you plan on including Particles in your project, please read this [additional information](#pre-release).
 
