@@ -37,18 +37,16 @@ Easily integrate Particles into your SwiftUI views.
 
 ```swift
 VStack {
-  Text(purchased ? "Thank you!" : "Please press Purchase!")
-    .emits(if: purchased) {
+  Text(purchased ? "Thank you!" : "")
+    .emits(every: 0.1, if: purchased, offset: CGPoint(x: 0, y: -20)) {
       Particle { Text("❤️") }
-        .acceleration(y: 1.0)
+        .fixAcceleration(y: 0.05)
         .initialVelocity(xIn: -2.0 ... 2.0, yIn: -2.0 ... -1.5)
         .transition(.scale)
     }
-  Button("Cancel") {
-    ...
+  Button("Purchase") {
     purchased = true
   }
-  .dissolve(if: purchased)
 }
 ```
 
