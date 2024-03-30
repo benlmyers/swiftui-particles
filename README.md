@@ -1,5 +1,8 @@
 # Particles 🎉
 
+> [!IMPORTANT]  
+> Particles v2.0 is in **Pre-Release**. If you plan on including Particles in your project, please read this [additional information](#pre-release).
+
 ## Native, declarative, and fast.
 
 Create particle systems in a flash using a simple but powerful syntax.
@@ -61,7 +64,8 @@ ParticleSystem {
 4. [Modifiers](#modifiers) - change the behavior of particles (see [list](#list-of-entity-modifiers))
 5. [State Persistence](#state-persistence) - persist `ParticleSystem` simulation through state updates
 6. [Presets](#presets) - browse a curated library of preset entities
-7. [Performance](#performance) - debugging, frame rate tips, and benchmarks
+7. [Pre-Release](#pre-release) - this package is in pre-release, additional information here ⚠️
+8. [Performance](#performance) - debugging, frame rate tips, and benchmarks
 
 ## Quickstart
 
@@ -301,7 +305,11 @@ State refreshing works on all levels of the particle system, even in views insid
 
 ## Presets
 
-Several presets are available.
+Several presets are available. [TODO]
+
+## Pre-Release
+
+[TODO] Add info here about build time, particles in production, API changes before 2.0 release, etc.
 
 ## Performance
 
@@ -315,3 +323,5 @@ You can debug a `ParticleSystem` to view performance statistics.
 - Use `ForEach(merges: .entities)` if mapped entities only variate in their initial properties. `merges: .entities` tells `ForEach` (aka `Group`) to endow each created `Proxy` with properties determined by the mapped `Entity` **only upon birth**. After the proxy is born with its initial properties, like position, rotation, or hue rotation, it's entity rules are merged to the **first data mapping's** upon update.
 
 ### Benchmarks
+
+[TODO]
