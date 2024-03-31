@@ -29,13 +29,7 @@ public extension Preset {
           }
           .transition(.opacity, duration: 0.5)
           .initialVelocity(xIn: -5...5, yIn: -15...(-5))
-          .fixVelocity { c in
-              let angle = Double.random(in: 0.0 ..< (2 * Double.pi))
-              let dx = c.proxy.velocity.dx * c.timeAlive * cos(angle)
-              let dy = c.proxy.velocity.dy * c.timeAlive * sin(angle)
-              return .init(dx: dx, dy: dy)
-          }
-//          .initialAcceleration(y: 0.15)
+          .initialAcceleration(y: 0.15)
           .lifetime(2.5)
           .scale(1.5)
         }
