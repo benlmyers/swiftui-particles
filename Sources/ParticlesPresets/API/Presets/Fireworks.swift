@@ -10,31 +10,71 @@ import Particles
 import Foundation
 
 public extension Preset {
+  
   struct Fireworks: Entity, PresetEntry {
     
-    public init () {
-      
+    private var parameters: Parameters
+    
+    public init (shootFor shootDuration: TimeInterval = 1.0, color: Color = .blue, spread: Double = 1.0) {
+      self.parameters = .init(shootDuration: shootDuration, color: color, spread: spread)
     }
+    
     public var body: some Entity {
-      Emitter(every: 1.5) {
-        ForEach(0..<500, merges: .views) { i in
+      Group {
+        ForEach(0 ... 500, merges: .views) { i in
           Particle {
-            RadialGradient(
-              colors: [Color.white, .clear],
-              center: .center,
-              startRadius: 0.0,
-              endRadius: 3
-            )
-            .clipShape(Circle())
+            RadialGradient(colors: [parameters.color, .clear], center: .center, startRadius: 0.0, endRadius: 4.0)
+              .clipShape(Circle())
+              .frame(width: 4.0, height: 4.0)
           }
-          .transition(.opacity, duration: 0.5)
-          .initialVelocity(xIn: -5...5, yIn: -15...(-5))
-          .initialAcceleration(y: 0.15)
-          .lifetime(2.5)
-          .scale(1.5)
+          .initialPosition(.center)
+          .lifetime(4)
+          .transition(.twinkle, on: .death, duration: 3.0)
+          .blendMode(.plusLighter)
+          .glow(radius: 6.0)
+          .onUpdate { p, c in
+            if c.time < parameters.shootDuration {
+              p.velocity = .zero
+              p.opacity = .zero
+            } else {
+              p.opacity = 1.0
+              if p.velocity == .zero {
+                p.velocity = .init(angle: .degrees(Double(i) * 7), magnitude: parameters.spread * Double.random(in: 0.1 ... 3.0))
+              } else {
+                p.velocity.dx *= 0.98
+                p.velocity.dy *= 0.98
+              }
+            }
+          }
         }
+        Emitter(every: 0.04) {
+          Particle {
+            RadialGradient(colors: [Color.yellow, .clear], center: .center, startRadius: 0.0, endRadius: 4.0)
+              .clipShape(Circle())
+              .frame(width: 4.0, height: 4.0)
+          }
+          .lifetime(2.0)
+          .transition(.scale, on: .death, duration: 1.0)
+          .initialVelocity(xIn: -0.3 ... 0.3, yIn: -0.3 ... 0.3)
+          .initialAcceleration(y: 0.003)
+          .blur(in: 0.0 ... 5.0)
+          .opacity(in: 0.2 ... 0.5)
+          .blendMode(.plusLighter)
+        }
+        .maxSpawn(count: 37)
+        .lifetime(10)
+        .initialPosition(.bottom)
+        .initialVelocity { c in
+            .init(dx: 0.0, dy: -0.0105 * c.system.size.height / parameters.shootDuration)
+        }
+        .fixAcceleration(y: 0.05)
       }
-      .maxSpawn(count: 50)
+    }
+    
+    internal struct Parameters {
+      var shootDuration: TimeInterval
+      var color: Color
+      var spread: Double = 1.0
     }
   }
 }

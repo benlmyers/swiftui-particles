@@ -22,13 +22,13 @@ struct ContentView: View {
         NavigationLink("Magic", destination: MagicView.init)
         NavigationLink("Rain", destination: RainView.init)
         NavigationLink("Stars", destination: StarsView.init)
+        NavigationLink("Fireworks", destination: FireworksView.init)
 //        ForEach(Preset.allDefaults, id: \.0) { preset in
 //          NavigationLink(String(describing: type(of: preset.1)).capitalized, destination: AnyView(preset.1.demo))
 //        }
       }
     } detail: {
-      FireworksView()
-//      thumbnailView
+      thumbnailView
     }
   }
   

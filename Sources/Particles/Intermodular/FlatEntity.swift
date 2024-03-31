@@ -13,15 +13,18 @@ internal struct FlatEntity {
   internal var preferences: [Preference]
   internal var root: (any Entity)?
   
-  init?(single e: Any) {
+  init?(single e: Any, centered: Bool = true) {
     guard var body: any Entity = e as? any Entity else { return nil }
     guard !(e is EmptyEntity) else { return nil }
-    self.preferences = [.onBirth({ c in
-      var p = c.proxy
-      let s = c.system.size
-      p.position = .init(x: 0.5 * s.width, y: 0.5 * s.height)
-      return p
-    })]
+    self.preferences = []
+    if centered {
+      self.preferences = [.onBirth({ c in
+        var p = c.proxy
+        let s = c.system.size
+        p.position = .init(x: 0.5 * s.width, y: 0.5 * s.height)
+        return p
+      })]
+    }
     while true {
       if let group = body as? Group {
         self.root = group
@@ -40,7 +43,7 @@ internal struct FlatEntity {
     }
   }
   
-  static func make(_ entity: Any, merges: Group.Merges? = nil) -> [(result: FlatEntity, merges: Group.Merges?)] {
+  static func make(_ entity: Any, merges: Group.Merges? = nil, centered: Bool = true) -> [(result: FlatEntity, merges: Group.Merges?)] {
     if let grouped = entity as? any Transparent {
       return FlatEntity.make(grouped.body)
     }
