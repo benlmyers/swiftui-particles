@@ -47,7 +47,7 @@ internal struct FlatEntity {
     if let grouped = entity as? any Transparent {
       return FlatEntity.make(grouped.body)
     }
-    guard let single = FlatEntity.init(single: entity) else {
+    guard let single = FlatEntity.init(single: entity, centered: centered) else {
       return []
     }
     if let group = single.root as? Group {

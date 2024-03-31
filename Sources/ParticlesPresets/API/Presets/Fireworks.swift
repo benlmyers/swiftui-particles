@@ -61,11 +61,16 @@ public extension Preset {
           .opacity(in: 0.2 ... 0.5)
           .blendMode(.plusLighter)
         }
-        .maxSpawn(count: 37)
+        .maxSpawn(count: 30)
+        .onUpdate { p, c in
+          if p.position.y < c.size.height * 0.5 {
+            p.position.y = c.size.height
+          }
+        }
         .lifetime(10)
         .initialPosition(.bottom)
         .initialVelocity { c in
-            .init(dx: 0.0, dy: -0.0105 * c.system.size.height / parameters.shootDuration)
+            .init(dx: 0.0, dy: -0.01 * c.system.size.height / parameters.shootDuration)
         }
         .fixAcceleration(y: 0.05)
       }

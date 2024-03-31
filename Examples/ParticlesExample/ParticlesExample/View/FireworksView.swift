@@ -11,9 +11,17 @@ import ParticlesPresets
 
 struct FireworksView: View {
   
+  @State var color: Color = .pink
+  
   var body: some View {
-    ParticleSystem {
-      Preset.Fireworks()
+    ZStack(alignment: .topLeading) {
+      ParticleSystem {
+        Preset.Fireworks(color: color)
+      }
+      HStack {
+        ColorPicker("Color", selection: $color)
+      }
+      .padding()
     }
   }
 }
