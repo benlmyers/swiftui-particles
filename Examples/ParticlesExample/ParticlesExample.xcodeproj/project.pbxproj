@@ -11,6 +11,7 @@
 		3C247D4E2BADBF8D00488B02 /* SmokeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4A2BADBF8D00488B02 /* SmokeView.swift */; };
 		3C247D4F2BADBF8D00488B02 /* GhostRiderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4B2BADBF8D00488B02 /* GhostRiderView.swift */; };
 		3C247D502BADBF8D00488B02 /* SnowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4C2BADBF8D00488B02 /* SnowView.swift */; };
+		3CF22AF22BB996250000D463 /* FireworksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CF22AF12BB996250000D463 /* FireworksView.swift */; };
 		EE4265512BAE1C5C005193F1 /* MagicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE4265502BAE1C5C005193F1 /* MagicView.swift */; };
 		EE695F0C2ACB767E002D8F5B /* Particles in Frameworks */ = {isa = PBXBuildFile; productRef = EE695F0B2ACB767E002D8F5B /* Particles */; };
 		EEB3A3772BAE1F8300A5C591 /* RainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB3A3762BAE1F8300A5C591 /* RainView.swift */; };
@@ -27,6 +28,7 @@
 		3C247D4A2BADBF8D00488B02 /* SmokeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmokeView.swift; sourceTree = "<group>"; };
 		3C247D4B2BADBF8D00488B02 /* GhostRiderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GhostRiderView.swift; sourceTree = "<group>"; };
 		3C247D4C2BADBF8D00488B02 /* SnowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnowView.swift; sourceTree = "<group>"; };
+		3CF22AF12BB996250000D463 /* FireworksView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireworksView.swift; sourceTree = "<group>"; };
 		EE4265502BAE1C5C005193F1 /* MagicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicView.swift; sourceTree = "<group>"; };
 		EEB3A3762BAE1F8300A5C591 /* RainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RainView.swift; sourceTree = "<group>"; };
 		EEB3A3782BAE2AAD00A5C591 /* StarsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarsView.swift; sourceTree = "<group>"; };
@@ -57,6 +59,7 @@
 			children = (
 				3C247D492BADBF8D00488B02 /* FireView.swift */,
 				3C247D4B2BADBF8D00488B02 /* GhostRiderView.swift */,
+				3CF22AF12BB996250000D463 /* FireworksView.swift */,
 				3C247D4A2BADBF8D00488B02 /* SmokeView.swift */,
 				3C247D4C2BADBF8D00488B02 /* SnowView.swift */,
 				EE4265502BAE1C5C005193F1 /* MagicView.swift */,
@@ -201,6 +204,7 @@
 				EE4265512BAE1C5C005193F1 /* MagicView.swift in Sources */,
 				3C247D4E2BADBF8D00488B02 /* SmokeView.swift in Sources */,
 				EEB3A3772BAE1F8300A5C591 /* RainView.swift in Sources */,
+				3CF22AF22BB996250000D463 /* FireworksView.swift in Sources */,
 				EEB3A3792BAE2AAD00A5C591 /* StarsView.swift in Sources */,
 				EED626832A4990B300A3C3F4 /* ParticlesExampleApp.swift in Sources */,
 			);
@@ -332,7 +336,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ParticlesExample/Preview Content\"";
-				DEVELOPMENT_TEAM = B4D7K3EGJG;
+				DEVELOPMENT_TEAM = DKAHY69WLB;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -372,7 +376,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ParticlesExample/Preview Content\"";
-				DEVELOPMENT_TEAM = B4D7K3EGJG;
+				DEVELOPMENT_TEAM = DKAHY69WLB;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;

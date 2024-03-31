@@ -27,7 +27,8 @@ struct ContentView: View {
 //        }
       }
     } detail: {
-      thumbnailView
+      FireworksView()
+//      thumbnailView
     }
   }
   

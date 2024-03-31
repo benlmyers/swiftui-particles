@@ -46,7 +46,7 @@ fileprivate struct _ColorView: View {
   }
   init(parameter: any _PresetParameter) {
     self.parameter = parameter
-    self.color = .white
+    self._color = State(wrappedValue: Color.white)
     if let colorParameter = parameter as? PresetParameter<Color> {
       self.color = colorParameter.wrappedValue
     }
