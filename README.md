@@ -212,7 +212,7 @@ ParticleSystem {
 
 ## Defining Entities
 
-You can define a custom entity by conforming a `struct` to `Entity`.
+You can define a custom entity by conforming a `struct` to `Entity` and providing a value for `var body: some Entity`.
 
 ```swift
 struct MyEmojiParticle: Entity {
@@ -299,15 +299,15 @@ Like SwiftUI modifiers, *most*\* entity modifiers are applied *outside first*, *
 
 When importing `Particles`, you also have access to some useful view modifiers.
 
-> [!WARNING]
-> Particles is in **Pre-Release**. While the API for `Lattice` is to remain unchanged, there is a known performance issue with this entity. `Lattice` uses an expensive initializer that can cause a delay in appearance. This will be optimized before release.
-
 - `View.particleSystem(atop:offset:entities:)` - creates a particle system centered at the modified view
 - `View.emits(every:if:atop:simultaneously:entities:)` - emits specific entities on an interval from the center of the modified view
 - `View.dissolve(if:)` - dissolves the view (using `Lattice`) if `condition` is true
 - `View.burst(if:)` - bursts the view if `condition` is true
 
 All modifiers are documented with parameter information.
+
+> [!WARNING]
+> Particles is in **Pre-Release**. The API for the four view modifiers listed above may be changed before release.
   
 ## State Persistence
 
@@ -339,10 +339,7 @@ State refreshing works on all levels of the particle system, even in views insid
 
 ## Presets
 
-> [!WARNING]  
-> ParticlesPresets is in **Pre-Release**. The appearance of currently available presets are subject to change, as are their parameters. Avoid including presets in production code. [More information](#pre-release)
-
-A curated list of presets are available. More presets will sparingly be added in future package updates.
+A curated list of presets are available. These can be configured using parameters. Several additional presets will be added before the packages reaches a Release state.
 
 - [`Fire`](Sources/ParticlesPresets/API/Presets/Fire.swift)
 - [`Snow`](Sources/ParticlesPresets/API/Presets/Snow.swift)
@@ -351,17 +348,22 @@ A curated list of presets are available. More presets will sparingly be added in
 - [`Smoke`](Sources/ParticlesPresets/API/Presets/Smoke.swift)
 - [`Stars`](Sources/ParticlesPresets/API/Presets/Stars.swift)
 
-Presets can be configured using parameters.
+ParticlesPresets is accepting preset submissions in the form of pull requests. [Contributing guidelines](CONTRIBUTING.md)
+
+> [!WARNING]  
+> ParticlesPresets is in **Pre-Release**. The appearance of currently available presets are subject to change, as are their parameters. Avoid including presets in production code. [More information](#pre-release)
 
 ### Example Project
 
 This package contains an example project where you can preview and tweak the library of available presets. To run it, open the example's [Xcode project file](Examples/ParticlesExample/ParticlesExample.xcodeproj) located in **Examples/ParticlesExample**.
 
-ParticlesPresets is accepting preset submissions in the form of pull requests. [Contributing guidelines](CONTRIBUTING.md)
-
 ## Pre-Release
 
-This package is in a pre-release state, which means certain parts of it are subject to change. The following is a list of API changes expected before Release:
+This package is in a pre-release state, which means certain parts of it are subject to change. The following is a roadmap to Release (and conseqeuently, a list of planned API changes):
+
+- Streamlined demos for presets
+- Several new preset entries
+- View modifier improvements, like `.burst(if:)` or `.emits(...)`
 
 ## Performance
 
@@ -388,4 +390,4 @@ You can debug a `ParticleSystem` to view performance statistics, including *view
 
 ### Benchmarks
 
-Benchmarks will be available when this packages reaches a Release state.
+Performance Benchmarks will be available when this packages reaches a Release state.
