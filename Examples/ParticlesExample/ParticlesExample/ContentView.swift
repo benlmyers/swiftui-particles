@@ -23,6 +23,7 @@ struct ContentView: View {
         NavigationLink("Rain", destination: RainView.init)
         NavigationLink("Stars", destination: StarsView.init)
         NavigationLink("Fireworks", destination: FireworksView.init)
+//        NavigationLink("Thumb", destination: thumbnailView)
 //        ForEach(Preset.allDefaults, id: \.0) { preset in
 //          NavigationLink(String(describing: type(of: preset.1)).capitalized, destination: AnyView(preset.1.demo))
 //        }
@@ -30,6 +31,7 @@ struct ContentView: View {
     } detail: {
       thumbnailView
     }
+    .preferredColorScheme(.dark)
   }
   
   var thumbnailView: some View {

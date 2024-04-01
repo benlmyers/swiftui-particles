@@ -52,27 +52,33 @@ internal extension View {
   #endif
 }
 
-#if os(iOS)
-internal extension UIImage {
-  convenience init(view: UIView) {
-    UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, 0.0)
-    
-//    view.layer.proxy(in: UIGraphicsGetCurrentContext()!)
-    let image = UIGraphicsGetImageFromCurrentImageContext()
-    UIGraphicsEndImageContext()
-    self.init(cgImage: image!.cgImage!)
-  }
-}
-#else
-internal extension NSImage {
-  convenience init(view: NSView) {
-    guard let bitmapRepresentation = view.bitmapImageRepForCachingDisplay(in: view.bounds) else {
-      self.init()
-      return
-    }
-    
-    view.cacheDisplay(in: view.bounds, to: bitmapRepresentation)
-    self.init(cgImage: bitmapRepresentation.cgImage!, size: view.bounds.size)
-  }
-}
-#endif
+//#if os(iOS)
+//internal extension UIImage {
+//  convenience init(view: UIView) {
+//    
+//    let renderer = UIGraphicsImageRenderer(size: view.bounds.size)
+//    let image = renderer.image { ctx in
+//        view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+//    }
+//    
+////    UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, 0.0)
+//    
+////    view.layer.proxy(in: UIGraphicsGetCurrentContext()!)
+////    let image = UIGraphicsGetImageFromCurrentImageContext()
+////    UIGraphicsEndImageContext()
+//    self.init(cgImage: image.cgImage!)
+//  }
+//}
+//#else
+//internal extension NSImage {
+//  convenience init(view: NSView) {
+//    guard let bitmapRepresentation = view.bitmapImageRepForCachingDisplay(in: view.bounds) else {
+//      self.init()
+//      return
+//    }
+//    
+//    view.cacheDisplay(in: view.bounds, to: bitmapRepresentation)
+//    self.init(cgImage: bitmapRepresentation.cgImage!, size: view.bounds.size)
+//  }
+//}
+//#endif
