@@ -374,6 +374,8 @@ This package is in a pre-release state, which means certain parts of it are subj
 - Several new preset entries
 - View modifier improvements, like `.burst(if:)` or `.emits(...)`
 
+Until full release, including Particles in production code is not recommended.
+
 ## Performance
 
 Particles can support the use of thousands of entities when compiled in **Release** scheme. As more modifiers and entities are added, `ParticleSystem`'s frame rate will lower.
