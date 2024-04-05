@@ -44,7 +44,12 @@ public struct Lattice: Entity, Transparent {
     anchor: UnitPoint = .center,
     @ViewBuilder view: () -> Base
   ) where Base: View {
-    guard let viewImage = view().asImage()?.cgImage, let imgData = viewImage.dataProvider?.data else {
+    #if os(iOS)
+    let s = 0.66
+    #else
+    let s = 1.0
+    #endif
+    guard let viewImage = view().scaleEffect(s).background(Color.black).asImage()?.cgImage, let imgData = viewImage.dataProvider?.data else {
       fatalError("Particles could not convert view to image correctly. (Burst)")
     }
     viewSize = .init(width: viewImage.width / 2, height: viewImage.height / 2)

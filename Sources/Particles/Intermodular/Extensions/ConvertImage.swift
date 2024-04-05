@@ -13,18 +13,30 @@ import UIKit
 import AppKit
 #endif
 
-internal extension View {
+#if os(iOS)
+extension UIView {
+  func asImage() -> UIImage {
+    let renderer = UIGraphicsImageRenderer(bounds: bounds)
+    return renderer.image { rendererContext in
+      layer.render(in: rendererContext.cgContext)
+    }
+  }
+}
+#endif
+
+public extension View {
+  
   #if os(iOS)
   func asImage() -> UIImage? {
     let controller = UIHostingController(rootView: self)
-    let view = controller.view
-    let targetSize = controller.view.intrinsicContentSize
-    view?.bounds = CGRect(origin: .zero, size: targetSize)
-    view?.backgroundColor = .clear
-    let renderer = UIGraphicsImageRenderer(size: targetSize)
-    return renderer.image { _ in
-        view?.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
-    }
+    controller.view.frame = CGRect(x: 0, y: CGFloat(Int.max), width: 1, height: 1)
+    let size = controller.sizeThatFits(in: UIScreen.main.bounds.size)
+    controller.view.bounds = CGRect(origin: .zero, size: size)
+    controller.view.sizeToFit()
+    UIApplication.shared.windows.first?.rootViewController?.view.addSubview(controller.view)
+    let image = controller.view.asImage()
+    controller.view.removeFromSuperview()
+    return image
   }
   #else
   func asImage() -> NSImage? {
