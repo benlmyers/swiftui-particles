@@ -213,9 +213,6 @@ ParticleSystem {
 }
 ```
 
-> [!CAUTION]  
-> A known issue with Lattice is present on iOS. We are investigating a fix in issue #6.
-
 > [!WARNING]  
 > Particles is in **Pre-Release**. While the API for `Lattice` is to remain unchanged, there is a known performance issue with this entity. `Lattice` uses an expensive initializer that can cause a delay in appearance. This will be optimized before release.
 
