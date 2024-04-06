@@ -40,6 +40,7 @@ public extension Preset {
           let w = c.system.size.width * 0.5
           return .random(in: -w ... w)
         })
+        .initialPosition(.top)
         .initialVelocity(xIn: parameters.windVelocity +/- 1, yIn: 13 ... 15)
         .initialAcceleration(y: 0.1)
         .opacity(in: 0.5 ... 1.0)

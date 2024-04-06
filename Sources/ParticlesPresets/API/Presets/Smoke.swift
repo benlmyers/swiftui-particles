@@ -27,7 +27,7 @@ public extension Preset {
       case .topTrailing, .bottomTrailing, .trailing:
         return 3.0 ... 6.0
       default:
-        return 0.0 ... 0.0
+        return -0.5 ... 0.5
       }
     }
     

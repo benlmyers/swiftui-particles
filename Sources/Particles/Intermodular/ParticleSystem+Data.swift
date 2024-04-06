@@ -342,10 +342,10 @@ public extension ParticleSystem {
     }
     
     @discardableResult
-    private func create<E>(entity: E, spawn: Bool = true) -> [(EntityID, ProxyID?)] where E: Entity {
+    private func create<E>(entity: E, spawn: Bool = true, centered: Bool = true) -> [(EntityID, ProxyID?)] where E: Entity {
       guard !(entity is EmptyEntity) else { return [] }
       var result: [(EntityID, ProxyID?)] = []
-      let make = FlatEntity.make(entity)
+      let make = FlatEntity.make(entity, centered: centered)
       var firstID: EntityID?
       for (flat, merges) in make {
         var proxyID: ProxyID?
@@ -354,7 +354,7 @@ public extension ParticleSystem {
           proxyID = self.createProxy(entityID)
         }
         if let root = flat.root, root is _Emitter {
-          self.emitEntities[entityID] = self.create(entity: root.body, spawn: false).map({ $0.0 })
+          self.emitEntities[entityID] = self.create(entity: root.body, spawn: false, centered: false).map({ $0.0 })
         }
         if let merges: Group.Merges, let firstID: EntityID {
           switch merges {

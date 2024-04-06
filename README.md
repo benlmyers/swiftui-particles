@@ -1,8 +1,17 @@
-# Particles 🎉
+<p align="center">
+<img src="./Assets/particles.gif">
+</p>
+
+> [!IMPORTANT]  
+> Particles v2.0 is in **Pre-Release** and it is in active development. If you plan on including Particles in your project, please read this [additional information](#pre-release).
 
 ## Native, declarative, and fast.
 
 Create particle systems in a flash using a simple but powerful syntax.
+
+<p align="left">
+<img width=600 height=300 src="./Assets/Hue.gif">
+</p>
 
 ```swift
 import Particles
@@ -14,7 +23,7 @@ var body: some View {
         Text("✨")
       }
       .initialPosition(.center)
-      .initialVelocity(xIn: -1...1, yIn: -1...1)
+      .initialVelocity(xIn: -1.0 ... 1.0, yIn: -1.0 ... 1.0)
       .hueRotation(angleIn: .degrees(0) ... .degrees(360))
       .glow(.white)
     }
@@ -26,22 +35,20 @@ Easily integrate Particles into your SwiftUI views.
 
 ```swift
 VStack {
-  Text(purchased ? "Thank you!" : "Please press Purchase!")
-    .emits(if: purchased) {
+  Text(purchased ? "Thank you!" : "")
+    .emits(every: 0.1, if: purchased, offset: CGPoint(x: 0, y: -20)) {
       Particle { Text("❤️") }
-        .acceleration(y: 1.0)
+        .fixAcceleration(y: 0.05)
         .initialVelocity(xIn: -2.0 ... 2.0, yIn: -2.0 ... -1.5)
         .transition(.scale)
     }
-  Button("Cancel") {
-    ...
+  Button("Purchase") {
     purchased = true
   }
-  .dissolve(if: purchased)
 }
 ```
 
-And easily jump in with configurable presets.
+And jump in with configurable presets.
 
 ```swift
 import ParticlesPresets
@@ -61,7 +68,8 @@ ParticleSystem {
 4. [Modifiers](#modifiers) - change the behavior of particles (see [list](#list-of-entity-modifiers))
 5. [State Persistence](#state-persistence) - persist `ParticleSystem` simulation through state updates
 6. [Presets](#presets) - browse a curated library of preset entities
-7. [Performance](#performance) - debugging, frame rate tips, and benchmarks
+7. [Pre-Release](#pre-release) - this package is in pre-release, additional information here ⚠️
+8. [Performance](#performance) - debugging, frame rate tips, and benchmarks
 
 ## Quickstart
 
@@ -112,13 +120,16 @@ Particle {
 ### Emitter
 
 An `Emitter` fires new entities on a regular interval.
+<p align="left">
+<img width=400 height=200 src="./Assets/Emitter.gif">
+</p>
 
 ```swift
-Emitter(every: 0.01) { // Fires every 0.1 seconds
+Emitter(every: 0.02) { // Fires every 0.02 seconds
   Particle {
     Text("😀")
   }
-  .initialAcceleration(xIn: -1...1, yIn: -1...1) // A random value between -1 and 1 for each particle
+  .initialAcceleration(xIn: -1.0 ... 1.0, yIn: -1.0 ... 1.0)
   .initialTorque(.degrees(1.0))
 }
 ```
@@ -126,6 +137,10 @@ Emitter(every: 0.01) { // Fires every 0.1 seconds
 ### Group
 
 A `Group` holds multiple entities. Like SwiftUI, modifiers applied to a Group will be applied to all entities inside the Group.
+
+<p align="left">
+<img width=400 height=200 src="./Assets/Glow.png">
+</p>
 
 ```swift
 ParticleSystem {
@@ -154,6 +169,12 @@ ParticleSystem {
 
 Above, four view is registered; one for each particle. You can improve the performance of `ForEach` by merging views, or in rarer cases, entity declarations:
 
+#### Merging Views
+
+<p align="left">
+<img width=400 height=200 src="./Assets/ForEach.png">
+</p>
+
 ```swift
 ForEach(myLargeCollection, merges: .views) { item in
   Particle {
@@ -163,11 +184,15 @@ ForEach(myLargeCollection, merges: .views) { item in
 }
 ```
 
-Here, only the first view is registered, and the rest of the entities receive the same view. To learn more about `merges: .entities`, see [Performance](#performance).
+Here, only the first view is registered, and the rest of the entities receive the same view. To learn more about `merges: .views`, see [Performance](#performance).
 
 ### Lattice
 
 A `Lattice` creates a grid of particles that covers and samples the colors of a `View`. You can customize the behavior of each particle in the `Lattice` by applying modifiers.
+
+<p align="left">
+<img width=400 height=200 src="./Assets/Lattice.gif">
+</p>
 
 ```swift
 ParticleSystem {
@@ -182,9 +207,12 @@ ParticleSystem {
 }
 ```
 
+> [!WARNING]  
+> Particles is in **Pre-Release**. While the API for `Lattice` is to remain unchanged, there is a known performance issue with this entity. `Lattice` uses an expensive initializer that can cause a delay in appearance. This will be optimized before release.
+
 ## Defining Entities
 
-You can define a custom entity by conforming a `struct` to `Entity`.
+You can define a custom entity by conforming a `struct` to `Entity` and providing a value for `var body: some Entity`.
 
 ```swift
 struct MyEmojiParticle: Entity {
@@ -207,20 +235,22 @@ struct MyView: View {
 
 ## Modifiers
 
-Particles has dozens of modifiers you can apply to entities to change their behavior.
+Particles has several modifiers you can apply to entities to change their behavior.
 
 ```swift
 ParticleSystem {
   Particle {
     Image(systemName: "leaf.fill")
   }
-  .lifetime(3)
-  .colorOverlay(.orange)
-  .blur(in: 0.0 ... 3.0)
+  .lifetime(3) // particle lasts 3 seconds
+  .colorOverlay(.orange) // particle is orange
+  .blur(in: 0.0 ... 3.0) // particle has random blur effect
 }
 ```
 
-Like SwiftUI modifiers, *most*\* entity modifiers are applied outside first, inside last. Some modifiers affect the initial behavior of an entity, while others affect the behavior on each frame. For instance, since `.initialPosition(...)` *sets* a particle's position, applying this modifier **above** `.initialOffset(...)` will cause the offset to not be applied. `.initialOffset(...)`, which *changes* the position, must be written *inside*.
+Some modifiers, like `.initialPosition(x:y:)`, affect the initial behavior of an entity; while others, like `.fixPosition(with:)` affect the behavior on each frame.
+
+Like SwiftUI modifiers, *most*\* entity modifiers are applied *outside first*, *inside last*. For instance, since `.initialPosition(...)` *sets* a particle's position, applying this modifier **above** `.initialOffset(...)` will cause the offset to not be applied. `.initialOffset(...)`, which *changes* the position, must be written *inside*.
 
 \* *Some rendering operations, like `.colorOverlay(...)` or `.hueRotation(...)`, follow a static ordering despite modifier ordering.*
 
@@ -254,6 +284,9 @@ Like SwiftUI modifiers, *most*\* entity modifiers are applied outside first, ins
   - `.shader(...)`
 - Transitions
   - `.transition(_:on:duration:)`
+- Custom Behavior
+  - `.onAppear(perform:)`
+  - `.onUpdate(perform:)`
   
 ### Other Modifiers
 
@@ -264,12 +297,17 @@ Like SwiftUI modifiers, *most*\* entity modifiers are applied outside first, ins
 - `Emitter.maxSpawn(count:)` - stops emitting entities after `count` are emitted
 - `Lattice.customView(view:)` - customizes the view of `Lattice` particles
 
-When importing `Particles`, you also have access to some useful view modifiers:
+When importing `Particles`, you also have access to some useful view modifiers.
 
 - `View.particleSystem(atop:offset:entities:)` - creates a particle system centered at the modified view
 - `View.emits(every:if:atop:simultaneously:entities:)` - emits specific entities on an interval from the center of the modified view
 - `View.dissolve(if:)` - dissolves the view (using `Lattice`) if `condition` is true
-- `View.burst(if)` - bursts the view if `condition` is true
+- `View.burst(if:)` - bursts the view if `condition` is true
+
+All modifiers are documented with parameter information.
+
+> [!WARNING]
+> Particles is in **Pre-Release**. The API for the four view modifiers listed above may be changed before release.
   
 ## State Persistence
 
@@ -301,17 +339,55 @@ State refreshing works on all levels of the particle system, even in views insid
 
 ## Presets
 
-Several presets are available.
+A curated list of presets are available. These can be configured using parameters. Several additional presets will be added before the packages reaches a Release state.
+
+- [`Fire`](Sources/ParticlesPresets/API/Presets/Fire.swift)
+- [`Snow`](Sources/ParticlesPresets/API/Presets/Snow.swift)
+- [`Magic`](Sources/ParticlesPresets/API/Presets/Magic.swift)
+- [`Rain`](Sources/ParticlesPresets/API/Presets/Rain.swift)
+- [`Smoke`](Sources/ParticlesPresets/API/Presets/Smoke.swift)
+- [`Stars`](Sources/ParticlesPresets/API/Presets/Stars.swift)
+
+ParticlesPresets is accepting preset submissions in the form of pull requests. [Contributing guidelines](CONTRIBUTING.md)
+
+> [!WARNING]  
+> ParticlesPresets is in **Pre-Release**. The appearance of currently available presets are subject to change, as are their parameters. Avoid including presets in production code. [More information](#pre-release)
+
+### Example Project
+
+This package contains an example project where you can preview and tweak the library of available presets. To run it, open the example's [Xcode project file](Examples/ParticlesExample/ParticlesExample.xcodeproj) located in **Examples/ParticlesExample**.
+
+## Pre-Release
+
+This package is in a pre-release state, which means certain parts of it are subject to change. The following is a roadmap to Release (and conseqeuently, a list of planned API changes):
+
+- Streamlined demos for presets
+- Several new preset entries
+- View modifier improvements, like `.burst(if:)` or `.emits(...)`
 
 ## Performance
 
+Particles can support the use of thousands of entities when compiled in **Release** scheme. As more modifiers and entities are added, `ParticleSystem`'s frame rate will lower.
+
 ### Debug Mode
 
-You can debug a `ParticleSystem` to view performance statistics.
+Use `ParticleSystem.debug()` to enable Debug Mode.
+
+<img width="189" alt="Screenshot 2024-03-30 at 11 46 32 PM" src="https://github.com/benlmyers/swiftui-particles/assets/41796709/49c225d5-3000-4d8e-a012-19a93462cf50">
+
+You can debug a `ParticleSystem` to view performance statistics, including *view size*, *frame rate*, *proxy count*, *entity count*, *registered view count*, *proxy update time*, and *rendering time*.
+
+`ParticleSystem` targets 60 FPS, meaning each frame must update in `1.0 / 60.0 = 0.01666..` seconds, or 16.66ms. Each frame update is roughly equal to the max of *proxy update time* and *rendering time*. If this exceeds 16ms, frames will begin to drop.
 
 ### Improve Frame Rate
 
+- Particles runs faster in **Release** compile scheme as compared to **Debug**.
+- If you are using many entity modifiers, consider combining behavior into a single closure using `.onAppear(...)` or `.onUpdate(...)`.
+- Modifiers with custom closures containing expensive operations will increase proxy update time.
+- An increased amount of effect modifiers, like `.glow(...)` or `.blur(...)`, will increase rendering time. 
 - Use `ForEach(merges: .views)` if the view passed to `Particle` is the same across ForEach's data mapping.
 - Use `ForEach(merges: .entities)` if mapped entities only variate in their initial properties. `merges: .entities` tells `ForEach` (aka `Group`) to endow each created `Proxy` with properties determined by the mapped `Entity` **only upon birth**. After the proxy is born with its initial properties, like position, rotation, or hue rotation, it's entity rules are merged to the **first data mapping's** upon update.
 
 ### Benchmarks
+
+Performance Benchmarks will be available when this packages reaches a Release state.

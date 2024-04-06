@@ -43,12 +43,13 @@ public extension Preset {
           let w = c.system.size.width * 0.5
           return .random(in: -w ... w)
         })
+        .initialPosition(.top)
         .initialVelocity(xIn: -1.0 ... 1.0, yIn: 0.2 ... 0.8)
         .fixAcceleration{ c in
           return CGVectorMake(0.005 * sin(c.proxy.seed.2 + c.system.time * 1.8), 0.01)
         }
         .opacity(in: 0.2 ... 0.8)
-        .transition(.opacity)
+        .transition(.opacity, duration: 1.0)
         .colorOverlay(.init(red: 0.7, green: 0.9, blue: 0.9))
         .initialTorque(angleIn: .degrees(-2.0) ... .degrees(2.0))
         .hueRotation(angleIn: .degrees(-30.0) ... .degrees(30.0))
@@ -75,6 +76,7 @@ public extension Preset {
           let w = c.system.size.width * 0.5
           return .random(in: -w ... w)
         })
+        .initialPosition(.top)
         .initialVelocity(xIn: -4 ... 0.4, yIn: 1.0 ... 3.0)
         .fixAcceleration{ c in
           return CGVectorMake(0.04 * sin(c.proxy.seed.2 + c.system.time * 1.8), 0.007 + 0.008 * cos(c.system.time * 1.8))
