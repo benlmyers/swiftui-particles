@@ -15,27 +15,19 @@ struct ContentView: View {
     NavigationSplitView {
       List {
         Text("Presets").font(.headline).foregroundStyle(.secondary)
-        ForEach(Preset.allDefaults, id: \.0) { preset in
-          NavigationLink(String(describing: type(of: preset.1)).capitalized, destination: AnyView(preset.1.demo))
-        }
+        NavigationLink("Comet", destination: CometView.init)
+        NavigationLink("Ghost Rider", destination: GhostRiderView.init)
+        NavigationLink("Fire", destination: FireView.init)
+        NavigationLink("Snow", destination: SnowView.init)
+        NavigationLink("Smoke", destination: SmokeView.init)
+        NavigationLink("Magic", destination: MagicView.init)
+        NavigationLink("Rain", destination: RainView.init)
+        NavigationLink("Stars", destination: StarsView.init)
+        NavigationLink("Fireworks", destination: FireworksView.init)
       }
     } detail: {
       thumbnailView
     }
-//    VStack {
-//      Text(purchased ? "Thank you!" : "")
-//        .emits(every: 0.1, if: purchased, offset: CGPoint(x: 0, y: -20)) {
-//          Particle { Text("❤️") }
-//            .fixAcceleration(y: 0.05)
-//            .initialVelocity(xIn: -2.0 ... 2.0, yIn: -2.0 ... -1.5)
-//            .transition(.scale)
-//        }
-//      Button("Purchase") {
-//        purchased = true
-//      }
-//      .dissolve(if: purchased)
-//    }
-//    .frame(height: 300)
   }
   
   var thumbnailView: some View {
@@ -74,8 +66,8 @@ struct ContentView: View {
     }
     .debug()
   }
-
 }
+
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
     ContentView()
