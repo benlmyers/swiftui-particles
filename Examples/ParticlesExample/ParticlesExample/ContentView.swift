@@ -34,7 +34,7 @@ struct ContentView: View {
   
   var thumbnailView: some View {
     ParticleSystem {
-      Lattice(spacing: 4) {
+      Lattice(.hug(.all), spacing: 4) {
         Text("Particles")
           .fontWeight(.black)
           .font(.system(size: 90))

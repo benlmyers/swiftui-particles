@@ -71,7 +71,7 @@ public struct Lattice: Entity, Transparent {
       let b = CGFloat(data[pixelInfo + 2]) / CGFloat(255.0)
       let a = CGFloat(data[pixelInfo + 3]) / CGFloat(255.0)
       let color = Color(red: Double(r), green: Double(g), blue: Double(b), opacity: Double(a))
-      if a == 0 || r + g + b < 0.5 { return nil }
+      if a == 0 || r + g + b < 0.1 { return nil }
       if useCache { pixelColorCache["\(x)_\(y)"] = color }
       return color
     }
@@ -97,8 +97,8 @@ public struct Lattice: Entity, Transparent {
       for (edge, point) in flat {
         var proxy: CGPoint = point
         while proxy.x >= 0 && proxy.x <= viewSize.width && proxy.y >= 0 && proxy.y <= viewSize.height {
-          if let color = getPixelColorAt(x: Int(proxy.x), y: Int(proxy.y), useCache: false) {
-            newSpawns.append((CGPoint(x: proxy.x, y: proxy.y), .red))
+          if let color = getPixelColorAt(x: Int(proxy.x), y: Int(proxy.y), useCache: true) {
+            newSpawns.append((CGPoint(x: proxy.x, y: proxy.y), color))
             break
           } else {
             switch edge {
