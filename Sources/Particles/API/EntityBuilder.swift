@@ -8,7 +8,7 @@
 import Foundation
 
 /// A result builder used to build entities.
-/// If multiple entities are passed, an ``Group`` is returned.
+/// If multiple entities are passed, a ``Group`` is returned.
 @resultBuilder
 public struct EntityBuilder {
   

@@ -24,10 +24,12 @@ struct ContentView: View {
         NavigationLink("Rain", destination: RainView.init)
         NavigationLink("Stars", destination: StarsView.init)
         NavigationLink("Fireworks", destination: FireworksView.init)
+        NavigationLink("Lattice", destination: thumbnailView)
       }
     } detail: {
       thumbnailView
     }
+    .preferredColorScheme(.dark)
   }
   
   var thumbnailView: some View {

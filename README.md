@@ -103,6 +103,12 @@ struct MyView: View {
 }
 ```
 
+### Supported Versions
+
+- iOS 15.0+
+- macOS 12.0+
+- watchOS 8.0+
+
 ## Entities
 
 Particles has several entities that bring life to your SwiftUI views. Some entities are built using views, and others using other entities.
@@ -364,6 +370,8 @@ This package is in a pre-release state, which means certain parts of it are subj
 - Streamlined demos for presets
 - Several new preset entries
 - View modifier improvements, like `.burst(if:)` or `.emits(...)`
+
+Until full release, including Particles in production code is not recommended.
 
 ## Performance
 
