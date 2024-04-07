@@ -39,7 +39,7 @@ public extension Preset {
         }
         .initialPosition { c in
           let x = Int.random(in: 0 ... Int(c.system.size.width))
-          let y = Int.random(in: 0 ... Int(c.system.size.width))
+          let y = Int.random(in: 0 ... Int(c.system.size.height))
           return CGPoint(x: x, y: y)
         }
         .transition(.opacity, duration: 3.0)

@@ -32,7 +32,7 @@ struct CometView: View {
           .glow(Color.red.opacity(0.5), radius: 40.0)
           .initialVelocity(x: 2, y: -2)
           .initialPosition { c in
-            let pairs = [(-600, 500), (Int(c.system.size.width) - 400, Int(c.system.size.height) + 400)]
+            let pairs = [(-600, 500), (Int(c.system.size.width) - 600, Int(c.system.size.height) + 500)]
             let randomPair = pairs.randomElement()!
             return CGPoint(x: randomPair.0, y: randomPair.1)
           }
@@ -56,7 +56,7 @@ struct CometView: View {
         }
         .initialPosition { c in
           let x = Int.random(in: 0 ... Int(c.system.size.width))
-          let y = Int.random(in: 0 ... Int(c.system.size.width))
+          let y = Int.random(in: 0 ... Int(c.system.size.height))
           return CGPoint(x: x, y: y)
         }
         .opacity { c in

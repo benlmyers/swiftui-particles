@@ -58,7 +58,7 @@ public struct ParticleSystem: View {
   public var body: some View {
     GeometryReader { proxy in
       TimelineView(.animation(minimumInterval: 1.0 / 60.0, paused: false)) { [self] t in
-        Canvas(opaque: true, colorMode: .linear, rendersAsynchronously: true, renderer: renderer) {
+        Canvas(opaque: true, colorMode: .linear, rendersAsynchronously: false, renderer: renderer) {
           Text("❌").tag("NOT_FOUND")
           SwiftUI.ForEach(Array(data.viewPairs()), id: \.1) { (pair: (AnyView, EntityID)) in
             pair.0.tag(pair.1)
@@ -135,6 +135,7 @@ public struct ParticleSystem: View {
   }
   
   private func renderer(_ context: inout GraphicsContext, size: CGSize) {
+    context.stroke(.init(roundedRect: .init(x: 0.0, y: 0.0, width: size.width, height: size.height), cornerSize: .zero), with: .color(.white.opacity(0.001)))
     self.data.update(context: context, size: size)
   }
 }

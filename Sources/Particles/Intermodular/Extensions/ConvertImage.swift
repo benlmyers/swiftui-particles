@@ -33,10 +33,21 @@ public extension View {
     let size = controller.sizeThatFits(in: UIScreen.main.bounds.size)
     controller.view.bounds = CGRect(origin: .zero, size: size)
     controller.view.sizeToFit()
-    UIApplication.shared.windows.first?.rootViewController?.view.addSubview(controller.view)
+    keyWindow?.addSubview(controller.view)
     let image = controller.view.asImage()
     controller.view.removeFromSuperview()
     return image
+  }
+  
+  private var keyWindow: UIWindow? {
+    let allScenes = UIApplication.shared.connectedScenes
+    for scene in allScenes {
+      guard let windowScene = scene as? UIWindowScene else { continue }
+      for window in windowScene.windows where window.isKeyWindow {
+        return window
+      }
+    }
+    return nil
   }
   #else
   func asImage() -> NSImage? {

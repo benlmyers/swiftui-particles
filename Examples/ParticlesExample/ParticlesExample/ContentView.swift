@@ -66,7 +66,6 @@ struct ContentView: View {
         }
       }
     }
-    .debug()
   }
 }
 
