@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Entity+Transition.swift
 //  
 //
 //  Created by Ben Myers on 3/10/24.

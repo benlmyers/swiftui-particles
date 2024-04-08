@@ -140,9 +140,11 @@ public extension Proxy {
   }}
   
   /// The frame number upon which the entity was created.
-  var inception: Int {
+  internal(set) var inception: Int { get {
     Int(_inception)
-  }
+  } set {
+    _inception = UInt(newValue)
+  }}
   
   /// The lifetime, in seconds, of the entity.
   var lifetime: Double { get {

@@ -393,6 +393,11 @@ public extension ParticleSystem {
         physics.rotation = inherit.rotation
         physics.velocity = inherit.velocity
       }
+      for p in entity.preferences {
+        if case .custom(let custom) = p, case .delay(let duration) = custom {
+          physics.inception = physics.inception + Int(60.0 * duration)
+        }
+      }
       if entity.root is _Emitter {
         physics.lifetime = .infinity
       }

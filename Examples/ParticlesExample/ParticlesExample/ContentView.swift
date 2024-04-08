@@ -40,6 +40,8 @@ struct ContentView: View {
           .font(.system(size: 90))
           .foregroundStyle(Color.red)
       }
+      .delay(1.0)
+      .transition(.opacity, on: .birth, duration: 3.0)
       .hueRotation(with: { c in
         return .degrees(c.proxy.position.x + 60 * (c.timeAlive + c.proxy.seed.0))
       })

@@ -73,6 +73,7 @@ internal struct FlatEntity {
       case glow(color: Color?, radius: CGFloat)
       case colorOverlay(color: Color)
       case transition(transition: AnyTransition, bounds: TransitionBounds, duration: TimeInterval)
+      case delay(duration: TimeInterval)
     }
   }
   
