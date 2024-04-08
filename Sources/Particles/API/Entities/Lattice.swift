@@ -28,7 +28,7 @@ public struct Lattice: Entity, Transparent {
   
   // MARK: - Properties
   
-  private var mode: Mode
+  private var mode: Mode = .cover
   private var customView: AnyView = AnyView(Circle().frame(width: 2.0, height: 2.0))
   private var spawns: [(CGPoint, Color)]
   private var viewSize: CGSize
@@ -37,12 +37,25 @@ public struct Lattice: Entity, Transparent {
   // MARK: - Initalizers
   
   /// Creates a new Lattice particle group, which creates a grid of colored particles atop the opaque pixels of a view.
+  /// - Parameter hugging: The edges to spawn particles on.
   /// - Parameter spacing: Distance between each particle in the lattice.
-  /// - Parameter edges: The edges to spawn particles on. If empty `[]` (default), the lattice uses normal behavior and overlays entirely across the passed view. If `.all`,
   /// - Parameter anchor: Whether to spawn the lattice of particles relative to the view.
   /// - Parameter view: The view that is used as a source layer to choose where to spawn various colored particles.
   public init<Base>(
-    _ mode: Mode = .cover,
+    hugging edges: Edge...,
+    spacing: CGFloat = 3.0,
+    anchor: UnitPoint = .center,
+    @ViewBuilder view: () -> Base
+  ) where Base: View {
+    if edges.isEmpty {
+      self.init(mode: .cover, spacing: spacing, anchor: anchor, view: view)
+    } else {
+      self.init(mode: .hug(edges), spacing: spacing, anchor: anchor, view: view)
+    }
+  }
+  
+  private init<Base>(
+    mode: Mode = .cover,
     spacing: CGFloat = 3.0,
     anchor: UnitPoint = .center,
     @ViewBuilder view: () -> Base
@@ -76,20 +89,29 @@ public struct Lattice: Entity, Transparent {
       return color
     }
     
-    self.mode = mode
     self.spawns = []
     self.anchor = anchor
     self.customView = AnyView(Circle().frame(width: 2, height: 2))
     
     var newSpawns: [(CGPoint, Color)] = []
     
+    let group = DispatchGroup()
+    let queue = DispatchQueue(label: "com.benmyers.lattice.init", qos: .userInteractive, attributes: .concurrent)
+    let lock = NSLock()
+    
     switch mode {
     case .cover:
       for x in stride(from: 0.0, to: CGFloat(viewImage.width) / 2.0, by: spacing) {
         for y in stride(from: 0.0, to: CGFloat(viewImage.height) / 2.0, by: spacing) {
-          if let color = getPixelColorAt(x: Int(x), y: Int(y)) {
-            newSpawns.append((CGPoint(x: x, y: y), color))
+        group.enter()
+        queue.async(group: group) {
+            if let color = getPixelColorAt(x: Int(x), y: Int(y)) {
+              lock.lock()
+              newSpawns.append((CGPoint(x: x, y: y), color))
+              lock.unlock()
+            }
           }
+          group.leave()
         }
       }
     case .hug(let array):
@@ -116,6 +138,7 @@ public struct Lattice: Entity, Transparent {
       }
     }
     
+    group.wait()
     self.spawns = newSpawns
   }
   
@@ -137,10 +160,22 @@ public struct Lattice: Entity, Transparent {
     return copy
   }
   
+  public func hugs(_ edges: Edge...) -> Lattice {
+    var copy = self
+    copy.mode = .hug(edges)
+    return copy
+  }
+  
+  public func hugs() -> Lattice {
+    var copy = self
+    copy.mode = .hug(.all)
+    return copy
+  }
+  
   // MARK: - Subtypes
   
   /// How ``Lattice`` choose to generate particles.
-  public enum Mode {
+  private enum Mode {
     /// Cover the entire view with particles.
     case cover
     /// Hug the outside edges of the view with particles.

@@ -34,12 +34,13 @@ struct ContentView: View {
   
   var thumbnailView: some View {
     ParticleSystem {
-      Lattice(.hug(.all), spacing: 4) {
+      Lattice(hugging: .top, spacing: 4) {
         Text("Particles")
           .fontWeight(.black)
           .font(.system(size: 90))
           .foregroundStyle(Color.red)
       }
+//      .hugs(.top)
       .hueRotation(with: { c in
         return .degrees(c.proxy.position.x + 60 * (c.timeAlive + c.proxy.seed.0))
       })
