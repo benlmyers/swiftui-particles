@@ -201,6 +201,8 @@ public extension ParticleSystem {
           new.position.x += new.velocity.dx
           new.position.y += new.velocity.dy
           new.rotation.degrees += new.torque.degrees
+          new.velocity.dx *= (1 - new.drag)
+          new.velocity.dy *= (1 - new.drag)
           lock.lock()
           newProxies[proxyID] = new
           lock.unlock()
@@ -214,7 +216,13 @@ public extension ParticleSystem {
     
     private func performRenders(_ context: GraphicsContext) {
       let flag = Date()
+      var zIndices: [(ProxyID, Int)] = []
       for proxyID in proxies.keys {
+        guard let proxy: Proxy = proxies[proxyID] else { continue }
+        zIndices.append((proxyID, proxy.zIndex))
+      }
+      zIndices.sort(by: { $0.1 < $1.1 })
+      for (proxyID, _) in zIndices {
         // Initial checks
         guard
           let proxy: Proxy = proxies[proxyID],
@@ -372,6 +380,7 @@ public extension ParticleSystem {
         }
         result.append((entityID, proxyID))
       }
+      print("R")
       return result
     }
     

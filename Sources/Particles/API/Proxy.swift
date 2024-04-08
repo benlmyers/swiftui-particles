@@ -15,6 +15,7 @@ public struct Proxy {
   
   private var _x: CGFloat
   private var _y: CGFloat
+  private var _z: UInt
   private var _inception: UInt
   private var _rotation: Double
   private var _torque: Double
@@ -25,6 +26,7 @@ public struct Proxy {
   private var _accX: CGFloat
   private var _accY: CGFloat
   private var _lifetime: Double
+  private var _drag: Double
   
   private var _opacity: Double
   private var _hueRotation: Double
@@ -39,6 +41,7 @@ public struct Proxy {
   internal init(currentFrame: UInt) {
     _x = .zero
     _y = .zero
+    _z = .zero
     _velX = .zero
     _velY = .zero
     _accX = .zero
@@ -55,6 +58,7 @@ public struct Proxy {
     _scaleY = 1
     _blendMode = GraphicsContext.BlendMode.normal.rawValue
     _rotation3d = .zero
+    _drag = .zero
   }
   
   // MARK: - Subtypes
@@ -92,6 +96,17 @@ public extension Proxy {
   } set {
     _x = newValue.x
     _y = newValue.y
+  }}
+  
+  /// The z-index of the entity, used for layering.
+  var zIndex: Int { get {
+    Int(_z)
+  } set {
+    if newValue > 0 {
+      _z = UInt(newValue)
+    } else {
+      _z = 0
+    }
   }}
   
   /// The velocity of the entity, in pixels **per frame**.
@@ -178,9 +193,18 @@ public extension Proxy {
     _blendMode = newValue.rawValue
   }}
   
+  /// The 3D rotation of the particle.
   var rotation3d: SIMD3<Double> { get {
     _rotation3d
   } set {
     _rotation3d = newValue
+  }}
+  
+  /// The drag of the particle, from `0.0` to `1.0`.
+  /// Drag reduces the acceleration of a particle.
+  var drag: Double { get {
+    _drag
+  } set {
+    _drag = max(min(newValue, 1), 0)
   }}
 }

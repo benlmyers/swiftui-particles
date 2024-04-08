@@ -476,11 +476,78 @@ public extension Entity {
   }
   
   /// Sets the lifetime of the entity randomly within the specified range.
-    /// - Parameter in: The range of lifetimes, in seconds, to set the lifetime of the entity randomly within.
-    /// - Returns: The modified entity.
+  /// - Parameter in: The range of lifetimes, in seconds, to set the lifetime of the entity randomly within.
+  /// - Returns: The modified entity.
   func lifetime(in range: ClosedRange<Double>) -> some Entity {
     lifetime { _ in
         .random(in: range)
     }
   }
+  
+  /// Sets the initial drag of the entity. It is advised to use small values less than `0.1`.
+  /// - Parameter value: The initial drag of the entity, from `0.0` (no drag) to `1.0` (immediate stop).
+  /// - Returns: The modified entity.
+  func drag(_ value: Double) -> some Entity {
+    ModifiedEntity(entity: self, onBirth: { context in
+      var p = context.proxy
+      p.drag = value
+      return p
+    })
+  }
+  
+  /// Sets the constant drag of the entity using the values returned by the provided closure.
+  /// - Parameter withDrag: A closure returning a `Double` from `0.0` to `1.0` representing the value to set the entity's drag to.
+  /// - Returns: The modified entity.
+  func drag(with withDrag: @escaping (Proxy.Context) -> Double) -> some Entity {
+    ModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.proxy
+      p.drag = withDrag(context)
+      return p
+    })
+  }
+  
+  /// Sets the initial drag of the entity randomly within the specified range.
+  /// - Parameter range: The range of possible drag values to use, from `0.0` to `1.0`.
+  /// - Returns: The modified entity.
+  func drag(in range: ClosedRange<Double>) -> some Entity {
+    ModifiedEntity(entity: self, onBirth: { context in
+      var p = context.proxy
+      p.drag = .random(in: range)
+      return p
+    })
+  }
+  
+  /// Sets the initial z-index of the entity. It is advised to use small values less than `0.1`.
+  /// - Parameter value: The initial z-index of the entity.
+  /// - Returns: The modified entity.
+  func zIndex(_ value: Int) -> some Entity {
+    ModifiedEntity(entity: self, onBirth: { context in
+      var p = context.proxy
+      p.zIndex = value
+      return p
+    })
+  }
+
+  /// Sets the constant z-index of the entity using the values returned by the provided closure.
+  /// - Parameter withZIndex: A closure returning an `Int` representing the value to set the entity's z-index to.
+  /// - Returns: The modified entity.
+  func zIndex(with withZIndex: @escaping (Proxy.Context) -> Int) -> some Entity {
+    ModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.proxy
+      p.zIndex = withZIndex(context)
+      return p
+    })
+  }
+
+  /// Sets the initial z-index of the entity randomly within the specified range.
+  /// - Parameter range: The range of possible z-index values to use, from `0` to `Int.max`.
+  /// - Returns: The modified entity.
+  func zIndex(in range: ClosedRange<Int>) -> some Entity {
+    ModifiedEntity(entity: self, onBirth: { context in
+      var p = context.proxy
+      p.zIndex = .random(in: range)
+      return p
+    })
+  }
+
 }
