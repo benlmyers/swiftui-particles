@@ -284,6 +284,8 @@ public extension ParticleSystem {
           var blurOverlayRadius: CGFloat = .zero
           for preference in entity.preferences {
             if case .custom(let custom) = preference {
+              let context = Proxy.Context(proxy: proxy, system: self)
+              let custom = custom(context)
               if case .glow(let color, let radius) = custom {
                 if let color {
                   cc.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
@@ -380,29 +382,29 @@ public extension ParticleSystem {
         }
         result.append((entityID, proxyID))
       }
-      print("R")
       return result
     }
     
     @discardableResult
     private func createProxy(_ id: EntityID, inherit: Proxy? = nil) -> ProxyID? {
       guard let entity: FlatEntity = self.entities[id] else { return nil }
-      var physics = Proxy(currentFrame: currentFrame)
+      var proxy = Proxy(currentFrame: currentFrame)
       if let inherit {
-        physics.position = inherit.position
-        physics.rotation = inherit.rotation
-        physics.velocity = inherit.velocity
-      }
-      for p in entity.preferences {
-        if case .custom(let custom) = p, case .delay(let duration) = custom {
-          physics.inception = physics.inception + Int(60.0 * duration)
-        }
+        proxy.position = inherit.position
+        proxy.rotation = inherit.rotation
+        proxy.velocity = inherit.velocity
       }
       if entity.root is _Emitter {
-        physics.lifetime = .infinity
+        proxy.lifetime = .infinity
       }
-      let context = Proxy.Context(proxy: physics, system: self)
-      let new = entity.onBirth(context)
+      let context = Proxy.Context(proxy: proxy, system: self)
+      var new = entity.onBirth(context)
+      for p in entity.preferences {
+        let context = Proxy.Context(proxy: new, system: self)
+        if case .custom(let custom) = p, case .delay(let duration) = custom(context) {
+          new.inception = new.inception + Int(60.0 * duration)
+        }
+      }
       self.proxies[nextProxyRegistry] = new
       self.proxyEntities[nextProxyRegistry] = id
       let proxyID = nextProxyRegistry

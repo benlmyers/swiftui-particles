@@ -67,7 +67,7 @@ internal struct FlatEntity {
   enum Preference {
     case onBirth((Proxy.Context) -> Proxy)
     case onUpdate((Proxy.Context) -> Proxy)
-    case custom(Custom)
+    case custom((Proxy.Context) -> Custom)
     
     enum Custom {
       case glow(color: Color?, radius: CGFloat)
