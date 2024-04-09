@@ -152,7 +152,8 @@ public extension ParticleSystem {
         var finalEntities: [EntityID] = protoEntities
         if let chooser = emitter.emitChooser, !protoEntities.isEmpty {
           let context = Proxy.Context(proxy: proxy, system: self)
-          finalEntities = [protoEntities[chooser(context) % protoEntities.count]]
+          let i = chooser(context) % protoEntities.count
+          finalEntities = [protoEntities[i]]
         }
         for protoEntity in finalEntities {
           guard let _: ProxyID = self.createProxy(protoEntity, inherit: proxy) else { continue }

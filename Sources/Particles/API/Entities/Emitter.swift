@@ -25,7 +25,7 @@ public struct Emitter<Children>: Entity, _Emitter where Children: Entity {
   public var body: Children
   
   internal var emitInterval: TimeInterval
-  internal var emitChooser: ((Proxy.Context) -> Int)?
+  internal var emitChooser: ((Proxy.Context) -> Int)? = { c in Int(c.system?.proxiesSpawned ?? 0) }
   
   // MARK: - Initalizers
   
