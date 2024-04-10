@@ -19,10 +19,10 @@ struct SmokeView: View {
         Preset.Smoke(dirty: dirty)
       }
       .statePersistent("smoke")
-      HStack {
-        Toggle("Dirty Smoke", isOn: $dirty)
-      }
-      .padding()
+//      HStack {
+//        Toggle("Dirty Smoke", isOn: $dirty)
+//      }
+//      .padding()
     }
   }
 }
