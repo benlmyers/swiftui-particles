@@ -32,7 +32,7 @@ public extension Entity {
   /// - Parameter withColor: A closure that produces the color overlay to use on update.
   /// - Returns: The modified entity.
   func colorOverlay(
-    withColor: @escaping (Proxy.Context) -> Color = { _ in .white }
+    with withColor: @escaping (Proxy.Context) -> Color = { _ in .white }
   ) -> some Entity {
     var m = ModifiedEntity(entity: self)
     m.preferences.append(.custom({ c in .colorOverlay(color: withColor(c)) }))

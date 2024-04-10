@@ -16,7 +16,7 @@ struct ContentView: View {
       List {
         Text("Presets").font(.headline).foregroundStyle(.secondary)
         NavigationLink("Comet", destination: CometView.init)
-        NavigationLink("Ghost Rider", destination: GhostRiderView.init)
+//        NavigationLink("Ghost Rider", destination: GhostRiderView.init)
         NavigationLink("Fire", destination: FireView.init)
         NavigationLink("Snow", destination: SnowView.init)
         NavigationLink("Smoke", destination: SmokeView.init)

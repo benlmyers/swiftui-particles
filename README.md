@@ -213,8 +213,8 @@ ParticleSystem {
 }
 ```
 
-> [!WARNING]  
-> Particles is in **Pre-Release**. While the API for `Lattice` is to remain unchanged, there is a known performance issue with this entity. `Lattice` uses an expensive initializer that can cause a delay in appearance. This will be optimized before release.
+> [!TIP]  
+> You can choose to have the lattice spawn particles along a view's edge by passing `Lattice(hugging:)`.
 
 ## Defining Entities
 
@@ -262,17 +262,21 @@ Like SwiftUI modifiers, *most*\* entity modifiers are applied *outside first*, *
 
 ### List of Entity Modifiers
 
+For more information on modifier parameters, see symbol documentation.
+
 - Lifetime
   - `.lifetime(...)`
 - Position and Offset
   - `.initialPosition(...)`
   - `.initialOffset(...)`
   - `.fixPosition(...)`
+  - `.zIndex(...)`
 - Velocity and Acceleration
   - `.initialVelocity(...)`
   - `.fixVelocity(...)`
   - `.initialAcceleration(...)`
   - `.fixAcceleration(...)`
+  - `.drag(...)`
 - Rotation and Torque
   - `.initialRotation(...)`
   - `.fixRotation(...)`
@@ -288,8 +292,9 @@ Like SwiftUI modifiers, *most*\* entity modifiers are applied *outside first*, *
   - `.scale(...)`
   - `.glow(...)`
   - `.shader(...)`
-- Transitions
+- Transitions and Timing
   - `.transition(_:on:duration:)`
+  - `.delay(...)`
 - Custom Behavior
   - `.onAppear(perform:)`
   - `.onUpdate(perform:)`
@@ -315,6 +320,39 @@ All modifiers are documented with parameter information.
 
 > [!WARNING]
 > Particles is in **Pre-Release**. The API for the four view modifiers listed above may be changed before release.
+
+### Custom Behavior Closures
+
+Some modifier parameters take in a closure of the form `(Proxy.Context) -> <Type>`. [`Proxy.Context`](Sources/Particles/API/Proxy.swift#L68-L89) provides information about the current proxy and the system it lives in.
+
+Below is a list of properties of `Proxy.Context`. All symbols are documented.
+
+- `proxy: Proxy`
+  - `.position: CGPoint`
+  - `.velocity: CGVector`
+  - `.acceleration: CGVector`
+  - `.drag: Double`
+  - `.rotation: Angle`
+  - `.torque: Angle`
+  - `.rotation3d: SIMD3<Double>`
+  - `.zIndex: Int`
+  - `.lifetime: Double`
+  - `.seed: (Double, Double, Double, Double)`
+  - `.opacity: Double`
+  - `.hueRotation: Angle`
+  - `.blur: CGFloat`
+  - `.scale: CGSize`
+  - `.blendMode: GraphicsContext.BlendMode`
+- `system: ParticleSystem.Data`
+  - `.debug: Bool`
+  - `.size: CGSize`
+  - `.currentFrame: UInt`
+  - `.lastFrameUpdate`
+  - `.touches` (iOS)
+  - `.time: TimeInterval`
+  - `.proxiesAlive`
+  - `.proxiesSpawned`
+  - `.averageFrameRate`
   
 ## State Persistence
 
