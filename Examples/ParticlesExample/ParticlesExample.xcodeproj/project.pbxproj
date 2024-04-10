@@ -26,7 +26,7 @@
 		EEEB64EF2BC673EF00CC65D4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEB64EE2BC673EF00CC65D4 /* ContentView.swift */; };
 		EEEB64F12BC673EF00CC65D4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EEEB64F02BC673EF00CC65D4 /* Assets.xcassets */; };
 		EEEB64F42BC673EF00CC65D4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EEEB64F32BC673EF00CC65D4 /* Preview Assets.xcassets */; };
-		EEEB64F72BC673EF00CC65D4 /* ParticlesExampleWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = EEEB64EA2BC673EE00CC65D4 /* ParticlesExampleWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EEEB64F72BC673EF00CC65D4 /* ParticlesExampleWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = EEEB64EA2BC673EE00CC65D4 /* ParticlesExampleWatch Watch App.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EEEB64FC2BC6744400CC65D4 /* RainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB3A3762BAE1F8300A5C591 /* RainView.swift */; };
 		EEEB64FD2BC6744400CC65D4 /* FireworksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CF22AF12BB996250000D463 /* FireworksView.swift */; };
 		EEEB64FE2BC6744400CC65D4 /* CometView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C23DE952BC1EB5B00F1CEA4 /* CometView.swift */; };
@@ -348,6 +348,7 @@
 /* Begin PBXTargetDependency section */
 		EEEB64F62BC673EF00CC65D4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = EEEB64E92BC673EE00CC65D4 /* ParticlesExampleWatch Watch App */;
 			targetProxy = EEEB64F52BC673EF00CC65D4 /* PBXContainerItemProxy */;
 		};
