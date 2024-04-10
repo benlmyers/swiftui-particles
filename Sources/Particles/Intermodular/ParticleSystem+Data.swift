@@ -27,6 +27,11 @@ public extension ParticleSystem {
     /// The date of the last frame update in the ``ParticleSystem``.
     public private(set) var lastFrameUpdate: Date = .distantPast
     
+    #if os(iOS)
+    /// The taps registered inside the view.
+    public internal(set) var touches: [UITouch: CGPoint] = [:]
+    #endif
+    
     internal var initialEntity: (any Entity)?
     internal var nextEntityRegistry: EntityID = .zero
     internal var refreshViews: Bool = false

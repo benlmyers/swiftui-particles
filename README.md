@@ -298,6 +298,7 @@ Like SwiftUI modifiers, *most*\* entity modifiers are applied *outside first*, *
 
 - `ParticleSystem.debug()` - enables *[Debug Mode](#debug-mode)* for the particle system, showing performance metrics
 - `ParticleSystem.statePersistent(_:refreshesViews:)` - enables *[State Persistence](#state-persistence)* for the particle system
+- `ParticleSystem.checksTouches(_:)` - option to disable touch updates for performance
 - `Emitter.emitSingle(choosing:)` - instructs `Emitter` to emit one particle at a time
 - `Emitter.emitAll()` - instructs `Emitter` to emit all passed particles at once
 - `Emitter.maxSpawn(count:)` - stops emitting entities after `count` are emitted
@@ -395,6 +396,7 @@ You can debug a `ParticleSystem` to view performance statistics, including *view
 - An increased amount of effect modifiers, like `.glow(...)` or `.blur(...)`, will increase rendering time. 
 - Use `ForEach(merges: .views)` if the view passed to `Particle` is the same across ForEach's data mapping.
 - Use `ForEach(merges: .entities)` if mapped entities only variate in their initial properties. `merges: .entities` tells `ForEach` (aka `Group`) to endow each created `Proxy` with properties determined by the mapped `Entity` **only upon birth**. After the proxy is born with its initial properties, like position, rotation, or hue rotation, it's entity rules are merged to the **first data mapping's** upon update.
+- By default, `ParticleSystem` has the `checksTouches` property set to true. Set `.checksTouches(false)` to improve performance.
 
 ### Benchmarks
 
