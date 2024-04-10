@@ -24,6 +24,7 @@ import CoreGraphics
 ///   Circle().frame(width: 3.0, height: 3.0)
 /// }
 /// ```
+@available(watchOS, unavailable)
 public struct Lattice: Entity, Transparent {
   
   // MARK: - Properties
@@ -68,6 +69,7 @@ public struct Lattice: Entity, Transparent {
     self.init(hugging: [edge], spacing: spacing, anchor: anchor, view: view)
   }
   
+  @available(watchOS, unavailable)
   private init<Base>(
     mode: Mode = .cover,
     spacing: CGFloat = 3.0,
@@ -211,6 +213,7 @@ public struct Lattice: Entity, Transparent {
   }
 }
 
+@available(watchOS, unavailable)
 public extension Array where Element == Lattice.Edge {
   
   /// Hugs every edge.

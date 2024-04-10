@@ -18,10 +18,12 @@ struct FireworksView: View {
       ParticleSystem {
         Preset.Fireworks(color: color)
       }
+      #if !os(watchOS)
       HStack {
         ColorPicker("Color", selection: $color)
       }
       .padding()
+      #endif
     }
   }
 }

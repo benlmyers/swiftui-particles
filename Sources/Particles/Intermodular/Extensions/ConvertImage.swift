@@ -14,6 +14,7 @@ import AppKit
 #endif
 
 #if os(iOS)
+@available(watchOS, unavailable)
 extension UIView {
   func asImage() -> UIImage {
     let renderer = UIGraphicsImageRenderer(bounds: bounds)
@@ -24,6 +25,7 @@ extension UIView {
 }
 #endif
 
+@available(watchOS, unavailable)
 public extension View {
   
   #if os(iOS)
@@ -49,7 +51,7 @@ public extension View {
     }
     return nil
   }
-  #else
+#elseif os(macOS)
   func asImage() -> NSImage? {
     let controller = NSHostingController(rootView: self)
     let targetSize = controller.view.intrinsicContentSize
@@ -72,36 +74,9 @@ public extension View {
     image.addRepresentation(bitmapRep)
     return image
   }
+  #else
+  func asImage() -> UIImage? {
+    return nil
+  }
   #endif
 }
-
-//#if os(iOS)
-//internal extension UIImage {
-//  convenience init(view: UIView) {
-//    
-//    let renderer = UIGraphicsImageRenderer(size: view.bounds.size)
-//    let image = renderer.image { ctx in
-//        view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
-//    }
-//    
-////    UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, 0.0)
-//    
-////    view.layer.proxy(in: UIGraphicsGetCurrentContext()!)
-////    let image = UIGraphicsGetImageFromCurrentImageContext()
-////    UIGraphicsEndImageContext()
-//    self.init(cgImage: image.cgImage!)
-//  }
-//}
-//#else
-//internal extension NSImage {
-//  convenience init(view: NSView) {
-//    guard let bitmapRepresentation = view.bitmapImageRepForCachingDisplay(in: view.bounds) else {
-//      self.init()
-//      return
-//    }
-//    
-//    view.cacheDisplay(in: view.bounds, to: bitmapRepresentation)
-//    self.init(cgImage: bitmapRepresentation.cgImage!, size: view.bounds.size)
-//  }
-//}
-//#endif

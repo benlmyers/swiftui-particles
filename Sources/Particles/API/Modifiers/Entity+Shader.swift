@@ -8,6 +8,7 @@
 import SwiftUI
 
 @available(macOS 14.0, iOS 17.0, *)
+@available(watchOS, unavailable)
 public extension Entity {
   
   /// Applies a shader to this entity.

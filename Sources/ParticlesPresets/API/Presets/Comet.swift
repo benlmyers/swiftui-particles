@@ -14,7 +14,7 @@ public extension Preset {
   
   struct Comet: Entity, PresetEntry {
     
-    @PresetParameter var color: Color
+    var color: Color
     var spawnPoint: UnitPoint
     var spawnRadius: CGSize
     var flameSize: CGFloat = 25.0

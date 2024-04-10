@@ -22,7 +22,47 @@
 		EED626872A4990B500A3C3F4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EED626862A4990B500A3C3F4 /* Assets.xcassets */; };
 		EED6268B2A4990B500A3C3F4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EED6268A2A4990B500A3C3F4 /* Preview Assets.xcassets */; };
 		EEE123B32B5E3F9100C43002 /* ParticlesPresets in Frameworks */ = {isa = PBXBuildFile; productRef = EEE123B22B5E3F9100C43002 /* ParticlesPresets */; };
+		EEEB64ED2BC673EF00CC65D4 /* ParticlesExampleWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEB64EC2BC673EF00CC65D4 /* ParticlesExampleWatchApp.swift */; };
+		EEEB64EF2BC673EF00CC65D4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEB64EE2BC673EF00CC65D4 /* ContentView.swift */; };
+		EEEB64F12BC673EF00CC65D4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EEEB64F02BC673EF00CC65D4 /* Assets.xcassets */; };
+		EEEB64F42BC673EF00CC65D4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EEEB64F32BC673EF00CC65D4 /* Preview Assets.xcassets */; };
+		EEEB64F72BC673EF00CC65D4 /* ParticlesExampleWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = EEEB64EA2BC673EE00CC65D4 /* ParticlesExampleWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EEEB64FC2BC6744400CC65D4 /* RainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB3A3762BAE1F8300A5C591 /* RainView.swift */; };
+		EEEB64FD2BC6744400CC65D4 /* FireworksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CF22AF12BB996250000D463 /* FireworksView.swift */; };
+		EEEB64FE2BC6744400CC65D4 /* CometView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C23DE952BC1EB5B00F1CEA4 /* CometView.swift */; };
+		EEEB64FF2BC6744400CC65D4 /* GhostRiderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4B2BADBF8D00488B02 /* GhostRiderView.swift */; };
+		EEEB65002BC6744400CC65D4 /* MagicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE4265502BAE1C5C005193F1 /* MagicView.swift */; };
+		EEEB65012BC6744400CC65D4 /* FireView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D492BADBF8D00488B02 /* FireView.swift */; };
+		EEEB65022BC6744400CC65D4 /* StarsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB3A3782BAE2AAD00A5C591 /* StarsView.swift */; };
+		EEEB65032BC6744400CC65D4 /* SnowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4C2BADBF8D00488B02 /* SnowView.swift */; };
+		EEEB65042BC6744400CC65D4 /* SmokeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4A2BADBF8D00488B02 /* SmokeView.swift */; };
+		EEEB65072BC6749000CC65D4 /* Particles in Frameworks */ = {isa = PBXBuildFile; productRef = EEEB65062BC6749000CC65D4 /* Particles */; };
+		EEEB65092BC6749000CC65D4 /* ParticlesPresets in Frameworks */ = {isa = PBXBuildFile; productRef = EEEB65082BC6749000CC65D4 /* ParticlesPresets */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		EEEB64F52BC673EF00CC65D4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EED626772A4990B300A3C3F4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EEEB64E92BC673EE00CC65D4;
+			remoteInfo = "ParticlesExampleWatch Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		EEEB64F82BC673EF00CC65D4 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				EEEB64F72BC673EF00CC65D4 /* ParticlesExampleWatch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		3C23DE952BC1EB5B00F1CEA4 /* CometView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CometView.swift; sourceTree = "<group>"; };
@@ -41,6 +81,11 @@
 		EED626882A4990B500A3C3F4 /* ParticlesExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ParticlesExample.entitlements; sourceTree = "<group>"; };
 		EED6268A2A4990B500A3C3F4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		EED626922A4991B400A3C3F4 /* swiftui-particles */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "swiftui-particles"; path = ../..; sourceTree = "<group>"; };
+		EEEB64EA2BC673EE00CC65D4 /* ParticlesExampleWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ParticlesExampleWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EEEB64EC2BC673EF00CC65D4 /* ParticlesExampleWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticlesExampleWatchApp.swift; sourceTree = "<group>"; };
+		EEEB64EE2BC673EF00CC65D4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		EEEB64F02BC673EF00CC65D4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		EEEB64F32BC673EF00CC65D4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +95,15 @@
 			files = (
 				EE695F0C2ACB767E002D8F5B /* Particles in Frameworks */,
 				EEE123B32B5E3F9100C43002 /* ParticlesPresets in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EEEB64E72BC673EE00CC65D4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EEEB65072BC6749000CC65D4 /* Particles in Frameworks */,
+				EEEB65092BC6749000CC65D4 /* ParticlesPresets in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,6 +131,7 @@
 			children = (
 				EED626912A4991B400A3C3F4 /* Packages */,
 				EED626812A4990B300A3C3F4 /* ParticlesExample */,
+				EEEB64EB2BC673EE00CC65D4 /* ParticlesExampleWatch Watch App */,
 				EED626802A4990B300A3C3F4 /* Products */,
 				EED626932A49925A00A3C3F4 /* Frameworks */,
 			);
@@ -86,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				EED6267F2A4990B300A3C3F4 /* ParticlesExample.app */,
+				EEEB64EA2BC673EE00CC65D4 /* ParticlesExampleWatch Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -126,6 +182,25 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		EEEB64EB2BC673EE00CC65D4 /* ParticlesExampleWatch Watch App */ = {
+			isa = PBXGroup;
+			children = (
+				EEEB64EC2BC673EF00CC65D4 /* ParticlesExampleWatchApp.swift */,
+				EEEB64EE2BC673EF00CC65D4 /* ContentView.swift */,
+				EEEB64F02BC673EF00CC65D4 /* Assets.xcassets */,
+				EEEB64F22BC673EF00CC65D4 /* Preview Content */,
+			);
+			path = "ParticlesExampleWatch Watch App";
+			sourceTree = "<group>";
+		};
+		EEEB64F22BC673EF00CC65D4 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				EEEB64F32BC673EF00CC65D4 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -136,10 +211,12 @@
 				EED6267B2A4990B300A3C3F4 /* Sources */,
 				EED6267C2A4990B300A3C3F4 /* Frameworks */,
 				EED6267D2A4990B300A3C3F4 /* Resources */,
+				EEEB64F82BC673EF00CC65D4 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				EEEB64F62BC673EF00CC65D4 /* PBXTargetDependency */,
 			);
 			name = ParticlesExample;
 			packageProductDependencies = (
@@ -150,6 +227,27 @@
 			productReference = EED6267F2A4990B300A3C3F4 /* ParticlesExample.app */;
 			productType = "com.apple.product-type.application";
 		};
+		EEEB64E92BC673EE00CC65D4 /* ParticlesExampleWatch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EEEB64FB2BC673EF00CC65D4 /* Build configuration list for PBXNativeTarget "ParticlesExampleWatch Watch App" */;
+			buildPhases = (
+				EEEB64E62BC673EE00CC65D4 /* Sources */,
+				EEEB64E72BC673EE00CC65D4 /* Frameworks */,
+				EEEB64E82BC673EE00CC65D4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "ParticlesExampleWatch Watch App";
+			packageProductDependencies = (
+				EEEB65062BC6749000CC65D4 /* Particles */,
+				EEEB65082BC6749000CC65D4 /* ParticlesPresets */,
+			);
+			productName = "ParticlesExampleWatch Watch App";
+			productReference = EEEB64EA2BC673EE00CC65D4 /* ParticlesExampleWatch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -157,11 +255,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1430;
+				LastSwiftUpdateCheck = 1530;
 				LastUpgradeCheck = 1520;
 				TargetAttributes = {
 					EED6267E2A4990B300A3C3F4 = {
 						CreatedOnToolsVersion = 14.3.1;
+					};
+					EEEB64E92BC673EE00CC65D4 = {
+						CreatedOnToolsVersion = 15.3;
 					};
 				};
 			};
@@ -179,6 +280,7 @@
 			projectRoot = "";
 			targets = (
 				EED6267E2A4990B300A3C3F4 /* ParticlesExample */,
+				EEEB64E92BC673EE00CC65D4 /* ParticlesExampleWatch Watch App */,
 			);
 		};
 /* End PBXProject section */
@@ -190,6 +292,15 @@
 			files = (
 				EED6268B2A4990B500A3C3F4 /* Preview Assets.xcassets in Resources */,
 				EED626872A4990B500A3C3F4 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EEEB64E82BC673EE00CC65D4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EEEB64F42BC673EF00CC65D4 /* Preview Assets.xcassets in Resources */,
+				EEEB64F12BC673EF00CC65D4 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,7 +325,33 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EEEB64E62BC673EE00CC65D4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EEEB64EF2BC673EF00CC65D4 /* ContentView.swift in Sources */,
+				EEEB64FC2BC6744400CC65D4 /* RainView.swift in Sources */,
+				EEEB64FD2BC6744400CC65D4 /* FireworksView.swift in Sources */,
+				EEEB64FE2BC6744400CC65D4 /* CometView.swift in Sources */,
+				EEEB64FF2BC6744400CC65D4 /* GhostRiderView.swift in Sources */,
+				EEEB65002BC6744400CC65D4 /* MagicView.swift in Sources */,
+				EEEB65012BC6744400CC65D4 /* FireView.swift in Sources */,
+				EEEB65022BC6744400CC65D4 /* StarsView.swift in Sources */,
+				EEEB65032BC6744400CC65D4 /* SnowView.swift in Sources */,
+				EEEB65042BC6744400CC65D4 /* SmokeView.swift in Sources */,
+				EEEB64ED2BC673EF00CC65D4 /* ParticlesExampleWatchApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		EEEB64F62BC673EF00CC65D4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EEEB64E92BC673EE00CC65D4 /* ParticlesExampleWatch Watch App */;
+			targetProxy = EEEB64F52BC673EF00CC65D4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		EED6268C2A4990B500A3C3F4 /* Debug */ = {
@@ -333,6 +470,7 @@
 		EED6268F2A4990B500A3C3F4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ParticlesExample/ParticlesExample.entitlements;
@@ -373,6 +511,7 @@
 		EED626902A4990B500A3C3F4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ParticlesExample/ParticlesExample.entitlements;
@@ -410,6 +549,74 @@
 			};
 			name = Release;
 		};
+		EEEB64F92BC673EF00CC65D4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ParticlesExampleWatch Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = B4D7K3EGJG;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = ParticlesExampleWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.benmyers.ParticlesExample;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.benmyers.ParticlesExample.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.4;
+			};
+			name = Debug;
+		};
+		EEEB64FA2BC673EF00CC65D4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ParticlesExampleWatch Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = B4D7K3EGJG;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = ParticlesExampleWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.benmyers.ParticlesExample;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.benmyers.ParticlesExample.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.4;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -431,6 +638,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		EEEB64FB2BC673EF00CC65D4 /* Build configuration list for PBXNativeTarget "ParticlesExampleWatch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EEEB64F92BC673EF00CC65D4 /* Debug */,
+				EEEB64FA2BC673EF00CC65D4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -439,6 +655,14 @@
 			productName = Particles;
 		};
 		EEE123B22B5E3F9100C43002 /* ParticlesPresets */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ParticlesPresets;
+		};
+		EEEB65062BC6749000CC65D4 /* Particles */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Particles;
+		};
+		EEEB65082BC6749000CC65D4 /* ParticlesPresets */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ParticlesPresets;
 		};

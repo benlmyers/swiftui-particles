@@ -21,11 +21,13 @@ struct FireView: View {
         Preset.Fire(color: color, flameSize: flameSize, spawnRadius: .init(width: spawnRadius, height: spawnRadius))
       }
       .statePersistent("fire", refreshesViews: true)
+#if !os(watchOS)
       HStack {
         ColorPicker("Color", selection: $color)
         Slider(value: $flameSize, in: 5.0 ... 40.0, label: { Text("Flame Size (\(String(format: "%.1f", flameSize)))") })
       }
       .padding()
+      #endif
     }
   }
 }

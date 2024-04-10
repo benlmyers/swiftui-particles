@@ -31,27 +31,27 @@ public protocol _PresetParameterSingleValue {
 }
 public protocol _PresetParameterRangedValue: Comparable {}
 
-extension Color: _PresetParameterSingleValue {
-  public func view(_ v: any _PresetParameter) -> AnyView {
-    .init(_ColorView(parameter: v))
-  }
-}
+//extension Color: _PresetParameterSingleValue {
+//  public func view(_ v: any _PresetParameter) -> AnyView {
+//    .init(_ColorView(parameter: v))
+//  }
+//}
 
-fileprivate struct _ColorView: View {
-  @State var color: Color
-  var parameter: any _PresetParameter
-  var body: some View {
-    ColorPicker(parameter.name, selection: $color)
-      .preference(key: _ContainerPreferenceKey<Color>.self, value: color)
-  }
-  init(parameter: any _PresetParameter) {
-    self.parameter = parameter
-    self._color = State(wrappedValue: Color.white)
-    if let colorParameter = parameter as? PresetParameter<Color> {
-      self.color = colorParameter.wrappedValue
-    }
-  }
-}
+//fileprivate struct _ColorView: View {
+//  @State var color: Color
+//  var parameter: any _PresetParameter
+//  var body: some View {
+//    ColorPicker(parameter.name, selection: $color)
+//      .preference(key: _ContainerPreferenceKey<Color>.self, value: color)
+//  }
+//  init(parameter: any _PresetParameter) {
+//    self.parameter = parameter
+//    self._color = State(wrappedValue: Color.white)
+//    if let colorParameter = parameter as? PresetParameter<Color> {
+//      self.color = colorParameter.wrappedValue
+//    }
+//  }
+//}
 
 public struct _ContainerPreferenceKey<V>: PreferenceKey {
   static public var defaultValue: V? { nil }

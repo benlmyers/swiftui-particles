@@ -8,6 +8,7 @@
 import SwiftUI
 
 @available(macOS 14.0, iOS 17.0, *)
+@available(watchOS, unavailable)
 internal struct ShaderEntity<E>: Entity where E: Entity {
   
   internal private(set) var shader: (Proxy.Context) -> Shader

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(watchOS, unavailable)
 public extension View {
   
   /// Dissolves the view into several tiny particles when `condition` is set to `true`.

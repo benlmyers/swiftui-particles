@@ -19,10 +19,12 @@ struct MagicView: View {
         Preset.Magic(color: color)
       }
       .statePersistent("magic")
+#if !os(watchOS)
       HStack {
         ColorPicker("Color", selection: $color)
       }
       .padding()
+      #endif
     }
   }
 }
