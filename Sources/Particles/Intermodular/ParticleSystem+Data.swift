@@ -143,7 +143,7 @@ public extension ParticleSystem {
         guard let proxy: Proxy = proxies[proxyID] else { continue }
         guard let entityID: EntityID = proxyEntities[proxyID] else { continue }
         guard let entity: FlatEntity = entities[entityID] else { continue }
-        guard let emitter = (entity.root as? _Emitter) else { continue }
+        guard let emitter = (entity.root as? (any _Emitter)) else { continue }
         guard let protoEntities: [EntityID] = emitEntities[entityID] else { continue }
         if let emitted: UInt = lastEmitted[proxyID] {
           let emitAt: UInt = emitted + UInt(emitter.emitInterval * 60.0)
@@ -236,7 +236,11 @@ public extension ParticleSystem {
         var resolvedEntityID: EntityID = entityID
         if let maybe = views[entityID] {
           switch maybe {
-          case .merged(let mergedID): resolvedEntityID = mergedID
+          case .merged(let mergedID):
+            resolvedEntityID = mergedID
+            if views[resolvedEntityID] == nil, let view: AnyView = (entity.root as? Particle)?.view {
+              views[resolvedEntityID] = .some(view)
+            }
           case .some(_):
             if refreshViews {
               guard let view: AnyView = (entity.root as? Particle)?.view else { break }
@@ -289,7 +293,7 @@ public extension ParticleSystem {
               let custom = custom(context)
               if case .glow(let color, let radius) = custom {
                 if let color {
-                  cc.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .normal, options: .shadowAbove))
+                  cc.addFilter(.shadow(color: color, radius: radius, x: 0.0, y: 0.0, blendMode: .plusLighter, options: .shadowAbove))
                 } else {
                   blurOverlayRadius = radius
                 }
@@ -325,6 +329,7 @@ public extension ParticleSystem {
           cc.draw(resolved, at: .zero)
           cc.drawLayer { ccx in
             if blurOverlayRadius > .zero {
+              ccx.blendMode = .plusLighter
               ccx.addFilter(.blur(radius: blurOverlayRadius))
               ccx.draw(resolved, at: .zero)
             }
@@ -364,7 +369,7 @@ public extension ParticleSystem {
         if spawn {
           proxyID = self.createProxy(entityID)
         }
-        if let root = flat.root, root is _Emitter {
+        if let root = flat.root, root is (any _Emitter) {
           self.emitEntities[entityID] = self.create(entity: root.body, spawn: false, centered: false).map({ $0.0 })
         }
         if let merges: Group.Merges, let firstID: EntityID {
@@ -395,7 +400,7 @@ public extension ParticleSystem {
         proxy.rotation = inherit.rotation
         proxy.velocity = inherit.velocity
       }
-      if entity.root is _Emitter {
+      if entity.root is (any _Emitter) {
         proxy.lifetime = .infinity
       }
       let context = Proxy.Context(proxy: proxy, system: self)
