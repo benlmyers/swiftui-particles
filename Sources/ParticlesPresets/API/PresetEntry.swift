@@ -27,7 +27,7 @@ public extension PresetEntry {
   /// Converts the preset into a `View` that can be used in SwiftUI.
   var view: AnyView {
     .init(ParticleSystem(entity: { self })
-      .statePersistent("_ParticlesPresetEntry\(String(describing: type(of: self)))"))
+      .statePersistent("x"))
   }
   
   /// Converts the presets into a demo view where parameters can be tweaked.

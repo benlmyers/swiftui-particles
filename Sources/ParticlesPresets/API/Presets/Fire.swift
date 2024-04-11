@@ -40,7 +40,7 @@ public extension Preset {
         .initialOffset(xIn: -spawnRadius.width/2 ... spawnRadius.width/2, yIn: -spawnRadius.height/2 ... spawnRadius.height/2)
         .initialVelocity(xIn: -0.4 ... 0.4, yIn: -1 ... 0.5)
         .fixAcceleration(y: -0.05)
-        .lifetime(in: 1 +/- 0.2)
+        .lifetime(in: flameLifetime +/- 0.2)
         .glow(color.opacity(0.5), radius: 18.0)
         .blendMode(.plusLighter)
         .transition(.scale, on: .death, duration: 0.5)

@@ -16,8 +16,9 @@ struct ContentView: View {
       List {
         Text("Presets").font(.headline).foregroundStyle(.secondary)
         ForEach(Preset.allDefaults, id: \.0) { d in
-          NavigationLink(d.0, destination: { d.1.demo })
+          NavigationLink(d.0, destination: d.1.demo)
         }
+        NavigationLink("Lattice", destination: thumbnailView)
       }
     } detail: {
       thumbnailView

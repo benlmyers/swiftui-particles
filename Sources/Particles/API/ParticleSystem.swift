@@ -84,7 +84,6 @@ public struct ParticleSystem: View {
       if _checksTouches {
         TouchRecognizer { touch, optLocation in
           data.touches[touch] = optLocation
-          print(data.touches.count)
         }
       }
       #endif
@@ -116,6 +115,7 @@ public struct ParticleSystem: View {
     let e: E = entity()
     self._data = .init()
     self._data?.initialEntity = e
+    self._data?.refreshViews = true
   }
   
   // MARK: - Methods

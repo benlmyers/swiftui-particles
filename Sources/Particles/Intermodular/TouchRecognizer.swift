@@ -25,7 +25,6 @@ private class NFingerGestureRecognizer: UIGestureRecognizer {
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
     for touch in touches {
       let location = touch.location(in: touch.view)
-      // print("Start: (\(location.x)/\(location.y))")
       touchViews[touch] = location
       tappedCallback(touch, location)
     }
@@ -34,8 +33,6 @@ private class NFingerGestureRecognizer: UIGestureRecognizer {
   override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
     for touch in touches {
       let newLocation = touch.location(in: touch.view)
-      // let oldLocation = touchViews[touch]!
-      // print("Move: (\(oldLocation.x)/\(oldLocation.y)) -> (\(newLocation.x)/\(newLocation.y))")
       touchViews[touch] = newLocation
       tappedCallback(touch, newLocation)
     }
@@ -43,8 +40,6 @@ private class NFingerGestureRecognizer: UIGestureRecognizer {
   
   override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
     for touch in touches {
-      // let oldLocation = touchViews[touch]!
-      // print("End: (\(oldLocation.x)/\(oldLocation.y))")
       touchViews.removeValue(forKey: touch)
       tappedCallback(touch, nil)
     }
