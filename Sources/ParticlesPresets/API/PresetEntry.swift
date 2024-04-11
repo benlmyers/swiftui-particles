@@ -17,7 +17,7 @@ import Foundation
 public protocol PresetEntry: Entity {
   
   /// The parameters of this entry.
-  var parameters: [String: PresetParameter] { get }
+  var parameters: [String: (PresetParameter, PartialKeyPath<Self>)] { get }
 }
 
 public extension PresetEntry {
@@ -32,24 +32,6 @@ public extension PresetEntry {
   
   /// Converts the presets into a demo view where parameters can be tweaked.
   var demo: AnyView {
-    .init(DemoView(entry: self))
-  }
-}
-
-fileprivate struct DemoView<Entry>: View where Entry: PresetEntry {
-  
-  @State var entry: Entry
-  
-  var body: some View {
-    ZStack(alignment: .topLeading) {
-      entry.view
-      VStack(alignment: .leading) {
-        ForEach(Array(entry.parameters), id: \.0) { pair in
-          _PresetParameterView(title: pair.key, parameter: pair.value, onUpdate: <#T##(any PresetEntry) -> Void#>)
-          pair.value.view(title: pair.key, onUpdate: <#(any PresetEntry) -> Void#>)
-        }
-      }
-      .padding()
-    }
+    .init(PresetDemoView(entry: self))
   }
 }

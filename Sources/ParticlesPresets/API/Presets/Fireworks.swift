@@ -13,7 +13,7 @@ public extension Preset {
   
   struct Fireworks: Entity, PresetEntry {
     
-    public var parameters: [String : PresetParameter] {[:]}
+    public var parameters: [String: (PresetParameter, PartialKeyPath<Self>)] {[:]}
     
     private var _parameters: Parameters
     

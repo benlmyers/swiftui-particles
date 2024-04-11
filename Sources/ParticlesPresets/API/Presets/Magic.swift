@@ -13,7 +13,7 @@ public extension Preset {
   
   struct Magic: Entity, PresetEntry {
     
-    public var parameters: [String : PresetParameter] {[:]}
+    public var parameters: [String: (PresetParameter, PartialKeyPath<Self>)] {[:]}
     
     var color: Color
     var spawnPoint: UnitPoint

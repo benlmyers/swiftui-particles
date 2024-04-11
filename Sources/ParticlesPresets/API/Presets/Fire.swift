@@ -13,8 +13,10 @@ public extension Preset {
   
   struct Fire: Entity, PresetEntry {
     
-    public var parameters: [String : PresetParameter] {[
-      "color": .color(.red)
+    public var parameters: [String : (PresetParameter, PartialKeyPath<Self>)] {[
+      "Color": (.color(.red), \.color),
+      "Size": (.floatRange(10.0, min: 5.0, max: 50.0), \.flameSize),
+      "Lifetime": (.doubleRange(1.0, min: 0.1, max: 5.0), \.flameLifetime)
     ]}
     
     var color: Color = .red
