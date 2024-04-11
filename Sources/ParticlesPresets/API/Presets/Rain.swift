@@ -13,15 +13,17 @@ public extension Preset {
   
   struct Rain: Entity, PresetEntry {
     
-    private var parameters: Parameters
+    public var parameters: [String : PresetParameter] {[:]}
+    
+    private var _parameters: Parameters
     
     public init(lifetime: TimeInterval = 1.0, intensity: Int = 20, wind: CGFloat = 0.5) {
-      self.parameters = .init(intensity: intensity, rainLifetime: lifetime, windVelocity: wind)
+      self._parameters = .init(intensity: intensity, rainLifetime: lifetime, windVelocity: wind)
     }
     
     public var body: some Entity {
-      Emitter(every: 1.0 / Double(parameters.intensity)) {
-        Drop(parameters: parameters)
+      Emitter(every: 1.0 / Double(_parameters.intensity)) {
+        Drop(parameters: _parameters)
       }
       .emitAll()
       .initialPosition(.top)

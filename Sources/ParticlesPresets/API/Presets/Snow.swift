@@ -12,17 +12,19 @@ import Foundation
 public extension Preset {
   
   struct Snow: Entity, PresetEntry {
+    
+    public var parameters: [String : PresetParameter] {[:]}
 
-    private var parameters: Parameters
+    private var _parameters: Parameters
     
     public init(size: CGFloat = 30.0, lifetime: TimeInterval = 5.0, intensity: Int = 20) {
-      self.parameters = .init(intensity: intensity, snowSize: size, snowLifetime: lifetime)
+      self._parameters = .init(intensity: intensity, snowSize: size, snowLifetime: lifetime)
     }
     
     public var body: some Entity {
-      Emitter(every: 1.0 / Double(parameters.intensity)) {
-        Flake(parameters: parameters)
-        Drift(parameters: parameters)
+      Emitter(every: 1.0 / Double(_parameters.intensity)) {
+        Flake(parameters: _parameters)
+        Drift(parameters: _parameters)
       }
       .emitAll()
       .initialPosition(.top)

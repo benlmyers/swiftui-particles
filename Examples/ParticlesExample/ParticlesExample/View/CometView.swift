@@ -42,7 +42,8 @@ struct CometView: View {
       }
     }
   }
-  struct Stars: Entity, PresetEntry {
+  
+  struct Stars: Entity {
     public var body: some Entity {
       Emitter(every: 0.01) {
         Star()

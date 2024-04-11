@@ -14,6 +14,8 @@ public extension Preset {
   
   struct Comet: Entity, PresetEntry {
     
+    public var parameters: [String : PresetParameter] {[:]}
+    
     var color: Color
     var spawnPoint: UnitPoint
     var spawnRadius: CGSize

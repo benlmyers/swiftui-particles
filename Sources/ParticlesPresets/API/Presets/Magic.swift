@@ -13,6 +13,8 @@ public extension Preset {
   
   struct Magic: Entity, PresetEntry {
     
+    public var parameters: [String : PresetParameter] {[:]}
+    
     var color: Color
     var spawnPoint: UnitPoint
     

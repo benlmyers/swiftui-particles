@@ -13,6 +13,8 @@ public extension Preset {
   
   struct Smoke: Entity, PresetEntry {
     
+    public var parameters: [String : PresetParameter] {[:]}
+    
     var color: Color
     var startRadius: CGFloat =  8.0
     var endRadius: CGFloat = 30.0

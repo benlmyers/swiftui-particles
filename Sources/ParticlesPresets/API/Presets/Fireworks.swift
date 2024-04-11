@@ -13,17 +13,19 @@ public extension Preset {
   
   struct Fireworks: Entity, PresetEntry {
     
-    private var parameters: Parameters
+    public var parameters: [String : PresetParameter] {[:]}
+    
+    private var _parameters: Parameters
     
     public init (shootFor shootDuration: TimeInterval = 1.0, color: Color = .blue, spread: Double = 1.0) {
-      self.parameters = .init(shootDuration: shootDuration, color: color, spread: spread)
+      self._parameters = .init(shootDuration: shootDuration, color: color, spread: spread)
     }
     
     public var body: some Entity {
       Group {
         ForEach(0 ... 500, merges: .views) { i in
           Particle {
-            RadialGradient(colors: [parameters.color, .clear], center: .center, startRadius: 0.0, endRadius: 4.0)
+            RadialGradient(colors: [_parameters.color, .clear], center: .center, startRadius: 0.0, endRadius: 4.0)
               .clipShape(Circle())
               .frame(width: 4.0, height: 4.0)
           }
@@ -33,13 +35,13 @@ public extension Preset {
           .blendMode(.plusLighter)
           .glow(radius: 6.0)
           .onUpdate { p, c in
-            if c.time < parameters.shootDuration {
+            if c.time < _parameters.shootDuration {
               p.velocity = .zero
               p.opacity = .zero
             } else {
               p.opacity = 1.0
               if p.velocity == .zero {
-                p.velocity = .init(angle: .degrees(Double(i) * 7), magnitude: parameters.spread * Double.random(in: 0.1 ... 3.0))
+                p.velocity = .init(angle: .degrees(Double(i) * 7), magnitude: _parameters.spread * Double.random(in: 0.1 ... 3.0))
               } else {
                 p.velocity.dx *= 0.98
                 p.velocity.dy *= 0.98
@@ -70,7 +72,7 @@ public extension Preset {
         .lifetime(10)
         .initialPosition(.bottom)
         .initialVelocity { c in
-            .init(dx: 0.0, dy: -0.01 * c.system.size.height / parameters.shootDuration)
+            .init(dx: 0.0, dy: -0.01 * c.system.size.height / _parameters.shootDuration)
         }
         .fixAcceleration(y: 0.05)
       }

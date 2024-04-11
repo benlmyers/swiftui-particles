@@ -15,16 +15,9 @@ struct ContentView: View {
     NavigationSplitView {
       List {
         Text("Presets").font(.headline).foregroundStyle(.secondary)
-        NavigationLink("Comet", destination: CometView.init)
-//        NavigationLink("Ghost Rider", destination: GhostRiderView.init)
-        NavigationLink("Fire", destination: FireView.init)
-        NavigationLink("Snow", destination: SnowView.init)
-        NavigationLink("Smoke", destination: SmokeView.init)
-        NavigationLink("Magic", destination: MagicView.init)
-        NavigationLink("Rain", destination: RainView.init)
-        NavigationLink("Stars", destination: StarsView.init)
-        NavigationLink("Fireworks", destination: FireworksView.init)
-        NavigationLink("Lattice", destination: thumbnailView)
+        ForEach(Preset.allDefaults, id: \.0) { d in
+          NavigationLink(d.0, destination: { d.1.demo })
+        }
       }
     } detail: {
       thumbnailView

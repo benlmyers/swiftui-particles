@@ -12,16 +12,18 @@ import Foundation
 public extension Preset {
   
   struct Stars: Entity, PresetEntry {
+    
+    public var parameters: [String : PresetParameter] {[:]}
         
-    private var parameters: Parameters
+    private var _parameters: Parameters
     
     public init(size: CGFloat = 30.0, lifetime: TimeInterval = 5.0, intensity: Int = 20, twinkle: Bool = true) {
-      self.parameters = .init(intensity: intensity, starSize: size, starLifetime: lifetime, twinkle: twinkle)
+      self._parameters = .init(intensity: intensity, starSize: size, starLifetime: lifetime, twinkle: twinkle)
     }
     
     public var body: some Entity {
-      Emitter(every: 1.0 / Double(parameters.intensity)) {
-        Star(parameters: parameters)
+      Emitter(every: 1.0 / Double(_parameters.intensity)) {
+        Star(parameters: _parameters)
       }
       .emitAll()
     }

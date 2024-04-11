@@ -13,8 +13,11 @@ public extension Preset {
   
   struct Fire: Entity, PresetEntry {
     
-    var color: Color
-    var spawnPoint: UnitPoint
+    public var parameters: [String : PresetParameter] {[
+      "color": .color(.red)
+    ]}
+    
+    var color: Color = .red
     var spawnRadius: CGSize
     var flameSize: CGFloat = 10.0
     var flameLifetime: TimeInterval = 1
@@ -31,7 +34,6 @@ public extension Preset {
           .clipShape(Circle())
         }
         .initialOffset(xIn: -spawnRadius.width/2 ... spawnRadius.width/2, yIn: -spawnRadius.height/2 ... spawnRadius.height/2)
-        .initialPosition(.center)
         .hueRotation(angleIn: .degrees(0.0) ... .degrees(50.0))
         .initialOffset(xIn: -spawnRadius.width/2 ... spawnRadius.width/2, yIn: -spawnRadius.height/2 ... spawnRadius.height/2)
         .initialVelocity(xIn: -0.4 ... 0.4, yIn: -1 ... 0.5)
@@ -46,12 +48,10 @@ public extension Preset {
     
     public init(
       color: Color = .red,
-      spawnPoint: UnitPoint = .center,
       flameSize: CGFloat = 10.0,
       spawnRadius: CGSize = .init(width: 20.0, height: 4.0)
     ) {
       self.color = color
-      self.spawnPoint = spawnPoint
       self.flameSize = flameSize
       self.spawnRadius = spawnRadius
     }
