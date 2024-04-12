@@ -7,16 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3C23DE962BC1EB5B00F1CEA4 /* CometView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C23DE952BC1EB5B00F1CEA4 /* CometView.swift */; };
-		3C247D4D2BADBF8D00488B02 /* FireView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D492BADBF8D00488B02 /* FireView.swift */; };
-		3C247D4E2BADBF8D00488B02 /* SmokeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4A2BADBF8D00488B02 /* SmokeView.swift */; };
-		3C247D4F2BADBF8D00488B02 /* GhostRiderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4B2BADBF8D00488B02 /* GhostRiderView.swift */; };
-		3C247D502BADBF8D00488B02 /* SnowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4C2BADBF8D00488B02 /* SnowView.swift */; };
-		3CF22AF22BB996250000D463 /* FireworksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CF22AF12BB996250000D463 /* FireworksView.swift */; };
-		EE4265512BAE1C5C005193F1 /* MagicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE4265502BAE1C5C005193F1 /* MagicView.swift */; };
 		EE695F0C2ACB767E002D8F5B /* Particles in Frameworks */ = {isa = PBXBuildFile; productRef = EE695F0B2ACB767E002D8F5B /* Particles */; };
-		EEB3A3772BAE1F8300A5C591 /* RainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB3A3762BAE1F8300A5C591 /* RainView.swift */; };
-		EEB3A3792BAE2AAD00A5C591 /* StarsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB3A3782BAE2AAD00A5C591 /* StarsView.swift */; };
 		EED626832A4990B300A3C3F4 /* ParticlesExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED626822A4990B300A3C3F4 /* ParticlesExampleApp.swift */; };
 		EED626852A4990B300A3C3F4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED626842A4990B300A3C3F4 /* ContentView.swift */; };
 		EED626872A4990B500A3C3F4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EED626862A4990B500A3C3F4 /* Assets.xcassets */; };
@@ -27,15 +18,6 @@
 		EEEB64F12BC673EF00CC65D4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EEEB64F02BC673EF00CC65D4 /* Assets.xcassets */; };
 		EEEB64F42BC673EF00CC65D4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EEEB64F32BC673EF00CC65D4 /* Preview Assets.xcassets */; };
 		EEEB64F72BC673EF00CC65D4 /* ParticlesExampleWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = EEEB64EA2BC673EE00CC65D4 /* ParticlesExampleWatch Watch App.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		EEEB64FC2BC6744400CC65D4 /* RainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB3A3762BAE1F8300A5C591 /* RainView.swift */; };
-		EEEB64FD2BC6744400CC65D4 /* FireworksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CF22AF12BB996250000D463 /* FireworksView.swift */; };
-		EEEB64FE2BC6744400CC65D4 /* CometView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C23DE952BC1EB5B00F1CEA4 /* CometView.swift */; };
-		EEEB64FF2BC6744400CC65D4 /* GhostRiderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4B2BADBF8D00488B02 /* GhostRiderView.swift */; };
-		EEEB65002BC6744400CC65D4 /* MagicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE4265502BAE1C5C005193F1 /* MagicView.swift */; };
-		EEEB65012BC6744400CC65D4 /* FireView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D492BADBF8D00488B02 /* FireView.swift */; };
-		EEEB65022BC6744400CC65D4 /* StarsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB3A3782BAE2AAD00A5C591 /* StarsView.swift */; };
-		EEEB65032BC6744400CC65D4 /* SnowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4C2BADBF8D00488B02 /* SnowView.swift */; };
-		EEEB65042BC6744400CC65D4 /* SmokeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C247D4A2BADBF8D00488B02 /* SmokeView.swift */; };
 		EEEB65072BC6749000CC65D4 /* Particles in Frameworks */ = {isa = PBXBuildFile; productRef = EEEB65062BC6749000CC65D4 /* Particles */; };
 		EEEB65092BC6749000CC65D4 /* ParticlesPresets in Frameworks */ = {isa = PBXBuildFile; productRef = EEEB65082BC6749000CC65D4 /* ParticlesPresets */; };
 /* End PBXBuildFile section */
@@ -65,15 +47,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3C23DE952BC1EB5B00F1CEA4 /* CometView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CometView.swift; sourceTree = "<group>"; };
-		3C247D492BADBF8D00488B02 /* FireView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireView.swift; sourceTree = "<group>"; };
-		3C247D4A2BADBF8D00488B02 /* SmokeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmokeView.swift; sourceTree = "<group>"; };
-		3C247D4B2BADBF8D00488B02 /* GhostRiderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GhostRiderView.swift; sourceTree = "<group>"; };
-		3C247D4C2BADBF8D00488B02 /* SnowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnowView.swift; sourceTree = "<group>"; };
-		3CF22AF12BB996250000D463 /* FireworksView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireworksView.swift; sourceTree = "<group>"; };
-		EE4265502BAE1C5C005193F1 /* MagicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicView.swift; sourceTree = "<group>"; };
-		EEB3A3762BAE1F8300A5C591 /* RainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RainView.swift; sourceTree = "<group>"; };
-		EEB3A3782BAE2AAD00A5C591 /* StarsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarsView.swift; sourceTree = "<group>"; };
 		EED6267F2A4990B300A3C3F4 /* ParticlesExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ParticlesExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EED626822A4990B300A3C3F4 /* ParticlesExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticlesExampleApp.swift; sourceTree = "<group>"; };
 		EED626842A4990B300A3C3F4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -110,22 +83,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		3C247D482BADBF4400488B02 /* View */ = {
-			isa = PBXGroup;
-			children = (
-				3C247D492BADBF8D00488B02 /* FireView.swift */,
-				3C247D4B2BADBF8D00488B02 /* GhostRiderView.swift */,
-				3CF22AF12BB996250000D463 /* FireworksView.swift */,
-				3C247D4A2BADBF8D00488B02 /* SmokeView.swift */,
-				3C247D4C2BADBF8D00488B02 /* SnowView.swift */,
-				3C23DE952BC1EB5B00F1CEA4 /* CometView.swift */,
-				EE4265502BAE1C5C005193F1 /* MagicView.swift */,
-				EEB3A3762BAE1F8300A5C591 /* RainView.swift */,
-				EEB3A3782BAE2AAD00A5C591 /* StarsView.swift */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
 		EED626762A4990B300A3C3F4 = {
 			isa = PBXGroup;
 			children = (
@@ -149,7 +106,6 @@
 		EED626812A4990B300A3C3F4 /* ParticlesExample */ = {
 			isa = PBXGroup;
 			children = (
-				3C247D482BADBF4400488B02 /* View */,
 				EED626822A4990B300A3C3F4 /* ParticlesExampleApp.swift */,
 				EED626842A4990B300A3C3F4 /* ContentView.swift */,
 				EED626862A4990B500A3C3F4 /* Assets.xcassets */,
@@ -312,15 +268,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				EED626852A4990B300A3C3F4 /* ContentView.swift in Sources */,
-				3C247D4F2BADBF8D00488B02 /* GhostRiderView.swift in Sources */,
-				3C247D502BADBF8D00488B02 /* SnowView.swift in Sources */,
-				3C247D4D2BADBF8D00488B02 /* FireView.swift in Sources */,
-				EE4265512BAE1C5C005193F1 /* MagicView.swift in Sources */,
-				3C23DE962BC1EB5B00F1CEA4 /* CometView.swift in Sources */,
-				3C247D4E2BADBF8D00488B02 /* SmokeView.swift in Sources */,
-				EEB3A3772BAE1F8300A5C591 /* RainView.swift in Sources */,
-				3CF22AF22BB996250000D463 /* FireworksView.swift in Sources */,
-				EEB3A3792BAE2AAD00A5C591 /* StarsView.swift in Sources */,
 				EED626832A4990B300A3C3F4 /* ParticlesExampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -330,15 +277,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				EEEB64EF2BC673EF00CC65D4 /* ContentView.swift in Sources */,
-				EEEB64FC2BC6744400CC65D4 /* RainView.swift in Sources */,
-				EEEB64FD2BC6744400CC65D4 /* FireworksView.swift in Sources */,
-				EEEB64FE2BC6744400CC65D4 /* CometView.swift in Sources */,
-				EEEB64FF2BC6744400CC65D4 /* GhostRiderView.swift in Sources */,
-				EEEB65002BC6744400CC65D4 /* MagicView.swift in Sources */,
-				EEEB65012BC6744400CC65D4 /* FireView.swift in Sources */,
-				EEEB65022BC6744400CC65D4 /* StarsView.swift in Sources */,
-				EEEB65032BC6744400CC65D4 /* SnowView.swift in Sources */,
-				EEEB65042BC6744400CC65D4 /* SmokeView.swift in Sources */,
 				EEEB64ED2BC673EF00CC65D4 /* ParticlesExampleWatchApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -26,8 +26,7 @@ internal extension PresetParameter {
       case .color(let d):
         _ColorView(title: title, defaultValue: d, onUpdate: onUpdate)
       case .intRange(let d, let min, let max):
-        EmptyView()
-//        _NumericRangeView(title: title, defaultValue: d, minValue: min, maxValue: max, onUpdate: onUpdate)
+        _NumericRangeView(title: title, defaultValue: Float(d), minValue: Float(min), maxValue: Float(max), onUpdate: onUpdate)
       }
     }
     
