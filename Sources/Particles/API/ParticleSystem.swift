@@ -115,24 +115,25 @@ public struct ParticleSystem: View {
     let e: E = entity()
     self._data = .init()
     self._data?.initialEntity = e
-    self._data?.refreshViews = true
+    self.data.refreshViews = true
   }
   
   // MARK: - Methods
   
   /// Enables debug mode for this particle system.
   /// When enabled, a border is shown around the system's edges, and statistics are displayed.
+  /// - Parameter flag: Whether to enable debug mode.
   /// - Returns: A modified `ParticleSystem`
-  public func debug() -> ParticleSystem {
-    self.data.debug = true
+  public func debug(_ flag: Bool = true) -> ParticleSystem {
+    self.data.debug = flag
     return self
   }
   
   /// Marks this particle system as **state persistent**.
   /// State persistent particle systems to not reset their simulations when the view is re-rendered.
   /// - Parameter id: A `String` ID to use for the particle system. A unique ID will allow the system to persist across state updates.
-  /// - Parameter refreshesViews: Whether view refreshes at the top level should reset and re-render all particle views. Default `false`.
-  public func statePersistent(_ id: String, refreshesViews: Bool = false) -> ParticleSystem {
+  /// - Parameter refreshesViews: Whether view refreshes at the top level should reset and re-render all particle views. Default `true`.
+  public func statePersistent(_ id: String, refreshesViews: Bool = true) -> ParticleSystem {
     var copy = self
     copy._id = id
     if !Self.data.contains(where: { $0.key == id }) {

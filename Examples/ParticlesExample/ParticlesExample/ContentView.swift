@@ -10,15 +10,23 @@ import Particles
 import ParticlesPresets
 
 struct ContentView: View {
-  @State var purchased = false
+  
+  @State var purchased: Bool = false
+  @State var debug: Bool = false
+  
   var body: some View {
     NavigationSplitView {
-      List {
-        Text("Presets").font(.headline).foregroundStyle(.secondary)
-        ForEach(Preset.allDefaults, id: \.0) { d in
-          NavigationLink(d.0, destination: d.1.demo)
+      VStack(spacing: .zero) {
+        List {
+          Text("Presets").font(.headline).foregroundStyle(.secondary)
+          ForEach(Preset.allDefaults, id: \.0) { d in
+            NavigationLink(d.0, destination: d.1.demo(debug: debug))
+          }
+          NavigationLink("Lattice", destination: thumbnailView)
         }
-        NavigationLink("Lattice", destination: thumbnailView)
+        Spacer()
+        Divider()
+        Toggle("Debug Mode", isOn: $debug).padding()
       }
     } detail: {
       thumbnailView
@@ -37,7 +45,7 @@ struct ContentView: View {
       .delay(with: { c in
         return Double(c.proxy.position.x) * 0.005 + Double.random(in: 0.0 ... 0.5)
       })
-      .transition(.opacity, on: .birth, duration: 3.0)
+      .transition(.scale, on: .birth, duration: 1.0)
       .hueRotation(with: { c in
         return .degrees(c.proxy.position.x + 60 * (c.timeAlive + c.proxy.seed.0))
       })
@@ -48,30 +56,8 @@ struct ContentView: View {
       .fixVelocity { c in
           .init(dx: 0.1 * cos(6 * (c.timeAlive + c.proxy.seed.0)), dy: 0.1 * sin(6 * (c.timeAlive + c.proxy.seed.1)))
       }
-      Emitter(every: 0.01) {
-        Particle {
-          Circle()
-            .frame(width: 5, height: 5)
-            .foregroundStyle(.red)
-        }
-        .hueRotation(angleIn: .zero ... .degrees(360))
-        .glow(radius: 5)
-        .transition(.opacity, on: .birth, duration: 1.0)
-        .initialOffset(y: -150.0)
-        .transition(.twinkle, on: .death, duration: 4.0)
-        .zIndex(with: { c in
-          if c.proxy.position.x > c.system.size.width * 0.5 {
-            return 2
-          } else {
-            return 0
-          }
-        })
-        .fixVelocity { c in
-          let t: Double = c.timeAlive * ((2.0 + 0.5 * c.proxy.seed.0) /*+ c.proxy.seed.1 * 2 * .pi*/)
-          return CGVector(dx: 15 * cos(t + 0.1 * c.proxy.seed.2), dy: 10 * sin(t - 0.6))
-        }
-      }
     }
+    .debug(debug)
   }
 }
 

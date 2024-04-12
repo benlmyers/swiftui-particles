@@ -31,7 +31,7 @@ public extension PresetEntry {
   }
   
   /// Converts the presets into a demo view where parameters can be tweaked.
-  var demo: AnyView {
-    .init(PresetDemoView(entry: self))
+  func demo(debug: Bool) -> AnyView {
+    .init(PresetDemoView(entry: self, debug: debug))
   }
 }
