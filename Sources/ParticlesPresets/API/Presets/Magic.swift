@@ -13,6 +13,8 @@ public extension Preset {
   
   struct Magic: Entity, PresetEntry {
     
+    static public var `default`: Self = .init()
+    
     public var parameters: [String: (PresetParameter, PartialKeyPath<Self>)] {[:]}
     
     var color: Color

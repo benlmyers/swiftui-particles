@@ -13,6 +13,8 @@ public extension Preset {
   
   struct Rain: Entity, PresetEntry {
     
+    static public var `default`: Self = .init()
+    
     public var parameters: [String : (PresetParameter, PartialKeyPath<Self>)] {[
       "Intensity": (.intRange(20, min: 1, max: 100), \._parameters.intensity),
       "Wind": (.floatRange(0.5, min: -3.0, max: 3.0), \._parameters.windVelocity)

@@ -14,6 +14,8 @@ public extension Preset {
   
   struct Comet: Entity, PresetEntry {
     
+    static public var `default`: Self = .init()
+    
     public var parameters: [String: (PresetParameter, PartialKeyPath<Self>)] {[:]}
     
     var color: Color

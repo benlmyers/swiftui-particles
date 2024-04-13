@@ -11,7 +11,7 @@ import ParticlesPresets
 
 struct ContentView: View {
   
-  @State var purchased: Bool = false
+  @State var customization: Bool = true
   @State var debug: Bool = false
   
   var body: some View {
@@ -20,18 +20,33 @@ struct ContentView: View {
         List {
           Text("Presets").font(.headline).foregroundStyle(.secondary)
           ForEach(Preset.allDefaults, id: \.0) { d in
-            NavigationLink(d.0, destination: d.1.demo(debug: debug))
+            NavigationLink(d.0, destination: d.1.demo(customization: customization, debug: debug))
           }
           NavigationLink("Lattice", destination: thumbnailView)
         }
         Spacer()
         Divider()
-        Toggle("Debug Mode", isOn: $debug).padding()
+        ViewThatFits {
+          HStack(spacing: 16.0) {
+            settingsToggles
+          }
+          VStack {
+            settingsToggles
+          }
+        }
+        .padding()
       }
     } detail: {
       thumbnailView
     }
     .preferredColorScheme(.dark)
+    .background(Color.black)
+  }
+  
+  @ViewBuilder
+  var settingsToggles: some View {
+    Toggle("Preset Customization", isOn: $customization)
+    Toggle("Debug Mode", isOn: $debug)
   }
   
   var thumbnailView: some View {
@@ -49,7 +64,7 @@ struct ContentView: View {
       .hueRotation(with: { c in
         return .degrees(c.proxy.position.x + 60 * (c.timeAlive + c.proxy.seed.0))
       })
-      .glow(radius: 4)
+      .glow(radius: 8)
       .scale(1.5)
       .lifetime(99)
       .zIndex(1)

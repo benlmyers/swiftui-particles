@@ -13,10 +13,12 @@ public extension Preset {
   
   struct Fire: Entity, PresetEntry {
     
+    static public var `default`: Preset.Fire = .init()
+    
     public var parameters: [String : (PresetParameter, PartialKeyPath<Self>)] {[
       "Color": (.color(.red), \.color),
-      "Size": (.floatRange(10.0, min: 5.0, max: 50.0), \.flameSize),
-      "Lifetime": (.doubleRange(1.0, min: 0.1, max: 5.0), \.flameLifetime)
+      "Size": (.floatRange(18.0, min: 10.0, max: 40.0), \.flameSize),
+      "Lifetime": (.doubleRange(1.0, min: 0.5, max: 2.0), \.flameLifetime)
     ]}
     
     var color: Color = .red
@@ -40,7 +42,7 @@ public extension Preset {
         .initialOffset(xIn: -spawnRadius.width/2 ... spawnRadius.width/2, yIn: -spawnRadius.height/2 ... spawnRadius.height/2)
         .initialVelocity(xIn: -0.4 ... 0.4, yIn: -1 ... 0.5)
         .fixAcceleration(y: -0.05)
-        .lifetime(in: flameLifetime +/- 0.2)
+        .lifetime(in: flameLifetime +/- flameLifetime * 0.2)
         .glow(color.opacity(0.5), radius: 18.0)
         .blendMode(.plusLighter)
         .transition(.scale, on: .death, duration: 0.5)
@@ -55,7 +57,7 @@ public extension Preset {
     ) {
       self.color = color
       self.flameSize = flameSize
-      self.spawnRadius = spawnRadius
+      self.spawnRadius = .init(width: flameSize, height: 4.0)
     }
   }
 }

@@ -8,10 +8,8 @@
 import Foundation
 
 /// The base namespace for all particles presets.
-///
-/// To define new presets, see ``Preset/Entry``.
-///
-/// - seealso: ``ParticlesPresets/Preset/Fire``
+/// To define new presets, see ``PresetEntry``.
+/// - SeeAlso: ``ParticlesPresets/Preset/Fire``
 public struct Preset {
   
   /// Every preset available, as an array of entities.

@@ -13,6 +13,8 @@ public extension Preset {
   
   struct Stars: Entity, PresetEntry {
     
+    static public var `default`: Self = .init()
+    
     public var parameters: [String: (PresetParameter, PartialKeyPath<Self>)] {[:]}
         
     private var _parameters: Parameters
