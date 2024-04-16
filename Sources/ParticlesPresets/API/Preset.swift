@@ -20,7 +20,9 @@ public struct Preset {
       ("Rain", Rain()),
       ("Smoke", Smoke()),
       ("Snow", Snow()),
-      ("Stars", Stars())
+      ("Stars", Stars()),
+      ("Confetti", Confetti()),
+      ("Leaves", Leaves())
     ]
   }
 }

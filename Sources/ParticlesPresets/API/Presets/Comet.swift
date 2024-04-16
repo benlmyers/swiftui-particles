@@ -5,7 +5,6 @@
 //  Created by Demirhan Mehmet Atabey on 6.04.2024.
 //
 
-
 import SwiftUI
 import Particles
 import Foundation
@@ -46,7 +45,7 @@ public extension Preset {
         .blendMode(.plusLighter)
         .transition(.scale, on: .death, duration: 0.5)
 //        .transition(.twinkle, on: .birth, duration: 0.3)
-        .fixScale { c in
+        .scale { c in
           return 1.0 - (c.timeAlive * 0.1)
         }
       }

@@ -179,12 +179,27 @@ public extension Entity {
   /// - Parameter x: The x-rotation.
   /// - Parameter y: The y-rotation.
   /// - Parameter z: The z-rotation.
+  /// - Returns: The modified entity.
   func rotation3D(x: Angle, y: Angle, z: Angle) -> some Entity {
     ModifiedEntity(entity: self, onBirth: { context in
       var p = context.proxy
       p.rotation3d.x = x.radians
       p.rotation3d.y = y.radians
       p.rotation3d.z = z.radians
+      return p
+    })
+  }
+  
+  /// Applies a 3D rotation effect to the entity each frame.
+  /// - Parameter withRotations: A closure that returns the rotation to apply on each axis each frame.
+  /// - Returns: The modified entity.
+  func rotation3D(with withRotations: @escaping (Proxy.Context) -> (x: Angle, y: Angle, z: Angle)) -> some Entity {
+    ModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.proxy
+      let r = withRotations(context)
+      p.rotation3d.x = r.x.radians
+      p.rotation3d.y = r.y.radians
+      p.rotation3d.z = r.z.radians
       return p
     })
   }

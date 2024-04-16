@@ -84,6 +84,11 @@ public extension ParticleSystem {
     
     // MARK: - Methods
     
+    /// Resets the particle system simulation.
+    public func reset() {
+      
+    }
+    
     internal func update(context: GraphicsContext, size: CGSize) {
       self.size = size
       if let initialEntity = self.initialEntity, self.currentFrame > 1 {
@@ -317,11 +322,14 @@ public extension ParticleSystem {
                 cc.addFilter(.colorMultiply(overlay))
               } else if case .transition(let transition, let bounds, let duration) = custom {
                 let c = Proxy.Context(proxy: proxy, system: self)
-                if bounds == .birth || bounds == .birthAndDeath {
+                if bounds == .birth {
                   guard c.timeAlive < duration else { continue }
                 }
-                if bounds == .death || bounds == .birthAndDeath {
+                if bounds == .death {
                   guard c.timeAlive > proxy.lifetime - duration else { continue }
+                }
+                if bounds == .birthAndDeath {
+                  guard c.timeAlive < duration || c.timeAlive > proxy.lifetime - duration else { continue }
                 }
                 transition.modifyRender(
                   getTransitionProgress(bounds: bounds, duration: duration, context: c),
