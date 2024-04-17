@@ -27,9 +27,9 @@ public extension Preset {
     private var velocityX: ClosedRange<CGFloat> {
       switch spawnPoint {
       case .bottomLeading, .leading, .topLeading:
-        return -6.0 ... -3.0
-      case .topTrailing, .bottomTrailing, .trailing:
         return 3.0 ... 6.0
+      case .topTrailing, .bottomTrailing, .trailing:
+        return -6.0 ... -3.0
       default:
         return -0.5 ... 0.5
       }
@@ -68,7 +68,6 @@ public extension Preset {
           )
           .clipShape(Circle())
         }
-        .initialPosition(.center)
         .initialOffset(xIn: -spawnRadius.width ... spawnRadius.width/2, yIn: -spawnRadius.height/2 ... spawnRadius.height/2)
         .initialVelocity(xIn: velocityX, yIn: velocityY)
         .fixAcceleration(y: velocityAccelerationY)
