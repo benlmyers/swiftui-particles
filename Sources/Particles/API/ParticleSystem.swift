@@ -60,7 +60,7 @@ public struct ParticleSystem: View {
     ZStack {
       GeometryReader { proxy in
         TimelineView(.animation(minimumInterval: 1.0 / 60.0, paused: false)) { [self] t in
-          Canvas(opaque: true, colorMode: .linear, rendersAsynchronously: false, renderer: renderer) {
+          Canvas(opaque: false, colorMode: .linear, rendersAsynchronously: false, renderer: renderer) {
             Text("❌").tag("NOT_FOUND")
             SwiftUI.ForEach(Array(data.viewPairs()), id: \.1) { (pair: (AnyView, EntityID)) in
               pair.0.tag(pair.1)

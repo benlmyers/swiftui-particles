@@ -42,6 +42,12 @@ public extension Preset {
       }
     }
     
+    public init(amount: Int = 50, windSpeed: Double = 1.0, scale: Double = 1.0) {
+        self.amount = amount
+        self.windSpeed = windSpeed
+        self.scale = scale
+    }
+    
     /// A single leaf particle.
     public struct Leaf: Entity {
       
