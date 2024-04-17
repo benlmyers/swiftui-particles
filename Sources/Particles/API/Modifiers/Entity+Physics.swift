@@ -123,6 +123,20 @@ public extension Entity {
     }
   }
   
+  /// Sets the scale of the entity.
+  /// - Parameters:
+  ///   - scale: The scale of the entity on update.
+  /// - Returns: The modified entity.
+  func fixScale(_ withScale: @escaping (Proxy.Context) -> CGFloat) -> some Entity {
+    ModifiedEntity(entity: self, onUpdate: { context in
+      var p = context.proxy
+      let scale = withScale(context)
+      p.scale.width *= scale
+      p.scale.height *= scale
+      return p
+    })
+  }
+  
   /// Sets the constant position of the entity.
   /// - Parameters:
   ///   - x: The x-position, in pixels, to set the entity's position to. Set to `nil` for no behavior.
