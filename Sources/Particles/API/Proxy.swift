@@ -143,7 +143,7 @@ public extension Proxy {
   internal(set) var inception: Int { get {
     Int(_inception)
   } set {
-    _inception = UInt(newValue)
+    _inception = UInt(abs(newValue))
   }}
   
   /// The lifetime, in seconds, of the entity.
