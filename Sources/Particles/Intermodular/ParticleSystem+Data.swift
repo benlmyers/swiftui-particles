@@ -160,6 +160,19 @@ public extension ParticleSystem {
           guard currentFrame >= emitAt else { continue }
         }
         var finalEntities: [EntityID] = protoEntities
+        let context = Proxy.Context(proxy: proxy, system: self)
+        
+        var flag: Bool = false
+        for pref in entity.preferences {
+          if case FlatEntity.Preference.custom(let cl) = pref,
+             case FlatEntity.Preference.Custom.emitChance(let c) = cl(context),
+             Double.random(in: .leastNonzeroMagnitude ... 1.0) >= c {
+            flag = true
+            break
+          }
+        }
+        if flag { continue }
+        
         if let chooser = emitter.emitChooser, !protoEntities.isEmpty {
           let context = Proxy.Context(proxy: proxy, system: self)
           let i = chooser(context) % protoEntities.count

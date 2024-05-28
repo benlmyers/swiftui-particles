@@ -9,22 +9,30 @@ import SwiftUI
 import Particles
 import ParticlesPresets
 
-/// A demo with `Lattice`.
+/// A demo with `Lattice` using a `hugging` mode.
 struct HuggingLatticeDemo: View {
   
   @Environment(\.debug) var debug: Bool
   
   var body: some View {
-    ParticleSystem {
-      Lattice(hugging: .all, customEntity: {
-        Preset.Fire()
-      }) {
-        Text("Particles")
-          .fontWeight(.black)
-          .font(.system(size: 90))
-          .foregroundStyle(Color.red)
+    ZStack {
+      p
+      ParticleSystem {
+        Lattice(hugging: .top, customEntity: {
+          Preset.Fire()
+        }) {
+          p
+        }
+        .emitChance(0.1)
       }
+      .debug(debug)
     }
-    .debug(debug)
+  }
+  
+  var p: some View {
+    Text("Particles")
+      .fontWeight(.black)
+      .font(.system(size: 90))
+      .foregroundStyle(Color.orange)
   }
 }

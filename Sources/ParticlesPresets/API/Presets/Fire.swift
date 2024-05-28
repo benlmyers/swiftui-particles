@@ -39,7 +39,6 @@ public extension Preset {
         }
         .initialOffset(xIn: -spawnRadius.width/2 ... spawnRadius.width/2, yIn: -spawnRadius.height/2 ... spawnRadius.height/2)
         .hueRotation(angleIn: .degrees(0.0) ... .degrees(50.0))
-        .initialOffset(xIn: -spawnRadius.width/2 ... spawnRadius.width/2, yIn: -spawnRadius.height/2 ... spawnRadius.height/2)
         .initialVelocity(xIn: -0.4 ... 0.4, yIn: -1 ... 0.5)
         .fixAcceleration(y: -0.05)
         .lifetime(in: flameLifetime +/- flameLifetime * 0.2)
@@ -57,7 +56,7 @@ public extension Preset {
     ) {
       self.color = color
       self.flameSize = flameSize
-      self.spawnRadius = .init(width: flameSize, height: 4.0)
+      self.spawnRadius = spawnRadius
     }
   }
 }

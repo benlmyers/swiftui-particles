@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		EE1CCF602C057A1400E89225 /* HuggingLatticeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE1CCF5F2C057A1400E89225 /* HuggingLatticeDemo.swift */; };
+		EE1CCF622C0594F000E89225 /* FireplaceDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE1CCF612C0594F000E89225 /* FireplaceDemo.swift */; };
 		EE695F0C2ACB767E002D8F5B /* Particles in Frameworks */ = {isa = PBXBuildFile; productRef = EE695F0B2ACB767E002D8F5B /* Particles */; };
 		EED06F962C03A36500896E21 /* SpaceCometDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED06F952C03A36500896E21 /* SpaceCometDemo.swift */; };
 		EED06F982C03A70A00896E21 /* LatticeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED06F972C03A70A00896E21 /* LatticeDemo.swift */; };
@@ -51,6 +52,7 @@
 
 /* Begin PBXFileReference section */
 		EE1CCF5F2C057A1400E89225 /* HuggingLatticeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingLatticeDemo.swift; sourceTree = "<group>"; };
+		EE1CCF612C0594F000E89225 /* FireplaceDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireplaceDemo.swift; sourceTree = "<group>"; };
 		EED06F952C03A36500896E21 /* SpaceCometDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceCometDemo.swift; sourceTree = "<group>"; };
 		EED06F972C03A70A00896E21 /* LatticeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LatticeDemo.swift; sourceTree = "<group>"; };
 		EED6267F2A4990B300A3C3F4 /* ParticlesExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ParticlesExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -95,6 +97,7 @@
 				EED06F972C03A70A00896E21 /* LatticeDemo.swift */,
 				EED06F952C03A36500896E21 /* SpaceCometDemo.swift */,
 				EE1CCF5F2C057A1400E89225 /* HuggingLatticeDemo.swift */,
+				EE1CCF612C0594F000E89225 /* FireplaceDemo.swift */,
 			);
 			path = Demos;
 			sourceTree = "<group>";
@@ -286,6 +289,7 @@
 			files = (
 				EED626852A4990B300A3C3F4 /* ContentView.swift in Sources */,
 				EED06F962C03A36500896E21 /* SpaceCometDemo.swift in Sources */,
+				EE1CCF622C0594F000E89225 /* FireplaceDemo.swift in Sources */,
 				EE1CCF602C057A1400E89225 /* HuggingLatticeDemo.swift in Sources */,
 				EED626832A4990B300A3C3F4 /* ParticlesExampleApp.swift in Sources */,
 				EED06F982C03A70A00896E21 /* LatticeDemo.swift in Sources */,

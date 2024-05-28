@@ -28,6 +28,7 @@ struct ContentView: View {
             NavigationLink("Space Comet", destination: SpaceCometDemo())
             NavigationLink("Lattice", destination: LatticeDemo())
             NavigationLink("Hugging Lattice", destination: HuggingLatticeDemo())
+            NavigationLink("Fireplace", destination: FireplaceDemo())
           }
         }
         Spacer()

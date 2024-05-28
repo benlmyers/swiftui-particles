@@ -31,6 +31,7 @@ public struct Lattice<E>: Entity, Transparent where E: Entity {
   // MARK: - Properties
   
   private var mode: Mode = .cover
+  
   private var entity: E
   private var spawns: [(CGPoint, Color)]
   private var viewSize: CGSize
