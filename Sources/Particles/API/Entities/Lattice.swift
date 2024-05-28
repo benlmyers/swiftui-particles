@@ -11,26 +11,27 @@ import CoreGraphics
 
 /// A lattice entity group that 'imitates' a view by creating a grid of colored particles.
 ///
-/// You can customize the behavior of each particle to create neat effects on your views:
+/// Lattice acts as a ``Particles/Group`` which adds two modifers to each lattice particle; namely **initial position** and **color overlay**.
+///
+/// Like modifying entities within a ``Particles/Group``, you can customize the behavior of each underlying entity in ``Lattice`` by chaining
+/// entity modifiers after `Lattice { ... }`.
 /// ```
 /// Lattice(spacing: 3) {
 ///   Text("Hello, World!").font(.title).fontWeight(.bold)
-/// } withBehavior: { p in
-///   p
-///     .initialVelocity(xIn: -0.05 ... 0.05, yIn: -0.05 ... 0.05)
-///     .lifetime(4)
-///     .initialAcceleration(y: 0.0002)
-/// } customView: {
-///   Circle().frame(width: 3.0, height: 3.0)
 /// }
+/// .initialVelocity(xIn: -0.05 ... 0.05, yIn: -0.05 ... 0.05)
+/// .lifetime(4)
+/// .initialAcceleration(y: 0.0002)
 /// ```
+///
+/// To pass a custom underlying entity instead of using Lattice's default, a circle of width `2.0`, see ``Lattice/customEntity(entity:)``.
 @available(watchOS, unavailable)
-public struct Lattice: Entity, Transparent {
+public struct Lattice<E>: Entity, Transparent where E: Entity {
   
   // MARK: - Properties
   
   private var mode: Mode = .cover
-  private var customView: AnyView = AnyView(Circle().frame(width: 2.0, height: 2.0))
+  private var entity: E
   private var spawns: [(CGPoint, Color)]
   private var viewSize: CGSize
   private var anchor: UnitPoint
@@ -38,35 +39,42 @@ public struct Lattice: Entity, Transparent {
   // MARK: - Initalizers
   
   /// Creates a new Lattice particle group, which creates a grid of colored particles atop the opaque pixels of a view.
-  /// - Parameter edges: The edges to spawn particles on. Pass `[]` (default) to cover the view in particles.
+  /// - Parameter edges: The edges to spawn particles on. Pass `nil` (default) to cover the view in particles.
   /// - Parameter spacing: Distance between each particle in the lattice.
   /// - Parameter anchor: Whether to spawn the lattice of particles relative to the view.
+  /// - Parameter customEntity: A custom underlying entity to use within the lattice's array.
   /// - Parameter view: The view that is used as a source layer to choose where to spawn various colored particles.
   public init<Base>(
-    hugging edges: [Edge] = [],
+    hugging edges: Edge.Set? = nil,
     spacing: CGFloat = 3.0,
     anchor: UnitPoint = .center,
+    @EntityBuilder customEntity: () -> E,
     @ViewBuilder view: () -> Base
   ) where Base: View {
-    if edges.isEmpty {
-      self.init(mode: .cover, spacing: spacing, anchor: anchor, view: view)
+    if let edges {
+      self.init(mode: .hug(edges), spacing: spacing, anchor: anchor, entity: customEntity, view: view)
     } else {
-      self.init(mode: .hug(edges), spacing: spacing, anchor: anchor, view: view)
+      self.init(mode: .cover, spacing: spacing, anchor: anchor, entity: customEntity, view: view)
     }
   }
   
   /// Creates a new Lattice particle group, which creates a grid of colored particles atop the opaque pixels of a view.
-  /// - Parameter edge: The edge to spawn particles on.
+  /// - Parameter edges: The edges to spawn particles on. Pass `nil` (default) to cover the view in particles.
   /// - Parameter spacing: Distance between each particle in the lattice.
   /// - Parameter anchor: Whether to spawn the lattice of particles relative to the view.
   /// - Parameter view: The view that is used as a source layer to choose where to spawn various colored particles.
   public init<Base>(
-    hugging edge: Edge,
+    hugging edges: Edge.Set? = nil,
     spacing: CGFloat = 3.0,
     anchor: UnitPoint = .center,
     @ViewBuilder view: () -> Base
-  ) where Base: View {
-    self.init(hugging: [edge], spacing: spacing, anchor: anchor, view: view)
+  ) where Base: View, E == Particle {
+    let e: () -> E = { Particle(anyView: AnyView(Circle().frame(width: 2, height: 2))) }
+    if let edges {
+      self.init(mode: .hug(edges), spacing: spacing, anchor: anchor, entity: e, view: view)
+    } else {
+      self.init(mode: .cover, spacing: spacing, anchor: anchor, entity: e, view: view)
+    }
   }
   
   @available(watchOS, unavailable)
@@ -74,7 +82,8 @@ public struct Lattice: Entity, Transparent {
     mode: Mode = .cover,
     spacing: CGFloat = 3.0,
     anchor: UnitPoint = .center,
-    @ViewBuilder view: () -> Base
+    entity: () -> E,
+    view: () -> Base
   ) where Base: View {
     
 #if os(iOS)
@@ -90,6 +99,7 @@ public struct Lattice: Entity, Transparent {
     viewSize = .init(width: viewImage.width / 2, height: viewImage.height / 2)
     
     var pixelColorCache: [String: Color] = [:]
+    
     func getPixelColorAt(x: Int, y: Int, useCache: Bool = false) -> Color? {
       if useCache, let color = pixelColorCache["\(x)_\(y)"] { return color }
       let data: UnsafePointer<UInt8> = CFDataGetBytePtr(imgData)
@@ -107,11 +117,12 @@ public struct Lattice: Entity, Transparent {
     
     self.spawns = []
     self.anchor = anchor
-    self.customView = AnyView(Circle().frame(width: 2, height: 2))
+    self.entity = entity()
     
     var newSpawns: [(CGPoint, Color)] = []
     
     switch mode {
+      
     case .cover:
       for x in stride(from: 0.0, to: CGFloat(viewImage.width) / 2.0, by: spacing) {
         for y in stride(from: 0.0, to: CGFloat(viewImage.height) / 2.0, by: spacing) {
@@ -120,8 +131,18 @@ public struct Lattice: Entity, Transparent {
           }
         }
       }
-    case .hug(let array):
-      let flat: [(Edge, CGPoint)] = array.flatMap({ edge in edge.points(size: viewSize, spacing: spacing).map({ point in (edge, point) }) })
+      
+    case .hug(let set):
+      
+      let flat: [(Edge, CGPoint)] = set
+        .array
+        .flatMap({ edge in
+          edge.points(size: viewSize, spacing: spacing).map({
+            point in
+            (edge, point)
+          })
+        })
+      
       for (edge, point) in flat {
         var proxy: CGPoint = point
         while proxy.x >= 0 && proxy.x <= viewSize.width && proxy.y >= 0 && proxy.y <= viewSize.height {
@@ -151,30 +172,10 @@ public struct Lattice: Entity, Transparent {
   
   public var body: some Entity {
     ForEach(spawns, merges: .views) { spawn in
-      Particle(anyView: customView)
+      entity
         .initialOffset(x: spawn.0.x - viewSize.width * anchor.x, y: spawn.0.y - viewSize.height * anchor.y)
         .colorOverlay(spawn.1)
     }
-  }
-  
-  // MARK: - Modifiers
-  
-  public func customView<V>(@ViewBuilder view: () -> V) -> Lattice where V: View {
-    var copy = self
-    copy.customView = .init(view())
-    return copy
-  }
-  
-  public func hugs(_ edges: Edge...) -> Lattice {
-    var copy = self
-    copy.mode = .hug(edges)
-    return copy
-  }
-  
-  public func hugs() -> Lattice {
-    var copy = self
-    copy.mode = .hug(.all)
-    return copy
   }
   
   // MARK: - Subtypes
@@ -184,40 +185,34 @@ public struct Lattice: Entity, Transparent {
     /// Cover the entire view with particles.
     case cover
     /// Hug the outside edges of the view with particles.
-    case hug([Edge])
+    case hug(Edge.Set)
   }
-  
-  /// A edge against which Lattice choose to generate particles.
-  public enum Edge {
-    /// The top edge of a view.
-    case top
-    /// The leading edge of a view.
-    case leading
-    /// The bottom edge of a view.
-    case bottom
-    /// The trailing edge of a view.
-    case trailing
-    
-    fileprivate func points(size: CGSize, spacing: CGFloat) -> [CGPoint] {
-      switch self {
-      case .top:
-        return stride(from: 0, to: size.width, by: spacing).map({ .init(x: $0, y: 0.0)})
-      case .leading:
-        return stride(from: 0, to: size.height, by: spacing).map({ .init(x: 0.0, y: $0)})
-      case .bottom:
-        return stride(from: 0, to: size.width, by: spacing).map({ .init(x: $0, y: size.height)})
-      case .trailing:
-        return stride(from: 0, to: size.height, by: spacing).map({ .init(x: size.width, y: $0)})
-      }
+}
+
+fileprivate extension Edge {
+  func points(size: CGSize, spacing: CGFloat) -> [CGPoint] {
+    switch self {
+    case .top:
+      return stride(from: 0, to: size.width, by: spacing).map({ .init(x: $0, y: 0.0)})
+    case .leading:
+      return stride(from: 0, to: size.height, by: spacing).map({ .init(x: 0.0, y: $0)})
+    case .bottom:
+      return stride(from: 0, to: size.width, by: spacing).map({ .init(x: $0, y: size.height)})
+    case .trailing:
+      return stride(from: 0, to: size.height, by: spacing).map({ .init(x: size.width, y: $0)})
     }
   }
 }
 
-@available(watchOS, unavailable)
-public extension Array where Element == Lattice.Edge {
-  
-  /// Hugs every edge.
-  static var all : Self {
-    [.top, .leading, .bottom, .trailing]
+fileprivate extension Edge.Set {
+  var array: [Edge] {
+    switch self {
+    case .all: return [.top, .leading, .bottom, .trailing]
+    case .top: return [.top]
+    case .leading: return [.leading]
+    case .bottom: return [.bottom]
+    case .trailing: return [.trailing]
+    default: return []
+    }
   }
 }

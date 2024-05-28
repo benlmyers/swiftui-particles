@@ -147,7 +147,7 @@ public struct ParticleSystem: View {
   }
   
   /// Sets whether this particle system checks and updates ``ParticleSystem/Data/touches``.
-  /// - Parameter flag: Whether to update `touches`.
+  /// - Parameter flag: Whether to update `touches`. Default `true`.
   public func checksTouches(_ flag: Bool = true) -> ParticleSystem {
     var copy = self
     copy._checksTouches = flag

@@ -7,7 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EE1CCF602C057A1400E89225 /* HuggingLatticeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE1CCF5F2C057A1400E89225 /* HuggingLatticeDemo.swift */; };
 		EE695F0C2ACB767E002D8F5B /* Particles in Frameworks */ = {isa = PBXBuildFile; productRef = EE695F0B2ACB767E002D8F5B /* Particles */; };
+		EED06F962C03A36500896E21 /* SpaceCometDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED06F952C03A36500896E21 /* SpaceCometDemo.swift */; };
+		EED06F982C03A70A00896E21 /* LatticeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED06F972C03A70A00896E21 /* LatticeDemo.swift */; };
 		EED626832A4990B300A3C3F4 /* ParticlesExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED626822A4990B300A3C3F4 /* ParticlesExampleApp.swift */; };
 		EED626852A4990B300A3C3F4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED626842A4990B300A3C3F4 /* ContentView.swift */; };
 		EED626872A4990B500A3C3F4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EED626862A4990B500A3C3F4 /* Assets.xcassets */; };
@@ -47,6 +50,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		EE1CCF5F2C057A1400E89225 /* HuggingLatticeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingLatticeDemo.swift; sourceTree = "<group>"; };
+		EED06F952C03A36500896E21 /* SpaceCometDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceCometDemo.swift; sourceTree = "<group>"; };
+		EED06F972C03A70A00896E21 /* LatticeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LatticeDemo.swift; sourceTree = "<group>"; };
 		EED6267F2A4990B300A3C3F4 /* ParticlesExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ParticlesExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EED626822A4990B300A3C3F4 /* ParticlesExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticlesExampleApp.swift; sourceTree = "<group>"; };
 		EED626842A4990B300A3C3F4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -83,6 +89,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EE1CCF5E2C0579F000E89225 /* Demos */ = {
+			isa = PBXGroup;
+			children = (
+				EED06F972C03A70A00896E21 /* LatticeDemo.swift */,
+				EED06F952C03A36500896E21 /* SpaceCometDemo.swift */,
+				EE1CCF5F2C057A1400E89225 /* HuggingLatticeDemo.swift */,
+			);
+			path = Demos;
+			sourceTree = "<group>";
+		};
 		EED626762A4990B300A3C3F4 = {
 			isa = PBXGroup;
 			children = (
@@ -106,6 +122,7 @@
 		EED626812A4990B300A3C3F4 /* ParticlesExample */ = {
 			isa = PBXGroup;
 			children = (
+				EE1CCF5E2C0579F000E89225 /* Demos */,
 				EED626822A4990B300A3C3F4 /* ParticlesExampleApp.swift */,
 				EED626842A4990B300A3C3F4 /* ContentView.swift */,
 				EED626862A4990B500A3C3F4 /* Assets.xcassets */,
@@ -268,7 +285,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				EED626852A4990B300A3C3F4 /* ContentView.swift in Sources */,
+				EED06F962C03A36500896E21 /* SpaceCometDemo.swift in Sources */,
+				EE1CCF602C057A1400E89225 /* HuggingLatticeDemo.swift in Sources */,
 				EED626832A4990B300A3C3F4 /* ParticlesExampleApp.swift in Sources */,
+				EED06F982C03A70A00896E21 /* LatticeDemo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -417,7 +437,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ParticlesExample/Preview Content\"";
-				DEVELOPMENT_TEAM = CN8A6854MM;
+				DEVELOPMENT_TEAM = B4D7K3EGJG;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -458,7 +478,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ParticlesExample/Preview Content\"";
-				DEVELOPMENT_TEAM = CN8A6854MM;
+				DEVELOPMENT_TEAM = B4D7K3EGJG;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
