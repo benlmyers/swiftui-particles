@@ -6,26 +6,22 @@
 //
 
 import SwiftUI
+import Particles
+import ParticlesPresets
 
 struct ContentView: View {
   var body: some View {
-    NavigationSplitView {
+    ScrollView {
       List {
-        Text("Presets").font(.headline).foregroundStyle(.secondary)
-        NavigationLink("Comet", destination: CometView.init)
-        NavigationLink("Ghost Rider", destination: GhostRiderView.init)
-        NavigationLink("Fire", destination: FireView.init)
-        NavigationLink("Snow", destination: SnowView.init)
-        NavigationLink("Smoke", destination: SmokeView.init)
-        NavigationLink("Magic", destination: MagicView.init)
-        NavigationLink("Rain", destination: RainView.init)
-        NavigationLink("Stars", destination: StarsView.init)
-        NavigationLink("Fireworks", destination: FireworksView.init)
+        Section("Presets") {
+          ForEach(Preset.allDefaults, id: \.0) { d in
+            NavigationLink(d.0, destination: d.1.demo(customization: false, debug: false))
+          }
+        }
       }
-    } detail: {
-      Text("Particles")
     }
     .preferredColorScheme(.dark)
+    .background(Color.black)
   }
 }
 

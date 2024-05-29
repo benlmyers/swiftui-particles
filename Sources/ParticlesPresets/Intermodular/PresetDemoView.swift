@@ -22,6 +22,9 @@ internal struct PresetDemoView<Entry>: View where Entry: PresetEntry {
       }
       .statePersistent(String(describing: type(of: Entry.self)), refreshesViews: true)
       .debug(debug)
+      
+#if !os(watchOS)
+      
       if customization {
         LazyVGrid(columns: [.init(.adaptive(minimum: 200.0))], spacing: 8.0) {
           ForEach(Array(entry.parameters).sorted(by: { $0.key < $1.key }), id: \.0) { pair in
@@ -45,6 +48,9 @@ internal struct PresetDemoView<Entry>: View where Entry: PresetEntry {
         .padding()
         .padding(.top, debug ? 45.0 : 0.0)
       }
+      
+#endif
+      
     }
   }
 }

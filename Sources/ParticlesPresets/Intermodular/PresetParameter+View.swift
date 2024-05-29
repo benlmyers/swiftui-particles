@@ -24,7 +24,11 @@ internal extension PresetParameter {
       case .doubleRange(let d, let min, let max):
         _NumericRangeView(title: title, defaultValue: d, minValue: min, maxValue: max, onUpdate: onUpdate)
       case .color(let d):
+        #if os(watchOS)
+        EmptyView()
+        #else
         _ColorView(title: title, defaultValue: d, onUpdate: onUpdate)
+        #endif
       case .intRange(let d, let min, let max):
         _NumericRangeView(title: title, defaultValue: Float(d), minValue: Float(min), maxValue: Float(max), onUpdate: onUpdate)
       }

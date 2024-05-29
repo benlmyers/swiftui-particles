@@ -15,11 +15,20 @@ public extension Preset {
     
     static public var `default`: Preset.Fire = .init()
     
-    public var parameters: [String : (PresetParameter, PartialKeyPath<Self>)] {[
-      "Color": (.color(.red), \.color),
-      "Size": (.floatRange(18.0, min: 10.0, max: 40.0), \.flameSize),
-      "Lifetime": (.doubleRange(1.0, min: 0.5, max: 2.0), \.flameLifetime)
-    ]}
+    public var parameters: [String : (PresetParameter, PartialKeyPath<Self>)] {
+      var result: [String : (PresetParameter, PartialKeyPath<Self>)] = [
+        "Size": (.floatRange(18.0, min: 10.0, max: 40.0), \.flameSize),
+        "Lifetime": (.doubleRange(1.0, min: 0.5, max: 2.0), \.flameLifetime)
+      ]
+      
+#if !os(watchOS)
+      
+      result["Color"] = (.color(.red), \.color)
+      
+#endif
+      
+      return result
+    }
     
     var color: Color = .red
     var spawnRadius: CGSize
