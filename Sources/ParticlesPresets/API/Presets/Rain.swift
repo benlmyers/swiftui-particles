@@ -36,7 +36,7 @@ public extension Preset {
     
     public struct Drop: Entity {
       
-      internal var parameters: Rain.Parameters
+      internal let parameters: Rain.Parameters
       
       public var body: some Entity {
         Particle {

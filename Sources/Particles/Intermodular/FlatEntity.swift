@@ -74,7 +74,6 @@ internal struct FlatEntity {
       case colorOverlay(color: Color)
       case transition(transition: AnyTransition, bounds: TransitionBounds, duration: TimeInterval)
       case delay(duration: TimeInterval)
-      case emitChance(_ chance: Double)
     }
   }
   

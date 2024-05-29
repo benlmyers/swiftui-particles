@@ -18,12 +18,16 @@ struct HuggingLatticeDemo: View {
     ZStack {
       p
       ParticleSystem {
-        Lattice(hugging: .top, customEntity: {
-          Preset.Fire()
-        }) {
-          p
+        Emitter(every: 0.01) {
+          Lattice(hugging: .top, customEntity: {
+            Preset.Fire.Flame()
+          }) {
+            p
+          }
         }
-        .emitChance(0.1)
+        .emitSingle { _ in
+            .random(in: 0 ... 999)
+        }
       }
       .debug(debug)
     }

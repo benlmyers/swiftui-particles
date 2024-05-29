@@ -34,7 +34,7 @@ public extension Preset {
     
     public struct Flake: Entity {
       
-      internal var parameters: Snow.Parameters
+      internal let parameters: Snow.Parameters
       
       public var body: some Entity {
         Particle {

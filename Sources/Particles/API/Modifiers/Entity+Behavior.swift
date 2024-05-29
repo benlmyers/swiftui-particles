@@ -71,15 +71,4 @@ public extension Entity {
     m.preferences.append(.custom({ c in .delay(duration: withDelay(c)) }))
     return m
   }
-  
-  /// Sets the chance that this entity (if it contains an ``Emitter``) emits child entities for each scheduled spawn.
-  /// This allows ``Emitter`` to have a more random effect when spawning proxies.
-  /// When an Emitter is ready to spawn a new proxy, there is a `1 - value` probability the action will be skipped.
-  /// The Emitter will wait again to spawn the next proxy.
-  /// - parameter value: The chance , from `0.0` to `1.0`, underlying emitters spawn children on their timers. Default `1.0`.
-  func emitChance(_ value: Double) -> some Entity {
-    var m = ModifiedEntity(entity: self)
-    m.preferences.append(.custom({ c in .emitChance(max(min(value, 1), 0)) }))
-    return m
-  }
 }

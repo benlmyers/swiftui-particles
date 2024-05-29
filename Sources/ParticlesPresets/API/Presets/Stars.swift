@@ -32,7 +32,7 @@ public extension Preset {
     
     public struct Star: Entity {
       
-      internal var parameters: Stars.Parameters
+      internal let parameters: Stars.Parameters
       
       public var body: some Entity {
         Particle {

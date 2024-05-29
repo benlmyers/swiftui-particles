@@ -19,7 +19,7 @@ public extension Preset {
     
     private var _parameters: Parameters
     
-    public init (shootFor shootDuration: TimeInterval = 1.0, color: Color = .blue, spread: Double = 1.0) {
+    public init(shootFor shootDuration: TimeInterval = 1.0, color: Color = .blue, spread: Double = 1.0) {
       self._parameters = .init(shootDuration: shootDuration, color: color, spread: spread)
     }
     
