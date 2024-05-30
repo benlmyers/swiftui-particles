@@ -10,25 +10,21 @@ import Particles
 import Foundation
 
 /// A preset entry entity.
-/// Presets have a optional property, ``parameters``, which holds a dictionary of configurable parameters for the preset. By default this is empty.
-/// If you choose to implement it, calling ``PresetEntry/demo(customization:debug:)`` will return a view displaying the preset with customization options.
+/// Presets have an optional function header, ``customizableParameters()``, which allows users to customize the preset within it's *demo*:
+/// Calling ``PresetEntry/demo(customization:debug:)`` will return a view displaying the preset with customization options.
 /// This is used in the [example project](https://github.com/benlmyers/swiftui-particles/tree/main/Examples/ParticlesExample).
 /// - SeeAlso: ``PresetEntry/view``
 /// - SeeAlso: ``PresetParameter``
 public protocol PresetEntry: Entity {
   
   /// The default instance of this entity.
-  static var `default`: Self { get }
+  static var defaultInstance: Self { get }
   
-  /// The parameters of this entry.
-  var parameters: [String: (PresetParameter, PartialKeyPath<Self>)] { get }
+  /// The customizable parameters of this entry.
+  func customizableParameters() -> [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)]
 }
 
 public extension PresetEntry {
-  
-  // MARK: - Default Implementation
-  
-  var parameters: [String: (PresetParameter, PartialKeyPath<Self>)] { [:] }
   
   // MARK: - Properties
   

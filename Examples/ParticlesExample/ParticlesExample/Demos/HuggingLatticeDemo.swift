@@ -23,7 +23,7 @@ struct HuggingLatticeDemo: View {
       ParticleSystem {
         Emitter(every: 0.005) {
           Lattice(hugging: .top, customEntity: {
-            Preset.Fire.Flame(color: .red)
+            Preset.Fire(color: .red).flame
           }) {
             Text("Particles")
               .fontWeight(.black)

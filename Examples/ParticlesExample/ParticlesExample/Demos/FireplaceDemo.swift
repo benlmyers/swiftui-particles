@@ -19,7 +19,7 @@ struct FireplaceDemo: View {
       Color.black
       Image("fireplace").resizable().frame(width: 300.0, height: 250.0).aspectRatio(contentMode: .fill)
       ParticleSystem {
-        Preset.Fire(color: .orange, flameSize: 15.0, spawnRadius: .init(width: 200.0, height: 5.0))
+        Preset.Fire(color: .orange, size: 15.0, radius: .init(width: 200.0, height: 5.0))
           .fixPosition(.init(x: 0.5, y: 0.65))
       }
       .debug(debug)
