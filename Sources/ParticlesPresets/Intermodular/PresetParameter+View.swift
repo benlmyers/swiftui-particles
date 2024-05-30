@@ -31,6 +31,10 @@ internal extension PresetParameter {
         #endif
       case .intRange(let d, let min, let max):
         _NumericRangeView(title: title, defaultValue: Float(d), minValue: Float(min), maxValue: Float(max), onUpdate: onUpdate)
+      case .angle(let d):
+        _NumericRangeView(title: title, defaultValue: d.degrees, minValue: 0.0, maxValue: 360.0, onUpdate: onUpdate)
+      case .bool(let d):
+        _ToggleView(title: title, defaultValue: d, onUpdate: onUpdate)
       }
     }
     
@@ -42,13 +46,20 @@ internal extension PresetParameter {
       var maxValue: T
       var onUpdate: (Any) -> Void
       var body: some View {
-        Slider(value: $selected, in: minValue ... maxValue, label: { Text(title) })
-          .onAppear {
-            selected = defaultValue
-          }
-          .onChange(of: selected) { v in
-            onUpdate(v)
-          }
+        HStack {
+          Text(title)
+          Spacer()
+          Slider(value: $selected, in: minValue ... maxValue)
+          Divider()
+          Text("\(Int(selected))")
+            .frame(width: 40.0)
+        }
+        .onAppear {
+          selected = defaultValue
+        }
+        .onChange(of: selected) { v in
+          onUpdate(v)
+        }
       }
     }
 
@@ -69,5 +80,20 @@ internal extension PresetParameter {
       }
     }
 
+    private struct _ToggleView: View {
+      @State private var on: Bool = false
+      var title: String
+      var defaultValue: Bool
+      var onUpdate: (Any) -> Void
+      var body: some View {
+        Toggle(title, isOn: $on)
+          .onAppear {
+            on = defaultValue
+          }
+          .onChange(of: on) { v in
+            onUpdate(v)
+          }
+      }
+    }
   }
 }

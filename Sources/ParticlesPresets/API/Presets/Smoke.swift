@@ -13,49 +13,12 @@ public extension Preset {
   
   struct Smoke: Entity, PresetEntry {
     
-    static public var `default`: Self = .init()
+    static public let defaultInstance: Self = .init()
     
-    public var parameters: [String: (PresetParameter, PartialKeyPath<Self>)] {[:]}
-    
-    var color: Color
-    var startRadius: CGFloat =  8.0
-    var endRadius: CGFloat = 30.0
-    var spawnPoint: UnitPoint
-    var spawnRadius: CGSize
-    var dirty: Bool = false
-    
-    private var velocityX: ClosedRange<CGFloat> {
-      switch spawnPoint {
-      case .bottomLeading, .leading, .topLeading:
-        return 3.0 ... 6.0
-      case .topTrailing, .bottomTrailing, .trailing:
-        return -6.0 ... -3.0
-      default:
-        return -0.5 ... 0.5
-      }
-    }
-    
-    private var velocityY: ClosedRange<CGFloat> {
-      switch spawnPoint {
-      case .bottomLeading, .bottomTrailing, .bottom:
-        return 1.0 ... 3.0
-      case .leading, .trailing:
-        return 0.0 ... 0.0
-      default:
-        return -3.0 ... 1.0
-      }
-    }
-
-    private var velocityAccelerationY: CGFloat {
-      switch spawnPoint {
-      case .bottom, .bottomLeading, .bottomTrailing:
-        return 0.02
-      case .leading, .trailing:
-        return 0
-      default:
-        return -0.02
-      }
-    }
+    internal var color: Color
+    internal var size: CGFloat
+    internal var radius: CGSize
+    internal var dirty: Bool
     
     public var body: some Entity {
       Emitter(every: 0.01) {
@@ -63,14 +26,14 @@ public extension Preset {
           RadialGradient(
             colors: [color, .clear],
             center: .center,
-            startRadius: startRadius,
-            endRadius: endRadius
+            startRadius: size / 4.0,
+            endRadius: size
           )
           .clipShape(Circle())
         }
-        .initialOffset(xIn: -spawnRadius.width ... spawnRadius.width/2, yIn: -spawnRadius.height/2 ... spawnRadius.height/2)
-        .initialVelocity(xIn: velocityX, yIn: velocityY)
-        .fixAcceleration(y: velocityAccelerationY)
+        .initialOffset(xIn: -radius.width ... radius.width/2, yIn: -radius.height/2 ... radius.height/2)
+        .initialVelocity(xIn: -0.5 ... 0.5, yIn: -3.0 ... 1.0)
+        .fixAcceleration(y: -0.02)
         .lifetime(in: 3 +/- 0.2)
         .blendMode(dirty ? .hardLight : .normal)
         .transition(.scale, on: .death, duration: 0.5)
@@ -79,20 +42,32 @@ public extension Preset {
       }
     }
     
+    /// Initializes Smoke with the specified properties.
+    /// - Parameter color: The color of the entity. Default `Color(red: 128/255, green: 128/255, blue: 128/255, opacity: 1)`.
+    /// - Parameter size: The size of the entity. Default `30.0`.
+    /// - Parameter radius: The radius of the entity. Default `CGSize(width: 40.0, height: 8.0)`.
+    /// - Parameter dirty: A flag indicating if the entity is dirty. Default `false`.
     public init(
       color: Color = Color(red: 128/255, green: 128/255, blue: 128/255, opacity: 1),
-      dirty: Bool = false,
-      spawnPoint: UnitPoint = .center,
-      startRadius: CGFloat =  12.0,
-      endRadius: CGFloat = 35.0,
-      spawnRadius: CGSize = .init(width: 40.0, height: 8.0)
+      size: CGFloat = 30.0,
+      radius: CGSize = .init(width: 40.0, height: 8.0),
+      dirty: Bool = false
     ) {
-      self.dirty = dirty
       self.color = color
-      self.spawnPoint = spawnPoint
-      self.startRadius = startRadius
-      self.endRadius = endRadius
-      self.spawnRadius = spawnRadius
+      self.size = size
+      self.radius = radius
+      self.dirty = dirty
     }
+    
+    public func customizableParameters() -> [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] {
+          var result: [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] = [
+            ("Size", .floatRange(18.0, min: 10.0, max: 40.0), \.size),
+            ("Dirty", .bool(false), \.dirty)
+          ]
+    #if !os(watchOS)
+          result.append(("Color", .color(.red), \.color))
+    #endif
+          return result
+        }
   }
 }

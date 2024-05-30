@@ -11,6 +11,7 @@ import Foundation
 
 public extension Preset {
   
+  /// A fire particle effect.
   struct Fire: Entity, PresetEntry {
     
     public static let defaultInstance = Self.init()
@@ -26,6 +27,11 @@ public extension Preset {
     internal var radius: CGSize
     internal var lifetime: Double
     
+    /// Initializes Fire with specified properties.
+    /// - Parameter color: The color of the entity. Default `.red`.
+    /// - Parameter size: The size of the entity. Default `10.0`.
+    /// - Parameter radius: The radius of the entity. Default `CGSize(width: 20.0, height: 4.0)`.
+    /// - Parameter lifetime: The lifetime of the entity. Default `1.0`.
     public init(
       color: Color = .red,
       size: CGFloat = 10.0,
@@ -38,6 +44,7 @@ public extension Preset {
       self.lifetime = lifetime
     }
     
+    /// A single fire flame.
     public var flame: some Entity {
       Particle {
         RadialGradient(
@@ -59,8 +66,8 @@ public extension Preset {
       .transition(.opacity, on: .birth, duration: 0.3)
     }
     
-    public func customizableParameters() -> [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Preset.Fire>)] {
-      var result: [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Preset.Fire>)] = [
+    public func customizableParameters() -> [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] {
+      var result: [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] = [
         ("Size", .floatRange(18.0, min: 10.0, max: 40.0), \.size),
         ("Lifetime", .doubleRange(1.0, min: 0.5, max: 2.0), \.lifetime)
       ]

@@ -22,4 +22,8 @@ public enum PresetParameter {
   /// A configurable `Color` parameter.
   @available(watchOS, unavailable)
   case color(Color)
+  /// An `Angle` parameter.
+  case angle(Angle)
+  /// A `Bool` parameter.
+  case bool(Bool)
 }

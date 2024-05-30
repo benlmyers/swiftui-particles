@@ -11,14 +11,14 @@ import Foundation
 
 public extension Preset {
   
+  /// A Magic effect that bursts outward radially.
   struct Magic: Entity, PresetEntry {
     
-    static public var `default`: Self = .init()
-    
-    public var parameters: [String: (PresetParameter, PartialKeyPath<Self>)] {[:]}
+    static public var defaultInstance: Self = .init()
     
     var color: Color
-    var spawnPoint: UnitPoint
+    var intensity: Int
+    var lifetime: TimeInterval
     
     public var body: some Entity {
       Emitter(every: 0.03) {
@@ -43,17 +43,33 @@ public extension Preset {
         .hueRotation(angleIn: .degrees(-10.0) ... .degrees(10.0))
         .transition(.twinkle, on: .death, duration: 2.0)
         .transition(.opacity, on: .birth, duration: 0.5)
-        .lifetime(3)
+        .lifetime(lifetime)
         .glow(color, radius: 4)
       }
     }
     
+    /// Initializes Magic with specified properties.
+    /// - Parameter color: The color of the entity. Default `.purple`.
+    /// - Parameter intensity: The intensity of the entity. Default `30`.
     public init(
       color: Color = .purple,
-      spawnPoint: UnitPoint = .center
+      intensity: Int = 30,
+      lifetime: TimeInterval = 3.0
     ) {
       self.color = color
-      self.spawnPoint = spawnPoint
+      self.intensity = intensity
+      self.lifetime = lifetime
+    }
+    
+    public func customizableParameters() -> [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] {
+      var result: [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] = [
+        ("Intensity", .intRange(10, min: 1, max: 100), \.intensity),
+        ("Lifetime", .doubleRange(1.0, min: 0.5, max: 2.0), \.lifetime)
+      ]
+#if !os(watchOS)
+      result.append(("Color", .color(.red), \.color))
+#endif
+      return result
     }
   }
 }

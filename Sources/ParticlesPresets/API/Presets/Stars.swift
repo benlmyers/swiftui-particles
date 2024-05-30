@@ -13,53 +13,64 @@ public extension Preset {
   
   struct Stars: Entity, PresetEntry {
     
-    static public var `default`: Self = .init()
+    static public let defaultInstance: Self = .init()
     
-    public var parameters: [String: (PresetParameter, PartialKeyPath<Self>)] {[:]}
-        
-    private var _parameters: Parameters
-    
-    public init(size: CGFloat = 30.0, lifetime: TimeInterval = 5.0, intensity: Int = 20, twinkle: Bool = true) {
-      self._parameters = .init(intensity: intensity, starSize: size, starLifetime: lifetime, twinkle: twinkle)
-    }
+    internal var intensity: Int = 3
+    internal var size: CGFloat
+    internal var lifetime: TimeInterval
+    internal var twinkle: Bool = false
     
     public var body: some Entity {
-      Emitter(every: 1.0 / Double(_parameters.intensity)) {
-        Star(parameters: _parameters)
+      Emitter(every: 1.0 / Double(intensity)) {
+        star
+          .initialPosition { c in
+            let x = Int.random(in: 0 ... Int(c.system.size.width))
+            let y = Int.random(in: 0 ... Int(c.system.size.height))
+            return CGPoint(x: x, y: y)
+          }
       }
       .emitAll()
     }
     
-    public struct Star: Entity {
-      
-      internal let parameters: Stars.Parameters
-      
-      public var body: some Entity {
-        Particle {
-          Image("sparkle", bundle: .module)
-            .resizable()
-            .aspectRatio(contentMode: .fill)
-            .frame(width: parameters.starSize, height: parameters.starSize)
-        }
-        .initialPosition { c in
-          let x = Int.random(in: 0 ... Int(c.system.size.width))
-          let y = Int.random(in: 0 ... Int(c.system.size.height))
-          return CGPoint(x: x, y: y)
-        }
-        .transition(.opacity, duration: 3.0)
-        .opacity { c in
-          return 0.5 + sin(c.timeAlive)
-        }
-        .scale(factorIn: 0.5 ... 1.0)
-        .blendMode(.plusLighter)
+    /// A single star particle.
+    public var star: some Entity {
+      Particle {
+        Image("sparkle", bundle: .module)
+          .resizable()
+          .aspectRatio(contentMode: .fill)
+          .frame(width: size, height: size)
       }
+      
+      .transition(.opacity, duration: 3.0)
+      .opacity { c in
+        return 0.5 + sin(c.timeAlive)
+      }
+      .scale(factorIn: 0.5 ... 1.0)
+      .blendMode(.plusLighter)
     }
     
-    internal struct Parameters {
-      var intensity: Int = 3
-      var starSize: CGFloat
-      var starLifetime: TimeInterval
-      var twinkle: Bool = false
+    /// Creates a sky of stars.
+    /// - Parameter size: The size of each star.
+    /// - Parameter lifetime: The lifetime of each star.
+    /// - Parameter intensity: The amount of stars to spawn.
+    /// - Parameter twinkle: Whether the stars should twinkle.
+    public init(
+      size: CGFloat = 30.0,
+      lifetime: TimeInterval = 5.0,
+      intensity: Int = 20,
+      twinkle: Bool = true
+    ) {
+      self.size = size
+      self.lifetime = lifetime
+      self.intensity = intensity
+      self.twinkle = twinkle
     }
+    
+    public func customizableParameters() -> [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] {[
+      ("Size", .floatRange(18.0, min: 10.0, max: 40.0), \.size),
+      ("Lifetime", .doubleRange(1.0, min: 0.5, max: 2.0), \.lifetime),
+      ("Intensity", .intRange(20, min: 5, max: 50), \.intensity),
+      ("Twinkle", .bool(true), \.twinkle)
+    ]}
   }
 }

@@ -14,24 +14,15 @@ public extension Preset {
   /// Leaves blowing in the wind.
   struct Leaves: Entity, PresetEntry {
     
-    static public var `default`: Preset.Leaves = .init()
+    static public var defaultInstance: Self = .init()
     
-    public var parameters: [String : (PresetParameter, PartialKeyPath<Self>)] {[
-      "Amount": (.intRange(50, min: 10, max: 300), \.amount),
-      "Wind Speed": (.doubleRange(1.0, min: 0.1, max: 3.0), \.windSpeed),
-      "Scale": (.doubleRange(1.0, min: 0.1, max: 5.0), \.scale)
-    ]}
-    
-    /// The amount of leaves to spawn.
-    public var amount: Int = 50
-    /// The speed factor of wind. Default `1.0`.
-    public var windSpeed: Double = 1.0
-    /// The scale factor of the leaves. Default `1.0`.
-    public var scale: Double = 1.0
+    internal var amount: Int
+    internal var wind: Double
+    internal var scale: Double
     
     public var body: some Entity {
       ForEach(0 ..< amount, merges: .entities) { _ in
-        Leaf(scale: scale)
+        leaf
           .initialPosition(with: { c in
               .init(x: .random(in: -c.system.size.width * 0.7 ... 0.0), y: .random(in: 0.0 ... c.system.size.height * 0.5))
           })
@@ -42,30 +33,38 @@ public extension Preset {
       }
     }
     
-    public init(amount: Int = 50, windSpeed: Double = 1.0, scale: Double = 1.0) {
-        self.amount = amount
-        self.windSpeed = windSpeed
-        self.scale = scale
+    /// Initializes a Leaf with specified properties.
+    /// - Parameter amount: The amount of entities. Default `50`.
+    /// - Parameter wind: The wind factor of the entities. Default `1.0`.
+    /// - Parameter scale: The scale of the entities. Default `1.0`.
+    public init(
+      amount: Int = 50,
+      wind: Double = 1.0,
+      scale: Double = 1.0
+    ) {
+      self.amount = amount
+      self.wind = wind
+      self.scale = scale
     }
     
-    /// A single leaf particle.
-    public struct Leaf: Entity {
-      
-      /// The scale factor of the leaf. Default `1.0`.
-      public var scale: Double = 1.0
-      
-      public var body: some Entity {
-        Particle {
-          Image("leaf", bundle: .module).resizable().frame(width: 20.0, height: 20.0)
-        }
-        .lifetime(in: 5.0 ... 8.0)
-        .transition(.scale, duration: 1.0)
-        .scale(factorIn: scale +/- 0.4)
-        .hueRotation(angleIn: .degrees(0) ... .degrees(30))
-        .fixTorque(with: { c in
-            .degrees(cos(c.timeAlive + 2 * .pi * c.proxy.seed.3))
-        })
+    /// An individual leaf.
+    public var leaf: some Entity {
+      Particle {
+        Image("leaf", bundle: .module).resizable().frame(width: 20.0, height: 20.0)
       }
+      .lifetime(in: 5.0 ... 8.0)
+      .transition(.scale, duration: 1.0)
+      .scale(factorIn: scale +/- 0.4)
+      .hueRotation(angleIn: .degrees(0) ... .degrees(30))
+      .fixTorque(with: { c in
+          .degrees(cos(c.timeAlive + 2 * .pi * c.proxy.seed.3))
+      })
     }
+    
+    public func customizableParameters() -> [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] {[
+      ("Amount", .intRange(50, min: 10, max: 300), \.amount),
+      ("Wind", .doubleRange(1.0, min: 0.1, max: 3.0), \.wind),
+      ("Scale", .doubleRange(1.0, min: 0.1, max: 5.0), \.scale)
+    ]}
   }
 }
