@@ -38,6 +38,15 @@ public struct Emitter<Children>: Entity, _Emitter where Children: Entity {
     self.body = emits()
   }
   
+  /// Creates an emitter that emits passed entities at a specific *rate per second*.
+  /// If a group of entities is passed in `emits`, you can use ``emitAll()`` or ``emitSingle(choosing:)`` to change the entities spawned.
+  /// - Parameter rate: The rate to emit entities **per second**.
+  /// - Parameter emits: A closure returning the entity/entities to spawn on the interval.
+  public init(rate: Double, @EntityBuilder emits: () -> Children) {
+    self.emitInterval = 1.0 / rate
+    self.body = emits()
+  }
+  
   // MARK: - Methods
   
   /// Modifies the ``Emitter`` to emit only one entity at a time.

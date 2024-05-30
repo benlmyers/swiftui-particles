@@ -155,19 +155,27 @@ public extension ParticleSystem {
         guard let entity: FlatEntity = entities[entityID] else { continue }
         guard let emitter = (entity.root as? (any _Emitter)) else { continue }
         guard let protoEntities: [EntityID] = emitEntities[entityID] else { continue }
+        var multiplier: Int = 1
         if let emitted: UInt = lastEmitted[proxyID] {
           let emitAt: UInt = emitted + UInt(emitter.emitInterval * 60.0)
           guard currentFrame >= emitAt else { continue }
+          if fps > 0 {
+            let m = 1.0 / (emitter.emitInterval * 60.0)
+            if m >= 2 { multiplier = Int(floor(m)) }
+          }
         }
         var finalEntities: [EntityID] = protoEntities
-        let context = Proxy.Context(proxy: proxy, system: self)
         if let chooser = emitter.emitChooser, !protoEntities.isEmpty {
           let context = Proxy.Context(proxy: proxy, system: self)
           let i = chooser(context) % protoEntities.count
           finalEntities = [protoEntities[i]]
         }
         for protoEntity in finalEntities {
-          guard let _: ProxyID = self.createProxy(protoEntity, inherit: proxy) else { continue }
+          var flag: Bool = false
+          for _ in 0 ..< multiplier {
+            if let _: ProxyID = self.createProxy(protoEntity, inherit: proxy) { flag = true }
+          }
+          guard flag else { continue }
           self.lastEmitted[proxyID] = currentFrame
         }
       }

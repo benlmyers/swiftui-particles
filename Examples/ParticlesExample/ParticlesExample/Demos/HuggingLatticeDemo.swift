@@ -16,13 +16,19 @@ struct HuggingLatticeDemo: View {
   
   var body: some View {
     ZStack {
-      p
+      Text("Particles")
+        .fontWeight(.black)
+        .font(.system(size: 90))
+        .foregroundStyle(LinearGradient(colors: [Color.clear, Color.red], startPoint: .bottom, endPoint: .top))
       ParticleSystem {
-        Emitter(every: 0.01) {
+        Emitter(every: 0.005) {
           Lattice(hugging: .top, customEntity: {
-            Preset.Fire.Flame()
+            Preset.Fire.Flame(color: .red)
           }) {
-            p
+            Text("Particles")
+              .fontWeight(.black)
+              .font(.system(size: 90))
+              .foregroundStyle(.red)
           }
         }
         .emitSingle { _ in
@@ -31,12 +37,5 @@ struct HuggingLatticeDemo: View {
       }
       .debug(debug)
     }
-  }
-  
-  var p: some View {
-    Text("Particles")
-      .fontWeight(.black)
-      .font(.system(size: 90))
-      .foregroundStyle(Color.orange)
   }
 }

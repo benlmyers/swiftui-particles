@@ -17,12 +17,13 @@ struct FireplaceDemo: View {
   var body: some View {
     ZStack {
       Color.black
-      Image("fireplace").resizable().aspectRatio(contentMode: .fit)
+      Image("fireplace").resizable().frame(width: 300.0, height: 250.0).aspectRatio(contentMode: .fill)
       ParticleSystem {
-        Preset.Fire(flameSize: 15.0, spawnRadius: .init(width: 200.0, height: 5.0))
+        Preset.Fire(color: .orange, flameSize: 15.0, spawnRadius: .init(width: 200.0, height: 5.0))
           .fixPosition(.init(x: 0.5, y: 0.65))
       }
       .debug(debug)
+      .scaleEffect(0.5)
     }
   }
 }

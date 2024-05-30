@@ -111,7 +111,7 @@ public struct Lattice<E>: Entity, Transparent where E: Entity {
       let b = CGFloat(data[pixelInfo + 2]) / CGFloat(255.0)
       let a = CGFloat(data[pixelInfo + 3]) / CGFloat(255.0)
       let color = Color(red: Double(r), green: Double(g), blue: Double(b), opacity: Double(a))
-      if a == 0 || r + g + b < 0.1 { return nil }
+      if a == 0 || r + g + b < 1.0 { return nil }
       if useCache { pixelColorCache["\(x)_\(y)"] = color }
       return color
     }

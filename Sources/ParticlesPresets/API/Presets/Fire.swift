@@ -41,7 +41,7 @@ public extension Preset {
       flameSize: CGFloat = 10.0,
       spawnRadius: CGSize = .init(width: 20.0, height: 4.0)
     ) {
-      self._parameters = .init(color: color, spawnRadius: .zero, flameSize: flameSize, flameLifetime: 1)
+      self._parameters = .init(color: color, spawnRadius: spawnRadius, flameSize: flameSize, flameLifetime: 1)
     }
     
     public struct Flame: Entity {
@@ -69,8 +69,12 @@ public extension Preset {
         .transition(.opacity, on: .birth, duration: 0.3)
       }
       
-      public init() {
-        self.parameters = .init(color: .red, spawnRadius: .zero, flameSize: 10.0, flameLifetime: 1.0)
+      public init(
+        color: Color = .red,
+        flameSize: CGFloat = 10.0,
+        spawnRadius: CGSize = .init(width: 20.0, height: 4.0)
+      ) {
+        self.parameters = .init(color: color, spawnRadius: spawnRadius, flameSize: flameSize, flameLifetime: 1)
       }
       
       internal init(parameters: Fire.Parameters) {
