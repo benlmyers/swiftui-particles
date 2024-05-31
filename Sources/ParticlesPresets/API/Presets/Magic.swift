@@ -21,7 +21,7 @@ public extension Preset {
     var lifetime: TimeInterval
     
     public var body: some Entity {
-      Emitter(every: 0.03) {
+      Emitter(rate: Double(intensity)) {
         Particle {
           RadialGradient(
             colors: [color, .clear],
@@ -63,11 +63,11 @@ public extension Preset {
     
     public func customizableParameters() -> [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] {
       var result: [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] = [
-        ("Intensity", .intRange(10, min: 1, max: 100), \.intensity),
-        ("Lifetime", .doubleRange(1.0, min: 0.5, max: 2.0), \.lifetime)
+        ("Intensity", .intRange(30, min: 1, max: 100), \.intensity),
+        ("Lifetime", .doubleRange(3.0, min: 0.5, max: 2.0), \.lifetime)
       ]
 #if !os(watchOS)
-      result.append(("Color", .color(.red), \.color))
+      result.append(("Color", .color(.purple), \.color))
 #endif
       return result
     }

@@ -41,13 +41,13 @@ public extension Preset {
           colors: [Color.blue, Color.clear],
           center: .center,
           startRadius: 0.0,
-          endRadius: 50.0 * 0.8
+          endRadius: size * 0.8
         )
         .clipShape(Circle())
       }
       .hueRotation(angleIn: .degrees(0.0) ... .degrees(20.0))
-      .fixAcceleration(x: 4.0 * cos(direction), y: 4.0 * sin(direction))
-      .lifetime(in: 2 +/- 0.5)
+      .fixAcceleration(x: cos(direction), y: sin(direction))
+      .lifetime(in: lifetime +/- 0.5)
       .glow(color.opacity(0.9), radius: 18.0)
       .blendMode(.plusLighter)
       .transition(.scale, on: .death, duration: 0.5)
@@ -65,7 +65,7 @@ public extension Preset {
       color: Color = .blue,
       size: CGFloat = 50.0,
       lifetime: TimeInterval = 1.0,
-      direction: Angle = .init(degrees: -45.0)
+      direction: Angle = .init(degrees: 315.0)
     ) {
       self.color = color
       self.size = size
@@ -75,11 +75,12 @@ public extension Preset {
     
     public func customizableParameters() -> [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] {
       var result: [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] = [
-        ("Size", .floatRange(18.0, min: 10.0, max: 40.0), \.size),
-        ("Lifetime", .doubleRange(1.0, min: 0.5, max: 2.0), \.lifetime)
+        ("Size", .floatRange(50.0, min: 10.0, max: 150.0), \.size),
+        ("Lifetime", .doubleRange(1.0, min: 0.5, max: 2.0), \.lifetime),
+        ("Direction", .angle(.degrees(315.0)), \.direction)
       ]
 #if !os(watchOS)
-      result.append(("Color", .color(.red), \.color))
+      result.append(("Color", .color(.blue), \.color))
 #endif
       return result
     }

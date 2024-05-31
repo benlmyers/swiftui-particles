@@ -50,9 +50,13 @@ internal extension PresetParameter {
           Text(title)
           Spacer()
           Slider(value: $selected, in: minValue ... maxValue)
-          Divider()
-          Text("\(Int(selected))")
-            .frame(width: 40.0)
+          if selected > 10 || T.self == Int.self {
+            Text("\(Int(selected))")
+              .frame(width: 30.0)
+          } else {
+            Text("\(Double(selected), specifier: "%.1f")")
+              .frame(width: 30.0)
+          }
         }
         .onAppear {
           selected = defaultValue

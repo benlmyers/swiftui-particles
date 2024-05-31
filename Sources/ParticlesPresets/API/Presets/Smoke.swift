@@ -61,11 +61,11 @@ public extension Preset {
     
     public func customizableParameters() -> [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] {
           var result: [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] = [
-            ("Size", .floatRange(18.0, min: 10.0, max: 40.0), \.size),
+            ("Size", .floatRange(30.0, min: 10.0, max: 70.0), \.size),
             ("Dirty", .bool(false), \.dirty)
           ]
     #if !os(watchOS)
-          result.append(("Color", .color(.red), \.color))
+          result.append(("Color", .color(Color(red: 128/255, green: 128/255, blue: 128/255, opacity: 1)), \.color))
     #endif
           return result
         }

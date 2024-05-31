@@ -86,7 +86,26 @@ public extension ParticleSystem {
     
     /// Resets the particle system simulation.
     public func reset() {
-      
+      let ie = self.initialEntity
+      self.currentFrame = .zero
+      self.lastFrameUpdate = .distantPast
+      #if os(iOS)
+      self.touches = [:]
+      #endif
+      self.nextEntityRegistry = .zero
+      self.refreshViews = false
+      self.fps = .zero
+      self.nextProxyRegistry = .zero
+      self.inception = Date()
+      self.last60 = .distantPast
+      self.updateTime = .zero
+      self.performRenderTime = .zero
+      self.entities = [:]
+      self.views = .init()
+      self.proxies = [:]
+      self.proxyEntities = [:]
+      self.lastEmitted = [:]
+      self.emitEntities = [:]
     }
     
     internal func update(context: GraphicsContext, size: CGSize) {
@@ -98,7 +117,6 @@ public extension ParticleSystem {
         } else {
           self.create(entity: initialEntity, spawn: true)
         }
-        self.initialEntity = nil
       }
       let group = DispatchGroup()
       let queue = DispatchQueue(label: "com.benmyers.particles.update", qos: .userInteractive, attributes: .concurrent)

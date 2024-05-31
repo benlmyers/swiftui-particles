@@ -16,13 +16,14 @@ public extension Preset {
     public static let defaultInstance: Self = .init()
     
     internal var colors: [Color] = [.red, .yellow, .green]
-    internal var size: CGFloat = 70.0
+    internal var size: CGFloat = 300.0
     
     public var body: some Entity {
-      Emitter {
+      Emitter(every: 0.02) {
         ForEach(colors, merges: .none) { color in
           Particle {
             RadialGradient(colors: [color, Color.clear], center: .center, startRadius: 0.0, endRadius: size)
+              .opacity(0.2)
           }
           .initialPosition { c in
             CGPoint(x: Int.random(in: 0 ... Int(c.system.size.width)), y: Int.random(in: 0 ... Int(c.system.size.height)))
