@@ -13,8 +13,6 @@ public extension Preset {
   
   struct Stars: Entity, PresetEntry {
     
-    static public let defaultInstance: Self = .init()
-    
     internal var intensity: Int = 3
     internal var size: CGFloat
     internal var lifetime: TimeInterval

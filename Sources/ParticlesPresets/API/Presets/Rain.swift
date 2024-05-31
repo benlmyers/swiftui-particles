@@ -14,8 +14,6 @@ public extension Preset {
   /// A rain effect.
   struct Rain: Entity, PresetEntry {
     
-    public static let defaultInstance: Self = .init()
-    
     internal var lifetime: TimeInterval
     internal var intensity: Int
     internal var wind: CGFloat

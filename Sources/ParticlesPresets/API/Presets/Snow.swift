@@ -13,8 +13,6 @@ public extension Preset {
   
   struct Snow: Entity, PresetEntry {
     
-    static public let defaultInstance: Self = .init()
-    
     internal var intensity: Int
     internal var size: CGFloat
     internal var lifetime: TimeInterval

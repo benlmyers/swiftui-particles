@@ -14,8 +14,6 @@ public extension Preset {
   /// A Magic effect that bursts outward radially.
   struct Magic: Entity, PresetEntry {
     
-    static public var defaultInstance: Self = .init()
-    
     var color: Color
     var intensity: Int
     var lifetime: TimeInterval

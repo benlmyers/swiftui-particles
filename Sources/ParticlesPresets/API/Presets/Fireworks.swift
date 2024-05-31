@@ -14,8 +14,6 @@ public extension Preset {
   /// A Fireworks entity that shoots, then bursts after a specific duration.
   struct Fireworks: Entity, PresetEntry {
     
-    static public var defaultInstance: Self = .init()
-    
     internal var duration: TimeInterval
     internal var color: Color
     internal var spread: Double

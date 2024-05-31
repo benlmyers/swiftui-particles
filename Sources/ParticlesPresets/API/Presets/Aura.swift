@@ -13,8 +13,6 @@ public extension Preset {
   
   struct Aura: Entity, PresetEntry {
     
-    public static let defaultInstance: Self = .init()
-    
     internal var colors: [Color] = [.red, .yellow, .green]
     internal var size: CGFloat = 300.0
     

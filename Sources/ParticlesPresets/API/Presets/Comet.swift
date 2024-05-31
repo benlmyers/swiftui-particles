@@ -14,8 +14,6 @@ public extension Preset {
   /// A Comet entity that can be customized with various properties.
   struct Comet: Entity, PresetEntry {
     
-    static public var defaultInstance: Self = .init()
-    
     /// The color of the comet.
     var color: Color
     

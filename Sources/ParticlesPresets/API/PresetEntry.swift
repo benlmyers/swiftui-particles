@@ -17,9 +17,6 @@ import Foundation
 /// - SeeAlso: ``PresetParameter``
 public protocol PresetEntry: Entity {
   
-  /// The default instance of this entity.
-  static var defaultInstance: Self { get }
-  
   /// The customizable parameters of this entry.
   func customizableParameters() -> [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)]
 }

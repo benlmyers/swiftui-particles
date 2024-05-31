@@ -14,8 +14,6 @@ public extension Preset {
   /// A Confetti entity that can be customized with various properties.
   struct Confetti: Entity, PresetEntry {
     
-    static public var defaultInstance: Self = .init()
-    
     internal var color: Color
     internal var hueVariation: Angle
     internal var size: CGFloat

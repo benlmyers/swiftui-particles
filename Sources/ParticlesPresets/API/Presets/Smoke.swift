@@ -13,8 +13,6 @@ public extension Preset {
   
   struct Smoke: Entity, PresetEntry {
     
-    static public let defaultInstance: Self = .init()
-    
     internal var color: Color
     internal var size: CGFloat
     internal var radius: CGSize

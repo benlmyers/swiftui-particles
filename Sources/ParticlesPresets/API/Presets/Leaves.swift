@@ -14,8 +14,6 @@ public extension Preset {
   /// Leaves blowing in the wind.
   struct Leaves: Entity, PresetEntry {
     
-    static public var defaultInstance: Self = .init()
-    
     internal var amount: Int
     internal var wind: Double
     internal var scale: Double

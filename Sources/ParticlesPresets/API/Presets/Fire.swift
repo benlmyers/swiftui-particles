@@ -14,8 +14,6 @@ public extension Preset {
   /// A fire particle effect.
   struct Fire: Entity, PresetEntry {
     
-    public static let defaultInstance = Self.init()
-    
     public var body: some Entity {
       Emitter(every: 0.01) {
         flame
