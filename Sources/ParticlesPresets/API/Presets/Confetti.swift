@@ -22,16 +22,19 @@ public extension Preset {
     public var body: some Entity {
       ForEach(1 ... 33, merges: .entities) { _ in
         single(Circle().frame(width: size, height: size))
+          .initialPosition { c in
+            CGPoint(x: CGFloat.random(in: 0.0 ... c.system.size.width), y: 0.0)
+          }
         single(Rectangle().frame(width: size, height: size))
-      }
-      .initialPosition { c in
-        CGPoint(x: CGFloat.random(in: 0.0 ... c.system.size.width), y: 0.0)
+          .initialPosition { c in
+            CGPoint(x: CGFloat.random(in: 0.0 ... c.system.size.width), y: 0.0)
+          }
       }
     }
     
     /// A single confetti particle.
     public func single<V>(_ body: V) -> some Entity where V: View {
-      Particle(view: { body.foregroundColor(Color.red) })
+      Particle(view: { body.foregroundColor(color) })
         .lifetime(lifetime)
         .hueRotation(angleIn: Angle.zero ... hueVariation)
         .initialAcceleration(xIn: 0.0 ... 0.0, yIn: 0.004 ... 0.005)
@@ -43,8 +46,11 @@ public extension Preset {
           CGSize(width: sin(5 * c.proxy.seed.2 * c.timeAlive + 2 * Double.pi * c.proxy.seed.1), height: 1)
         })
         .fixVelocity(with: { c in
-          CGVector(dx: sin(2 * c.timeAlive + 2 * Double.pi * c.proxy.seed.3), dy: c.proxy.velocity.dy + 0.01 * sin(4 * c.timeAlive + 2 * Double.pi * c.proxy.seed.3))
+          let dx: CGFloat = 4.0 * c.proxy.seed.1 * sin(2 * c.timeAlive + 2 * Double.pi * c.proxy.seed.3)
+          let dy: CGFloat = c.proxy.velocity.dy + c.proxy.seed.3 * 0.04 * sin(4 * c.timeAlive + 2 * Double.pi * c.proxy.seed.3)
+          return CGVector(dx: dx, dy: dy)
         })
+        .transition(.scale)
         .rotation3D { c in
           (
             Angle.degrees(90 * c.proxy.seed.2 + 15 * cos(2 * c.timeAlive + 2 * Double.pi * c.proxy.seed.0)),
@@ -73,8 +79,8 @@ public extension Preset {
     
     public func customizableParameters() -> [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] {
       var result: [(name: String, parameter: PresetParameter, keyPath: PartialKeyPath<Self>)] = [
-        ("Size", .floatRange(18.0, min: 10.0, max: 40.0), \.size),
-        ("Lifetime", .doubleRange(1.0, min: 0.5, max: 2.0), \.lifetime),
+        ("Size", .floatRange(10.0, min: 10.0, max: 40.0), \.size),
+        ("Lifetime", .doubleRange(5.0, min: 0.5, max: 20.0), \.lifetime),
         ("Hue Variation", .angle(.degrees(360.0)), \.hueVariation)
       ]
 #if !os(watchOS)
