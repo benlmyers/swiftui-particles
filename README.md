@@ -91,7 +91,7 @@ import ParticlesPresets
 import Particles
 ```
 
-Create a `ParticleSystem` within your `View`. Then, add some entities or presets!
+Create a [`ParticleSystem`](Sources/Particles/API/ParticleSystem.swift) within your `View`. Then, add some entities or presets!
 
 ```swift
 struct MyView: View {
@@ -115,7 +115,7 @@ Particles has several entities that bring life to your SwiftUI views. Some entit
 
 ### Particle
 
-A `Particle` is the building block of the particle system. You can define one using a view:
+A [`Particle`](Sources/Particles/API/Entities/Particle.swift) is the building block of the particle system. You can define one using a view:
 
 ```swift
 Particle {
@@ -125,7 +125,7 @@ Particle {
 
 ### Emitter
 
-An `Emitter` fires new entities on a regular interval.
+An [`Emitter`](Sources/Particles/API/Entities/Emitter.swift) fires new entities on a regular interval.
 <p align="left">
 <img width=400 height=200 src="./Assets/Emitter.gif">
 </p>
@@ -142,7 +142,7 @@ Emitter(every: 0.02) { // Fires every 0.02 seconds
 
 ### Group
 
-A `Group` holds multiple entities. Like SwiftUI, modifiers applied to a Group will be applied to all entities inside the Group.
+A [`Group`](Sources/Particles/API/Entities/Group.swift) holds multiple entities. Like SwiftUI, modifiers applied to a Group will be applied to all entities inside the Group.
 
 <p align="left">
 <img width=400 height=200 src="./Assets/Glow.png">
@@ -162,7 +162,7 @@ While the name clashes with SwiftUI's, in most cases you needn't worry. The `Par
 
 ### ForEach
 
-Like `Group`, `ForEach` holds multiple entities iterated over a collection of elements.
+Like `Group`, [`ForEach`](Sources/Particles/API/Entities/ForEach.swift) holds multiple entities iterated over a collection of elements.
 
 ```swift
 ParticleSystem {
@@ -194,7 +194,7 @@ Here, only the first view is registered, and the rest of the entities receive th
 
 ### Lattice
 
-A `Lattice` creates a grid of particles that covers and samples the colors of a `View`. You can customize the behavior of each particle in the `Lattice` by applying modifiers.
+A [`Lattice`](Sources/Particles/API/Entities/Lattice.swift) creates a grid of particles that covers and samples the colors of a `View`. You can customize the behavior of each particle in the `Lattice` by applying modifiers.
 
 <p align="left">
 <img width=400 height=200 src="./Assets/Lattice.gif">
