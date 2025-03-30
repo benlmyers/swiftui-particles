@@ -2,6 +2,10 @@
 <img src="./Assets/particles.gif">
 </p>
 
+> [!NOTE]
+> *Mar 30, 2025*: This repo has gotten 100 stars! I will continue to move this project to Release.
+> Please submit feature requests in **Issues**!
+
 > [!IMPORTANT]  
 > Particles v2.0 is in **Pre-Release** and it is in active development. If you plan on including Particles in your project, please read this [additional information](#pre-release).
 
