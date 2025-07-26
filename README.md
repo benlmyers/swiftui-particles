@@ -6,7 +6,8 @@
 > Please submit feature requests in **Issues**!
 
 > [!IMPORTANT]  
-> Particles v2.0 is in **Pre-Release** and it is in active development. If you plan on including Particles in your project, please read this [additional information](#pre-release).
+> Particles v2.0 is in **Pre-Release** and it is in stale development. This may move to a release state. If you plan on including Particles in your project, please read this [additional information](#pre-release).
+
 
 ## Native, declarative, and fast.
 
