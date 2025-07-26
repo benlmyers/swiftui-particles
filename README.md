@@ -3,7 +3,6 @@
 </p>
 
 > [!NOTE]
-> *Mar 30, 2025*: This repo has gotten 100 stars! I will continue to move this project to Release.
 > Please submit feature requests in **Issues**!
 
 > [!IMPORTANT]  
